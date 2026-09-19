@@ -137,7 +137,7 @@ export const ExecutiveCommandView: React.FC<ExecutiveCommandViewProps> = ({
   const activeAsset = dispatchQueue.find(u => u.id === selectedAssetId) || dispatchQueue[0];
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-geo-canvas text-geo-text-primary p-4 sm:p-6 space-y-6 select-none">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-geo-canvas text-geo-text-primary p-3 sm:p-6 space-y-6 select-none pb-28 md:pb-6">
       
       {/* 1. EOC Master Cockpit Header Bar */}
       <div className="rounded-xl border border-geo-border bg-geo-panel p-5 shadow-sm">
@@ -437,7 +437,7 @@ export const ExecutiveCommandView: React.FC<ExecutiveCommandViewProps> = ({
                   EN ROUTE (VIABLE)
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-[11px] pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2 text-[11px] pt-1">
                 <div>Next Waypoint: <strong className="text-white">Jalan Semenyih</strong></div>
                 <div>Transit Speed: <strong className="text-emerald-400">{activeAsset.speed}</strong></div>
                 <div>Water Depth: <strong className="text-cyan-400">{activeAsset.wading}</strong></div>

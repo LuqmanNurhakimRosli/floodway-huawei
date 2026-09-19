@@ -119,7 +119,7 @@ export const DamageRegistryView: React.FC<DamageRegistryViewProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-geo-canvas text-geo-text-primary p-6">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-geo-canvas text-geo-text-primary p-3 sm:p-6 pb-28 md:pb-6 space-y-4">
       {/* Top Header & Metrics */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-geo-border">
         <div>

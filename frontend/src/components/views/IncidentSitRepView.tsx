@@ -36,7 +36,7 @@ export const IncidentSitRepView: React.FC<IncidentSitRepViewProps> = ({
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-geo-canvas text-geo-text-primary p-4 sm:p-6 space-y-6 select-none">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-geo-canvas text-geo-text-primary p-3 sm:p-6 space-y-6 select-none pb-28 md:pb-6">
       {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-geo-border">
         <div>

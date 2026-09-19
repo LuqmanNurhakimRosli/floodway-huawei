@@ -5,7 +5,7 @@ export const MapLegend: React.FC = () => {
   const [collapsed, setCollapsed] = useState(true);
 
   return (
-    <div className="absolute bottom-3 right-3 z-20 bg-geo-panel backdrop-blur-[16px] border border-geo-border-strong rounded-lg shadow-tactical text-xs select-none p-2.5 w-56 transition-all duration-200">
+    <div className="absolute bottom-16 md:bottom-3 right-3 z-20 bg-geo-panel backdrop-blur-[16px] border border-geo-border-strong rounded-lg shadow-tactical text-xs select-none p-2.5 w-56 transition-all duration-200">
       <div 
         className="flex items-center justify-between cursor-pointer"
         onClick={() => setCollapsed(!collapsed)}

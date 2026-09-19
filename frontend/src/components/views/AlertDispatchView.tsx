@@ -154,7 +154,7 @@ export const AlertDispatchView: React.FC<AlertDispatchViewProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-geo-canvas text-geo-text-primary p-4 sm:p-6">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-geo-canvas text-geo-text-primary p-3 sm:p-6 pb-28 md:pb-6 space-y-6">
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-geo-border">
         <div>

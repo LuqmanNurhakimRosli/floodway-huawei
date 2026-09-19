@@ -243,3 +243,13 @@ input[type=range]::-moz-range-thumb:hover {
   background: transparent !important;
   border: none !important;
 }
+
+/* Mobile Touch & Scroll Fix */
+html, body {
+  -webkit-overflow-scrolling: touch;
+}
+
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}
+

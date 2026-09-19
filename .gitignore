@@ -24,6 +24,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+.wrangler/
 
 # Models & Big Binaries (>50MB)
 ml/checkpoints/*.pth

@@ -50,9 +50,9 @@ export const EvacuationNavigatorView: React.FC<EvacuationNavigatorViewProps> = (
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row h-full overflow-hidden bg-geo-canvas text-geo-text-primary">
+    <div className="flex-1 flex flex-col md:flex-row min-h-0 md:h-full overflow-y-auto md:overflow-hidden bg-geo-canvas text-geo-text-primary pb-28 md:pb-0">
       {/* Left / Top Mobile-Style Turn-by-Turn Card */}
-      <div className="w-full md:w-[420px] lg:w-[460px] h-full flex flex-col border-r border-geo-border bg-geo-panel shadow-sm overflow-y-auto z-10">
+      <div className="w-full md:w-[420px] lg:w-[460px] flex flex-col border-b md:border-b-0 md:border-r border-geo-border bg-geo-panel shadow-sm md:h-full md:overflow-y-auto shrink-0 z-10">
         
         {/* Navigation Mode Banner */}
         <div className="bg-geo-accent p-4 text-white">
@@ -196,8 +196,8 @@ export const EvacuationNavigatorView: React.FC<EvacuationNavigatorViewProps> = (
       </div>
 
       {/* Right / Map Guidance Canvas */}
-      <div className="flex-1 relative bg-geo-surface-2 flex flex-col items-center justify-center p-6 text-center">
-        <div className="max-w-md p-6 rounded-lg bg-geo-panel border border-geo-border shadow-sm">
+      <div className="w-full md:flex-1 relative bg-geo-surface-2 flex flex-col items-center justify-center p-4 sm:p-6 text-center md:h-full md:overflow-y-auto py-8">
+        <div className="max-w-md w-full p-5 sm:p-6 rounded-lg bg-geo-panel border border-geo-border shadow-sm">
           <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
             <ShieldCheck className="w-6 h-6" />
           </div>
