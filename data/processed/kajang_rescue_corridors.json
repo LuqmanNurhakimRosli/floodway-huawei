@@ -1,0 +1,96 @@
+[
+  {
+    "id": "rt-1",
+    "title": "Corridor Alpha: Staging Base \u2192 Hospital Kajang",
+    "origin": "Stadium Kajang Base",
+    "destination": "Hospital Kajang",
+    "distanceKm": 0.72,
+    "estTimeMin": 3,
+    "riskLevel": "LOW",
+    "status": "viable",
+    "confidence": 0.94,
+    "reason": "Elevated dry corridor clear of flood inundation. Suitable for all emergency response units.",
+    "coordinates": [
+      [
+        2.9922,
+        101.7901
+      ],
+      [
+        2.994,
+        101.7915
+      ],
+      [
+        2.9958,
+        101.7928
+      ],
+      [
+        2.9972,
+        101.7942
+      ]
+    ]
+  },
+  {
+    "id": "rt-2",
+    "title": "Corridor Bravo: Staging Base \u2192 Taman Sri Jelok Sector",
+    "origin": "Stadium Kajang Base",
+    "destination": "Taman Sri Jelok (Stranded Cluster)",
+    "distanceKm": 2.07,
+    "estTimeMin": 0,
+    "riskLevel": "CRITICAL",
+    "status": "impassable",
+    "confidence": 0.96,
+    "reason": "Severed by active flood overspill (Taman Sri Jelok Tributary Backflow Zone, est. depth ~0.45m). Impassable.",
+    "coordinates": [
+      [
+        2.9922,
+        101.7901
+      ],
+      [
+        2.9905,
+        101.794
+      ],
+      [
+        2.992,
+        101.7985
+      ],
+      [
+        2.9945,
+        101.802
+      ],
+      [
+        2.998,
+        101.806
+      ]
+    ]
+  },
+  {
+    "id": "rt-3",
+    "title": "Corridor Charlie: Staging Base \u2192 Sungai Chua via Jalan Reko",
+    "origin": "Stadium Kajang Base",
+    "destination": "Sungai Chua Industrial Core",
+    "distanceKm": 1.32,
+    "estTimeMin": 0,
+    "riskLevel": "CRITICAL",
+    "status": "impassable",
+    "confidence": 0.96,
+    "reason": "Severed by active flood overspill (Sungai Langat Main Overspill Zone, est. depth ~1.65m). Impassable.",
+    "coordinates": [
+      [
+        2.9922,
+        101.7901
+      ],
+      [
+        2.989,
+        101.787
+      ],
+      [
+        2.9865,
+        101.7845
+      ],
+      [
+        2.984,
+        101.7815
+      ]
+    ]
+  }
+]

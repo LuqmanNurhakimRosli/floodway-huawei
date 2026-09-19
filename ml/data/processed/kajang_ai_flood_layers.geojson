@@ -1,0 +1,99 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kajang_flood_zone_alpha",
+        "name": "Sungai Langat Main Overspill Zone",
+        "feature_type": "flood_zone",
+        "damage_class": "MAJOR_DAMAGE",
+        "confidence": 0.942,
+        "model_source": "GEO-RESQ Siamese U-Net (Prithvi-100M Finetuned)",
+        "huawei_inference": "ModelArts Ascend 910 Service",
+        "sensor": "Sentinel-2 MSI Level-2A (6 Bands)",
+        "timestamp": "2026-09-18T14:30:00Z",
+        "operational_tag": "active_inundation_water",
+        "inundation_depth_est_m": 1.45
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              101.78,
+              2.991
+            ],
+            [
+              101.792,
+              2.994
+            ],
+            [
+              101.798,
+              2.999
+            ],
+            [
+              101.791,
+              3.003
+            ],
+            [
+              101.783,
+              3.001
+            ],
+            [
+              101.777,
+              2.996
+            ],
+            [
+              101.78,
+              2.991
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kajang_flood_zone_beta",
+        "name": "Bandar Kajang Lowland Submersion Pocket",
+        "feature_type": "flood_zone",
+        "damage_class": "DESTROYED",
+        "confidence": 0.918,
+        "model_source": "GEO-RESQ Siamese U-Net (Prithvi-100M Finetuned)",
+        "huawei_inference": "ModelArts Ascend 910 Service",
+        "sensor": "Sentinel-2 MSI Level-2A (6 Bands)",
+        "timestamp": "2026-09-18T14:30:00Z",
+        "operational_tag": "critical_infrastructure_inundated",
+        "inundation_depth_est_m": 2.1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              101.785,
+              2.988
+            ],
+            [
+              101.795,
+              2.989
+            ],
+            [
+              101.793,
+              2.993
+            ],
+            [
+              101.784,
+              2.992
+            ],
+            [
+              101.785,
+              2.988
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

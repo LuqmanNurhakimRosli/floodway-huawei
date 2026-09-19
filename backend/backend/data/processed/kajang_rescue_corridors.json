@@ -1,0 +1,168 @@
+[
+  {
+    "id": "rt-1",
+    "title": "Corridor Alpha: Staging Base \u2192 Hospital Kajang",
+    "origin": "Stadium Kajang Base",
+    "destination": "Hospital Kajang",
+    "distanceKm": 0.8,
+    "estTimeMin": 3,
+    "riskLevel": "LOW",
+    "status": "viable",
+    "confidence": 0.94,
+    "reason": "Elevated dry corridor clear of flood inundation. Suitable for all emergency response units.",
+    "coordinates": [
+      [
+        2.9922,
+        101.7901
+      ],
+      [
+        2.9924,
+        101.7908
+      ],
+      [
+        2.9927,
+        101.7915
+      ],
+      [
+        2.993,
+        101.7922
+      ],
+      [
+        2.9934,
+        101.7928
+      ],
+      [
+        2.9938,
+        101.7932
+      ],
+      [
+        2.9943,
+        101.7936
+      ],
+      [
+        2.9948,
+        101.7938
+      ],
+      [
+        2.9953,
+        101.7939
+      ],
+      [
+        2.9959,
+        101.794
+      ],
+      [
+        2.9964,
+        101.7941
+      ],
+      [
+        2.9968,
+        101.7941
+      ],
+      [
+        2.9972,
+        101.7942
+      ]
+    ]
+  },
+  {
+    "id": "rt-2",
+    "title": "Corridor Bravo: Staging Base \u2192 Taman Sri Jelok Sector",
+    "origin": "Stadium Kajang Base",
+    "destination": "Taman Sri Jelok (Stranded Cluster)",
+    "distanceKm": 2.06,
+    "estTimeMin": 0,
+    "riskLevel": "CRITICAL",
+    "status": "impassable",
+    "confidence": 0.96,
+    "reason": "Severed by active flood overspill (Taman Sri Jelok Tributary Backflow Zone, est. depth ~0.45m). Impassable.",
+    "coordinates": [
+      [
+        2.9922,
+        101.7901
+      ],
+      [
+        2.9926,
+        101.7914
+      ],
+      [
+        2.9931,
+        101.7927
+      ],
+      [
+        2.9935,
+        101.794
+      ],
+      [
+        2.993,
+        101.7955
+      ],
+      [
+        2.9922,
+        101.7972
+      ],
+      [
+        2.992,
+        101.7985
+      ],
+      [
+        2.993,
+        101.8005
+      ],
+      [
+        2.9945,
+        101.802
+      ],
+      [
+        2.9962,
+        101.8042
+      ],
+      [
+        2.998,
+        101.806
+      ]
+    ]
+  },
+  {
+    "id": "rt-3",
+    "title": "Corridor Charlie: Staging Base \u2192 Sungai Chua via Jalan Reko",
+    "origin": "Stadium Kajang Base",
+    "destination": "Sungai Chua Industrial Core",
+    "distanceKm": 1.32,
+    "estTimeMin": 0,
+    "riskLevel": "CRITICAL",
+    "status": "impassable",
+    "confidence": 0.96,
+    "reason": "Severed by active flood overspill (Sungai Langat Main Overspill Zone, est. depth ~1.65m). Impassable.",
+    "coordinates": [
+      [
+        2.9922,
+        101.7901
+      ],
+      [
+        2.9915,
+        101.7892
+      ],
+      [
+        2.9902,
+        101.788
+      ],
+      [
+        2.9888,
+        101.7865
+      ],
+      [
+        2.9872,
+        101.785
+      ],
+      [
+        2.9855,
+        101.7832
+      ],
+      [
+        2.984,
+        101.7815
+      ]
+    ]
+  }
+]

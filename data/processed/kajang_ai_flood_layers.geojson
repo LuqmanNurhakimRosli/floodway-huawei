@@ -1,0 +1,107 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kajang_flood_zone_alpha",
+        "name": "Sungai Langat Main Overspill Zone",
+        "feature_type": "flood_zone",
+        "damage_class": "DESTROYED",
+        "confidence": 0.942,
+        "model_source": "GEO-RESQ Siamese U-Net (Prithvi-100M Finetuned)",
+        "huawei_inference": "ModelArts Ascend 910 Service",
+        "sensor": "Sentinel-2 MSI Level-2A (6 Bands)",
+        "timestamp": "2026-09-18T14:30:00Z",
+        "operational_tag": "active_inundation_water",
+        "inundation_depth_est_m": 1.65
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              101.78,
+              2.982
+            ],
+            [
+              101.783,
+              2.984
+            ],
+            [
+              101.7865,
+              2.985
+            ],
+            [
+              101.789,
+              2.988
+            ],
+            [
+              101.788,
+              2.9905
+            ],
+            [
+              101.783,
+              2.989
+            ],
+            [
+              101.777,
+              2.984
+            ],
+            [
+              101.78,
+              2.982
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kajang_flood_zone_beta",
+        "name": "Taman Sri Jelok Tributary Backflow Zone",
+        "feature_type": "flood_zone",
+        "damage_class": "MAJOR_DAMAGE",
+        "confidence": 0.885,
+        "model_source": "GEO-RESQ Siamese U-Net (Prithvi-100M Finetuned)",
+        "huawei_inference": "ModelArts Ascend 910 Service",
+        "sensor": "Sentinel-2 MSI Level-2A (6 Bands)",
+        "timestamp": "2026-09-18T14:30:00Z",
+        "operational_tag": "tributary_backwater",
+        "inundation_depth_est_m": 0.45
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              101.797,
+              2.991
+            ],
+            [
+              101.801,
+              2.9925
+            ],
+            [
+              101.803,
+              2.995
+            ],
+            [
+              101.8015,
+              2.996
+            ],
+            [
+              101.7975,
+              2.994
+            ],
+            [
+              101.797,
+              2.991
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
