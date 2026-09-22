@@ -15,6 +15,7 @@ interface TerraceHouseSceneProps {
     waterLevelM: number;
     showCallouts?: boolean;
     weatherCondition?: 'clear' | 'rain' | 'storm';
+    weatherMode?: 'daylight' | 'storm';
     activeLayers?: ActiveLayers;
 }
 
@@ -25,7 +26,7 @@ const CEILING_HEIGHT = 3.2;
 const ROOF_APEX_H = 1.85;  // Gable apex height above ceiling
 const ROOF_DEPTH = HOUSE_DEPTH - 5.5; // Main living block roof length
 
-export function TerraceHouseScene({ waterLevelM, showCallouts = true, activeLayers = { floodScenario: true, waterFlow: true, hazardLayer: true, buildingLayer: true } }: TerraceHouseSceneProps) {
+export function TerraceHouseScene({ waterLevelM, showCallouts = true, weatherMode = 'daylight', activeLayers = { floodScenario: true, waterFlow: true, hazardLayer: true, buildingLayer: true } }: TerraceHouseSceneProps) {
     const waterMeshRef = useRef<THREE.Mesh>(null);
     const waveClock = useRef(0);
 
@@ -430,6 +431,30 @@ export function TerraceHouseScene({ waterLevelM, showCallouts = true, activeLaye
                 </Html>
             </group>
 
+                        {/* GREEN LAWN GROUND & ASPHALT ROAD */}
+            <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+                <planeGeometry args={[36, 32]} />
+                <meshStandardMaterial
+                    color={weatherMode === 'daylight' ? '#2e7d32' : '#1e3a24'}
+                    roughness={0.9}
+                />
+            </mesh>
+
+            {/* Front Road Asphalt */}
+            <mesh position={[0, 0.005, HOUSE_DEPTH / 2 + 3.0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+                <planeGeometry args={[36, 6]} />
+                <meshStandardMaterial
+                    color={weatherMode === 'daylight' ? '#374151' : '#1f2937'}
+                    roughness={0.95}
+                />
+            </mesh>
+
+            {/* Road Curb */}
+            <mesh position={[0, 0.07, HOUSE_DEPTH / 2 + 0.1]} receiveShadow>
+                <boxGeometry args={[HOUSE_WIDTH + 6, 0.14, 0.25]} />
+                <meshStandardMaterial color="#94a3b8" roughness={0.7} />
+            </mesh>
+
             {/* 9. ENHANCED DYNAMIC FLOODWATER (Transparent Blue with Subtle Reflection) */}
             {activeLayers.floodScenario !== false && (
                 <mesh
@@ -462,65 +487,61 @@ export function TerraceHouseScene({ waterLevelM, showCallouts = true, activeLaye
                 </mesh>
             )}
 
-            {/* 10. GEOSPATIAL MEASUREMENT CALLOUTS (Matching Exact Reference Design) */}
+                        {/* 10. REFERENCE DATUM MEASUREMENT CALLOUTS (Matching User Screenshot) */}
             {showCallouts && (
                 <>
-                    {/* Callout 1: Rooftop Risk Badge */}
-                    {hazardLevel !== 'SAFE' && (
-                        <Html position={[0, CEILING_HEIGHT + ROOF_APEX_H + 0.85, -0.2]} center distanceFactor={18}>
-                            <div className={`px-3 py-1.5 rounded-xl text-white font-extrabold text-xs shadow-2xl flex items-center gap-1.5 backdrop-blur-md border ${
-                                hazardLevel === 'SEVERE'
-                                    ? 'bg-red-600/95 border-red-400 animate-bounce ring-2 ring-red-400/50'
-                                    : hazardLevel === 'HIGH_RISK'
-                                    ? 'bg-rose-600/95 border-rose-400 animate-pulse ring-2 ring-rose-400/50'
-                                    : 'bg-amber-600/95 border-amber-400'
-                            }`}>
-                                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                                <span>{hazardLevel === 'SEVERE' ? 'Severe Flooding' : hazardLevel === 'HIGH_RISK' ? 'High Risk' : 'Caution Stage'}</span>
-                            </div>
-                        </Html>
-                    )}
-
-                    {/* Callout 2: Water Level (est.) */}
-                    <Html position={[-3.8, Math.max(0.8, waterY + 0.4), 4.2]} center distanceFactor={19}>
-                        <div className="bg-[#030C18]/92 backdrop-blur-md border border-[#1677FF] text-white rounded-xl px-3 py-2 shadow-2xl pointer-events-none min-w-[130px]">
-                            <div className="text-[10px] font-semibold text-blue-400 flex items-center gap-1">
-                                <span>≋</span>
-                                <span>Water Level (est.)</span>
-                            </div>
-                            <div className="text-base font-extrabold text-white mt-0.5 tracking-tight">
-                                {waterLevelM.toFixed(2)} m
-                            </div>
+                    {/* Datum 1: Living Floor (0.90m) */}
+                    <Html position={[0.2, 1.15, HOUSE_DEPTH / 2 - 5.5]} center distanceFactor={18}>
+                        <div className={`px-2.5 py-1 rounded-xl text-xs font-bold shadow-xl border flex items-center gap-1.5 transition-all ${
+                            waterLevelM >= 0.90
+                                ? 'bg-red-950/95 text-red-200 border-red-500 animate-bounce'
+                                : 'bg-slate-900/90 text-white border-slate-700'
+                        }`}>
+                            <span className="text-sm">🏠</span>
+                            <span>Living Floor (0.90m)</span>
+                            {waterLevelM >= 0.90 && (
+                                <span className="px-1 rounded bg-red-600 text-[9px] text-white font-extrabold">BREACHED</span>
+                            )}
                         </div>
                     </Html>
 
-                    {/* Callout 3: House Elevation */}
-                    <Html position={[4.0, 1.5, 3.0]} center distanceFactor={19}>
-                        <div className="bg-[#030C18]/92 backdrop-blur-md border border-[#1677FF] text-white rounded-xl px-3 py-2 shadow-2xl pointer-events-none min-w-[130px]">
-                            <div className="text-[10px] font-semibold text-blue-400 flex items-center gap-1.5">
-                                <Home className="w-3 h-3 text-blue-400" />
-                                <span>House Elevation</span>
-                            </div>
-                            <div className="text-base font-extrabold text-white mt-0.5 tracking-tight">
-                                0.35 m
-                            </div>
+                    {/* Datum 2: Exhaust Intake (0.35m) on Car */}
+                    <Html position={[-0.9, 0.55, HOUSE_DEPTH / 2 - 2.8]} center distanceFactor={18}>
+                        <div className={`px-2.5 py-1 rounded-xl text-xs font-bold shadow-xl border flex items-center gap-1.5 transition-all ${
+                            waterLevelM >= 0.35
+                                ? 'bg-red-950/95 text-red-200 border-red-500 animate-pulse ring-2 ring-red-400'
+                                : 'bg-amber-950/90 text-amber-200 border-amber-600'
+                        }`}>
+                            <span className="text-sm">⚠️</span>
+                            <span>Exhaust Intake (0.35m)</span>
+                            {waterLevelM >= 0.35 && (
+                                <span className="px-1 rounded bg-red-600 text-[9px] text-white font-extrabold">HYDROLOCK</span>
+                            )}
                         </div>
                     </Html>
 
-                    {/* Callout 4: Road Flooding */}
-                    {waterLevelM > 0.05 && (
-                        <Html position={[-1.4, Math.max(0.5, waterY + 0.2), 7.6]} center distanceFactor={19}>
-                            <div className="bg-[#030C18]/92 backdrop-blur-md border border-[#1677FF] text-white rounded-xl px-3 py-2 shadow-2xl pointer-events-none min-w-[130px]">
-                                <div className="text-[10px] font-semibold text-blue-400 flex items-center gap-1">
-                                    <span>≋</span>
-                                    <span>Road Flooding</span>
-                                </div>
-                                <div className="text-base font-extrabold text-white mt-0.5 tracking-tight">
-                                    {Math.max(0, waterLevelM - 0.10).toFixed(2)} m
-                                </div>
-                            </div>
-                        </Html>
-                    )}
+                    {/* Datum 3: Car Porch (0.15m) */}
+                    <Html position={[1.4, 0.35, HOUSE_DEPTH / 2 - 2.2]} center distanceFactor={18}>
+                        <div className={`px-2.5 py-1 rounded-xl text-xs font-bold shadow-xl border flex items-center gap-1.5 transition-all ${
+                            waterLevelM >= 0.15
+                                ? 'bg-amber-950/95 text-amber-200 border-amber-500'
+                                : 'bg-slate-900/90 text-amber-300 border-slate-700'
+                        }`}>
+                            <span className="text-sm">🚗</span>
+                            <span>Car Porch (0.15m)</span>
+                            {waterLevelM >= 0.15 && (
+                                <span className="px-1 rounded bg-amber-600 text-[9px] text-slate-950 font-extrabold">FLOODED</span>
+                            )}
+                        </div>
+                    </Html>
+
+                    {/* Datum 4: Road Level (0.00m) */}
+                    <Html position={[1.8, 0.15, HOUSE_DEPTH / 2 + 1.2]} center distanceFactor={18}>
+                        <div className="px-2.5 py-1 rounded-xl text-xs font-bold shadow-xl border bg-slate-900/90 text-sky-300 border-slate-700 flex items-center gap-1.5">
+                            <span className="text-sm">🛣️</span>
+                            <span>Road Level (0.00m)</span>
+                        </div>
+                    </Html>
                 </>
             )}
         </group>

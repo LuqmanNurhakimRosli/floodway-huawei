@@ -59,6 +59,23 @@ export interface Shelter {
   travelTimeMin: number;
 }
 
+export interface AiVerificationResult {
+  verified: boolean;
+  confidenceScore: number;
+  detectedHazards: string[];
+  estimatedDepthCm: number;
+  engine: string;
+  notes: string;
+}
+
+export interface HumanVerificationResult {
+  verifiedBy: string;
+  role: string;
+  reviewedAt: string;
+  verdict: 'APPROVED' | 'REJECTED';
+  officialNotes?: string;
+}
+
 export interface CitizenReport {
   id: string;
   title: string;
@@ -66,12 +83,15 @@ export interface CitizenReport {
   lat: number;
   lon: number;
   waterDepthCm: number;
-  status: 'VERIFIED' | 'UNDER_REVIEW' | 'RESOLVED';
+  status: 'OFFICIAL_VERIFIED' | 'AI_VERIFIED' | 'VERIFIED' | 'UNDER_REVIEW' | 'REJECTED';
   verifiedBy: string;
   timestampStr: string;
   author: string;
   upvotes: number;
   imageUrl?: string;
+  description?: string;
+  aiVerification?: AiVerificationResult;
+  humanVerification?: HumanVerificationResult;
 }
 
 export interface SosEvent {

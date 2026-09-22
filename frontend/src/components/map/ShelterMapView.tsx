@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Polygon, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  Shield,
   Navigation,
   CheckCircle2,
   AlertTriangle,
@@ -13,14 +12,14 @@ import {
   Bike,
   Footprints,
   Waves,
-  Radio,
   Cpu,
-  RotateCcw,
   Check,
   AlertOctagon,
   ArrowRight,
   ShieldCheck,
-  Compass
+  Compass,
+  Shield,
+  Route
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { InPageActionDock } from './InPageActionDock';
@@ -91,118 +90,155 @@ const createShelterIcon = (isSelected: boolean, status: string) => {
   });
 };
 
-const roadblockIcon = new L.DivIcon({
-  className: 'roadblock-icon',
-  html: `
-    <div style="background: #DC2626; color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 8px rgba(220,38,38,0.5);">
-      <span style="font-size: 14px; font-weight: bold; line-height: 1;">✕</span>
-    </div>
-  `,
-  iconSize: [26, 26],
-  iconAnchor: [13, 13],
-});
+const roadblockIcon = (name: string) =>
+  new L.DivIcon({
+    className: 'roadblock-icon',
+    html: `
+      <div style="background: #DC2626; color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 10px rgba(220,38,38,0.7); cursor: pointer;">
+        <span style="font-size: 14px; font-weight: 900; line-height: 1;">✕</span>
+      </div>
+    `,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
 
-const sensorIcon = new L.DivIcon({
-  className: 'sensor-icon',
-  html: `
-    <div style="background: #071426; color: #60A5FA; width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid #1677FF; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
-      <span style="font-size: 11px; font-weight: 800;">1.2m</span>
-    </div>
-  `,
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-});
+// 5 MULTIPLE HISTORICAL / REALISTIC FLOOD-PRONE BASINS IN KLANG VALLEY
+const FLOOD_BASINS = [
+  {
+    id: 'basin-01',
+    name: 'Kampung Baru / Klang River Confluence',
+    normal: [
+      [3.1670, 101.7000],
+      [3.1640, 101.7040],
+      [3.1600, 101.7030],
+      [3.1610, 101.6970],
+    ] as [number, number][],
+    warning: [
+      [3.1700, 101.6980],
+      [3.1660, 101.7080],
+      [3.1570, 101.7060],
+      [3.1590, 101.6950],
+    ] as [number, number][],
+    danger: [
+      [3.1740, 101.6950],
+      [3.1690, 101.7120],
+      [3.1540, 101.7100],
+      [3.1560, 101.6910],
+    ] as [number, number][],
+  },
+  {
+    id: 'basin-02',
+    name: 'Taman Sri Muda Seksyen 25 Retention Basin',
+    normal: [
+      [3.0420, 101.5300],
+      [3.0400, 101.5370],
+      [3.0340, 101.5350],
+      [3.0360, 101.5280],
+    ] as [number, number][],
+    warning: [
+      [3.0450, 101.5270],
+      [3.0430, 101.5410],
+      [3.0310, 101.5390],
+      [3.0330, 101.5250],
+    ] as [number, number][],
+    danger: [
+      [3.0480, 101.5240],
+      [3.0460, 101.5450],
+      [3.0280, 101.5420],
+      [3.0300, 101.5210],
+    ] as [number, number][],
+  },
+  {
+    id: 'basin-03',
+    name: 'Sungai Rasau Flood Spillway (Klang Gateway)',
+    normal: [
+      [3.0580, 101.4870],
+      [3.0560, 101.5000],
+      [3.0490, 101.4980],
+      [3.0510, 101.4850],
+    ] as [number, number][],
+    warning: [
+      [3.0610, 101.4840],
+      [3.0590, 101.5040],
+      [3.0460, 101.5010],
+      [3.0480, 101.4820],
+    ] as [number, number][],
+    danger: [
+      [3.0640, 101.4810],
+      [3.0620, 101.5080],
+      [3.0430, 101.5040],
+      [3.0450, 101.4790],
+    ] as [number, number][],
+  },
+  {
+    id: 'basin-04',
+    name: 'Batu Tiga Low-Lying Industrial Catchment',
+    normal: [
+      [3.0800, 101.5580],
+      [3.0780, 101.5700],
+      [3.0710, 101.5670],
+      [3.0730, 101.5550],
+    ] as [number, number][],
+    warning: [
+      [3.0830, 101.5550],
+      [3.0810, 101.5740],
+      [3.0680, 101.5700],
+      [3.0700, 101.5520],
+    ] as [number, number][],
+    danger: [
+      [3.0860, 101.5520],
+      [3.0840, 101.5780],
+      [3.0650, 101.5730],
+      [3.0670, 101.5490],
+    ] as [number, number][],
+  },
+  {
+    id: 'basin-05',
+    name: 'Seksyen 13 Stadium Inundation Depression',
+    normal: [
+      [3.0870, 101.5340],
+      [3.0850, 101.5430],
+      [3.0790, 101.5410],
+      [3.0810, 101.5310],
+    ] as [number, number][],
+    warning: [
+      [3.0900, 101.5310],
+      [3.0880, 101.5460],
+      [3.0760, 101.5440],
+      [3.0780, 101.5280],
+    ] as [number, number][],
+    danger: [
+      [3.0930, 101.5280],
+      [3.0910, 101.5490],
+      [3.0730, 101.5470],
+      [3.0750, 101.5250],
+    ] as [number, number][],
+  },
+];
 
-// Safe Evacuation Route Coordinates (Kampung Baru -> Federal Highway -> Shah Alam Seksyen 24)
-const SAFE_CORRIDOR_ROUTE: [number, number][] = [
+// ROUTE 1: Direct Standard Route (Used in NORMAL baseline)
+const DIRECT_ROUTE: [number, number][] = [
   [3.1610, 101.7010], // Kampung Baru
   [3.1550, 101.6970],
   [3.1420, 101.6860],
   [3.1250, 101.6680],
   [3.1020, 101.6350],
   [3.0780, 101.5950],
-  [3.0550, 101.5520],
+  [3.0550, 101.5520], // Near Batu Tiga low ground
   [3.0450, 101.5280], // SK Seksyen 24 Shah Alam
 ];
 
-// 3 Flood Simulation Polygon States (Normal, Warning, Danger)
-interface FloodZoneConfig {
-  label: string;
-  badge: string;
-  depthM: string;
-  color: string;
-  fillColor: string;
-  fillOpacity: number;
-  description: string;
-  polygon: [number, number][];
-  sriMudaPolygon: [number, number][];
-}
-
-const FLOOD_ZONES: Record<'normal' | 'warning' | 'danger', FloodZoneConfig> = {
-  normal: {
-    label: 'Normal (Safe)',
-    badge: 'Baseline Flow',
-    depthM: '0.45 m',
-    color: '#0284C7',
-    fillColor: '#38BDF8',
-    fillOpacity: 0.22,
-    description: 'Klang River channel within normal bounds. All primary roads fully passable.',
-    polygon: [
-      [3.1670, 101.7000],
-      [3.1640, 101.7040],
-      [3.1600, 101.7030],
-      [3.1610, 101.6970],
-    ],
-    sriMudaPolygon: [
-      [3.0420, 101.5300],
-      [3.0400, 101.5370],
-      [3.0340, 101.5350],
-      [3.0360, 101.5280],
-    ],
-  },
-  warning: {
-    label: 'Warning (Yellow)',
-    badge: '+0.8m Spillover',
-    depthM: '1.20 m',
-    color: '#D97706',
-    fillColor: '#F59E0B',
-    fillOpacity: 0.40,
-    description: 'River discharge surging. Low-lying drainage backup in Jalan Raja Muda Musa & Seksyen 25.',
-    polygon: [
-      [3.1700, 101.6980],
-      [3.1660, 101.7080],
-      [3.1570, 101.7060],
-      [3.1590, 101.6950],
-    ],
-    sriMudaPolygon: [
-      [3.0450, 101.5270],
-      [3.0430, 101.5410],
-      [3.0310, 101.5390],
-      [3.0330, 101.5250],
-    ],
-  },
-  danger: {
-    label: 'Danger (Red)',
-    badge: 'Severe Breach',
-    depthM: '1.85 m',
-    color: '#DC2626',
-    fillColor: '#EF4444',
-    fillOpacity: 0.58,
-    description: 'Active flash inundation breach. Secondary routes submerged. Immediate evacuation required.',
-    polygon: [
-      [3.1740, 101.6950],
-      [3.1690, 101.7120],
-      [3.1540, 101.7100],
-      [3.1560, 101.6910],
-    ],
-    sriMudaPolygon: [
-      [3.0480, 101.5240],
-      [3.0460, 101.5450],
-      [3.0280, 101.5420],
-      [3.0300, 101.5210],
-    ],
-  },
-};
+// ROUTE 2: Dynamic Flood-Avoidance Route (Diverts via Elevated Highway to skirt flooded basins)
+const AVOIDANCE_ROUTE: [number, number][] = [
+  [3.1610, 101.7010], // Kampung Baru
+  [3.1520, 101.6940], // Divert south away from riverbank
+  [3.1380, 101.6790], // Elevated SMART / Kerinchi Link Bypass
+  [3.1180, 101.6520], // Federal Highway Elevated Viaduct
+  [3.0950, 101.6210], // Subang High-Ridge Crossing
+  [3.0680, 101.5780], // KESAS Elevated Flyover (Bypasses flooded Batu Tiga basin!)
+  [3.0520, 101.5440], // Persiaran Jubli Perak High Ridge (Skirts Sri Muda north boundary!)
+  [3.0450, 101.5280], // SK Seksyen 24 Shah Alam Safe Sanctuary
+];
 
 // Map Camera Controller for GPS Follower
 function NavigationMapController({
@@ -229,13 +265,13 @@ function NavigationMapController({
 
 export function ShelterMapView() {
   const navigate = useNavigate();
-  const { shelters, activeSos, setFamilySafetyStatus } = useApp();
+  const { shelters, setFamilySafetyStatus } = useApp();
 
   const [selectedShelterId, setSelectedShelterId] = useState<string>('shelter-01');
   const [filter, setFilter] = useState<'all' | 'open' | 'recommended'>('all');
   const [transportMode, setTransportMode] = useState<'car' | 'bike' | 'walk'>('car');
 
-  // Interactive Flood Prone Simulator state
+  // Interactive Flood Severity state (Normal, Warning, Danger)
   const [floodSeverity, setFloodSeverity] = useState<'normal' | 'warning' | 'danger'>('warning');
 
   // GPS Navigator 6-Second Simulation State
@@ -263,28 +299,33 @@ export function ShelterMapView() {
 
   const transport = getTransportDetails();
 
-  // Interpolate GPS coordinates along the SAFE_CORRIDOR_ROUTE
+  // Pick active route: If flood severity is Warning or Danger, intelligently avoid flooded basins!
+  const activeRoute = useMemo(() => {
+    return floodSeverity === 'normal' ? DIRECT_ROUTE : AVOIDANCE_ROUTE;
+  }, [floodSeverity]);
+
+  // Interpolate GPS coordinates along the activeRoute
   const currentGpsPosition = useMemo((): [number, number] => {
     if (!isNavigating || navProgress === 0) {
-      return SAFE_CORRIDOR_ROUTE[0];
+      return activeRoute[0];
     }
     if (navProgress >= 1) {
-      return SAFE_CORRIDOR_ROUTE[SAFE_CORRIDOR_ROUTE.length - 1];
+      return activeRoute[activeRoute.length - 1];
     }
 
-    const totalSegments = SAFE_CORRIDOR_ROUTE.length - 1;
+    const totalSegments = activeRoute.length - 1;
     const globalProgress = navProgress * totalSegments;
     const segmentIndex = Math.min(Math.floor(globalProgress), totalSegments - 1);
     const segmentRatio = globalProgress - segmentIndex;
 
-    const p1 = SAFE_CORRIDOR_ROUTE[segmentIndex];
-    const p2 = SAFE_CORRIDOR_ROUTE[segmentIndex + 1];
+    const p1 = activeRoute[segmentIndex];
+    const p2 = activeRoute[segmentIndex + 1];
 
     const lat = p1[0] + (p2[0] - p1[0]) * segmentRatio;
     const lon = p1[1] + (p2[1] - p1[1]) * segmentRatio;
 
     return [lat, lon];
-  }, [isNavigating, navProgress]);
+  }, [isNavigating, navProgress, activeRoute]);
 
   // 6-Second Turn-by-Turn GPS Navigation Loop
   useEffect(() => {
@@ -313,7 +354,7 @@ export function ShelterMapView() {
 
   const handleStartNavigation = (shelter: Shelter) => {
     if (shelter.status === 'FULL' || shelter.status === 'CLOSED') {
-      return; // Safeguard: full shelters cannot be navigated to
+      return;
     }
     setNavProgress(0);
     setNavElapsedSec(0);
@@ -328,14 +369,40 @@ export function ShelterMapView() {
     setHasArrived(false);
   };
 
-  const currentZone = FLOOD_ZONES[floodSeverity];
+  // Severity visual tokens
+  const severityTokens = {
+    normal: {
+      color: '#0284C7',
+      fillColor: '#38BDF8',
+      fillOpacity: 0.22,
+      label: 'Normal (Safe)',
+      depth: '0.45 m',
+      desc: 'All river basins within capacity. Standard direct route clear.',
+    },
+    warning: {
+      color: '#D97706',
+      fillColor: '#F59E0B',
+      fillOpacity: 0.38,
+      label: 'Warning (Yellow)',
+      depth: '1.20 m',
+      desc: 'River levels rising +0.8m. Avoidance routing active via elevated bypass.',
+    },
+    danger: {
+      color: '#DC2626',
+      fillColor: '#EF4444',
+      fillOpacity: 0.55,
+      label: 'Danger (Red)',
+      depth: '1.85 m',
+      desc: 'Severe flash breach in 5 basins. Low ground cut off. Rerouting around hazards.',
+    },
+  }[floodSeverity];
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-slate-100">
       {/* Floating In-Page Action Switcher Dock */}
       <InPageActionDock />
 
-      {/* Real OpenStreetMap Leaflet Canvas (Clean HD Tiles - Zero Watermarks) */}
+      {/* Real OpenStreetMap Leaflet Canvas (Clean HD Tiles - Zero Watermarks - Zero Floating Overlays) */}
       <div className="relative flex-1 h-full min-h-[350px]">
         <MapContainer
           center={[3.1050, 101.6200]}
@@ -343,7 +410,7 @@ export function ShelterMapView() {
           scrollWheelZoom={true}
           className="w-full h-full z-0"
         >
-          {/* OpenStreetMap Standard Clean Raster Tiles (No Watermarks, High Quality) */}
+          {/* OpenStreetMap Standard Clean Raster Tiles */}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -353,64 +420,80 @@ export function ShelterMapView() {
           {/* Camera follower during GPS turn-by-turn simulation */}
           <NavigationMapController isNavigating={isNavigating} gpsPos={currentGpsPosition} />
 
-          {/* Dynamic Interactive Flood Prone Simulator Polygons (Klang River & Sri Muda) */}
-          <Polygon
-            positions={currentZone.polygon}
-            pathOptions={{
-              color: currentZone.color,
-              fillColor: currentZone.fillColor,
-              fillOpacity: currentZone.fillOpacity,
-              weight: 2.5,
-              dashArray: floodSeverity === 'danger' ? '6, 6' : undefined,
-            }}
-          >
-            <Popup>
-              <div className="text-xs p-1">
-                <b className="block" style={{ color: currentZone.color }}>
-                  {currentZone.label} — {currentZone.badge}
-                </b>
-                <span className="font-semibold text-slate-700 block mt-0.5">
-                  Est. Depth: {currentZone.depthM}
-                </span>
-                <span className="text-slate-600 block text-[11px] mt-1">{currentZone.description}</span>
-                <span className="text-[10px] text-blue-600 font-bold block mt-1">
-                  ModelArts Ascend 910 GRU Hydrological Model
-                </span>
-              </div>
-            </Popup>
-          </Polygon>
+          {/* 5 Distinct Historical & Flood-Prone Basins across Klang Valley */}
+          {FLOOD_BASINS.map((basin) => (
+            <Polygon
+              key={basin.id}
+              positions={basin[floodSeverity]}
+              pathOptions={{
+                color: severityTokens.color,
+                fillColor: severityTokens.fillColor,
+                fillOpacity: severityTokens.fillOpacity,
+                weight: floodSeverity === 'danger' ? 2.5 : 1.8,
+                dashArray: floodSeverity === 'danger' ? '5, 5' : undefined,
+              }}
+            >
+              <Popup>
+                <div className="text-xs p-1">
+                  <b className="block" style={{ color: severityTokens.color }}>
+                    {basin.name}
+                  </b>
+                  <span className="font-semibold text-slate-700 block mt-0.5">
+                    Est. Surge: {severityTokens.depth} ({severityTokens.label})
+                  </span>
+                  <span className="text-[10px] text-blue-600 font-bold block mt-1">
+                    Huawei ModelArts Ascend 910 GRU Model
+                  </span>
+                </div>
+              </Popup>
+            </Polygon>
+          ))}
 
-          <Polygon
-            positions={currentZone.sriMudaPolygon}
-            pathOptions={{
-              color: currentZone.color,
-              fillColor: currentZone.fillColor,
-              fillOpacity: currentZone.fillOpacity,
-              weight: 2,
-            }}
-          >
-            <Popup>
-              <div className="text-xs p-1">
-                <b className="block" style={{ color: currentZone.color }}>
-                  Taman Sri Muda Sector ({currentZone.label})
-                </b>
-                <span className="text-slate-600 block text-[11px] mt-1">
-                  Drainage retention basin status: {currentZone.badge}
-                </span>
-              </div>
-            </Popup>
-          </Polygon>
-
-          {/* Safe Corridor Route Polyline */}
+          {/* Safe Corridor Route Polyline (Green in normal, Electric Blue in avoidance mode) */}
           <Polyline
-            positions={SAFE_CORRIDOR_ROUTE}
+            positions={activeRoute}
             pathOptions={{
-              color: isNavigating ? '#1677FF' : '#10B981',
+              color: isNavigating ? '#1677FF' : floodSeverity === 'normal' ? '#10B981' : '#0284C7',
               weight: isNavigating ? 6 : 5,
               opacity: 0.9,
               dashArray: isNavigating ? undefined : '8, 8',
             }}
           />
+
+          {/* Active Roadblocks Inundating Arteries (Shown when Warning or Danger) */}
+          {floodSeverity !== 'normal' && (
+            <>
+              {/* Roadblock 1: Batu Tiga Underpass */}
+              <Marker position={[3.0760, 101.5640]} icon={roadblockIcon('Batu Tiga Underpass')}>
+                <Popup>
+                  <div className="text-xs p-1">
+                    <b className="text-red-600 block">Batu Tiga Underpass Submerged (60cm)</b>
+                    <span>Avoided by system. Traffic diverted to KESAS Elevated Flyover.</span>
+                  </div>
+                </Popup>
+              </Marker>
+
+              {/* Roadblock 2: Jalan Raja Muda Musa */}
+              <Marker position={[3.1635, 101.7040]} icon={roadblockIcon('Jalan Raja Muda')}>
+                <Popup>
+                  <div className="text-xs p-1">
+                    <b className="text-red-600 block">Jalan Raja Muda Musa Closed</b>
+                    <span>Waterlogging above curb datum. Diverting via SMART elevated viaduct.</span>
+                  </div>
+                </Popup>
+              </Marker>
+
+              {/* Roadblock 3: Sri Muda Seksyen 25 Ingress */}
+              <Marker position={[3.0370, 101.5330]} icon={roadblockIcon('Sri Muda Ingress')}>
+                <Popup>
+                  <div className="text-xs p-1">
+                    <b className="text-red-600 block">Jalan Khidmat 25 Ingress Blocked</b>
+                    <span>Severe water surge. Navigating to SK Seksyen 24 on higher ground.</span>
+                  </div>
+                </Popup>
+              </Marker>
+            </>
+          )}
 
           {/* User Starting Live Marker / GPS Navigation Marker */}
           {isNavigating ? (
@@ -423,7 +506,7 @@ export function ShelterMapView() {
               </Popup>
             </Marker>
           ) : (
-            <Marker position={SAFE_CORRIDOR_ROUTE[0]} icon={userIcon}>
+            <Marker position={activeRoute[0]} icon={userIcon}>
               <Popup>
                 <div className="text-xs p-1 font-semibold">
                   <span>📍 Your Residence (Kampung Baru)</span>
@@ -431,27 +514,6 @@ export function ShelterMapView() {
               </Popup>
             </Marker>
           )}
-
-          {/* Roadblock Marker */}
-          <Marker position={[3.1635, 101.7040]} icon={roadblockIcon}>
-            <Popup>
-              <div className="text-xs p-1">
-                <b className="text-red-600 block">Jalan Raja Muda Musa Closed</b>
-                <span>Severe waterlogging ({currentZone.depthM} depth). Diverted south.</span>
-              </div>
-            </Popup>
-          </Marker>
-
-          {/* River Sensor Marker */}
-          <Marker position={[3.1630, 101.7020]} icon={sensorIcon}>
-            <Popup>
-              <div className="text-xs p-1">
-                <b className="block">Station #FW-KL-04</b>
-                <span>River Level: {currentZone.depthM} ({floodSeverity.toUpperCase()})</span>
-                <span className="text-[10px] text-slate-500 block">Ascend 910 GRU Real-time Ingestion</span>
-              </div>
-            </Popup>
-          </Marker>
 
           {/* Evacuation Shelter Markers (Max 6 Shelters) */}
           {shelters.map((s) => (
@@ -494,63 +556,6 @@ export function ShelterMapView() {
           ))}
         </MapContainer>
 
-        {/* TOP INTERACTIVE FLOOD PRONE SIMULATOR OVERLAY */}
-        <div className="absolute top-4 left-4 z-10 max-w-sm w-full bg-slate-950/90 backdrop-blur-md p-3 rounded-2xl border border-slate-700/80 shadow-2xl text-white">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="flex items-center gap-1.5">
-              <Waves className="w-4 h-4 text-cyan-400" />
-              <span className="text-xs font-extrabold tracking-wide uppercase font-heading">
-                Flood Zone Simulator
-              </span>
-            </div>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-bold">
-              <Cpu className="w-3 h-3" />
-              <span>Ascend 910 GRU</span>
-            </div>
-          </div>
-
-          <p className="text-[11px] text-slate-300 leading-snug mb-2.5">
-            Simulate dynamic flood hazard polygons calculated by the GRU time-series prediction pipeline:
-          </p>
-
-          {/* 3 Severity Switcher Buttons */}
-          <div className="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
-            <button
-              onClick={() => setFloodSeverity('normal')}
-              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 ${
-                floodSeverity === 'normal'
-                  ? 'bg-sky-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Normal</span>
-              <span className="text-[9px] opacity-80">Safe (0.45m)</span>
-            </button>
-            <button
-              onClick={() => setFloodSeverity('warning')}
-              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 ${
-                floodSeverity === 'warning'
-                  ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Warning</span>
-              <span className="text-[9px] opacity-80">+0.8m Rise</span>
-            </button>
-            <button
-              onClick={() => setFloodSeverity('danger')}
-              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 ${
-                floodSeverity === 'danger'
-                  ? 'bg-red-600 text-white shadow-md font-extrabold animate-pulse'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Danger</span>
-              <span className="text-[9px] opacity-80">Peak (1.85m)</span>
-            </button>
-          </div>
-        </div>
-
         {/* GPS NAVIGATION TURN-BY-TURN HUD (Top-Center when active) */}
         {isNavigating && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-[92%] max-w-md bg-slate-950/95 backdrop-blur-xl border-2 border-[#1677FF] text-white p-3.5 rounded-2xl shadow-2xl animate-fade-in">
@@ -574,9 +579,9 @@ export function ShelterMapView() {
                 <Navigation className="w-4 h-4 text-[#1677FF] shrink-0" />
                 <span className="font-bold truncate max-w-[200px]">
                   {navProgress < 0.4
-                    ? 'Jalan Raja Muda Musa → Federal Highway'
+                    ? 'Kerinchi Link → Federal Viaduct'
                     : navProgress < 0.8
-                    ? 'Persiaran Jubli Perak Westbound'
+                    ? 'KESAS Elevated Bypass (Avoiding Flooded Batu Tiga)'
                     : 'Arrival: SK Seksyen 24 Shah Alam'}
                 </span>
               </div>
@@ -594,8 +599,9 @@ export function ShelterMapView() {
             </div>
 
             <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span>Speed: 38 km/h</span>
-              <span>Corridor: Flood-Free Zone</span>
+              <span className="text-emerald-400 font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" /> Hazard Avoidance Corridor
+              </span>
               <button
                 onClick={handleResetNavigation}
                 className="text-xs text-red-400 hover:text-red-300 font-bold underline cursor-pointer"
@@ -606,7 +612,7 @@ export function ShelterMapView() {
           </div>
         )}
 
-        {/* ARRIVAL CONFIRMATION DIALOG (When 6s navigation finishes) */}
+        {/* ARRIVAL CONFIRMATION DIALOG */}
         {hasArrived && (
           <div className="absolute inset-0 z-30 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
             <div className="max-w-md w-full bg-slate-900 border border-emerald-500/80 rounded-3xl p-6 text-white shadow-2xl text-center space-y-4">
@@ -648,13 +654,13 @@ export function ShelterMapView() {
               <div className="flex gap-2">
                 <button
                   onClick={handleResetNavigation}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors cursor-pointer"
                 >
                   Return to Map
                 </button>
                 <button
                   onClick={() => navigate('/reports')}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold transition-colors flex items-center justify-center gap-1"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold transition-colors flex items-center justify-center gap-1 cursor-pointer"
                 >
                   <span>Submit Arrival Report</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -664,26 +670,19 @@ export function ShelterMapView() {
           </div>
         )}
 
-        {/* Floating Map Legend */}
+        {/* Floating Map Legend (Bottom-Left) */}
         <div className="absolute bottom-4 left-4 z-10 hidden sm:flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white text-xs font-semibold shadow-xl">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Safe Corridor</span>
+            <span>Safe Route</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: currentZone.fillColor }}
-            />
-            <span>{currentZone.label}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-            <span>Shelter Full</span>
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: severityTokens.color }} />
+            <span>5 Flood Basins ({severityTokens.label})</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-            <span>Shelter Closed</span>
+            <span>Roadblock Avoided</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1677FF]" />
@@ -692,13 +691,88 @@ export function ShelterMapView() {
         </div>
       </div>
 
-      {/* Shelter Selection Drawer (Right panel on Desktop, Bottom sheet on Mobile) */}
-      <div className="w-full md:w-[390px] lg:w-[430px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl overflow-hidden shrink-0">
-        {/* Header & Transport Mode */}
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-          <div className="flex items-center justify-between mb-3">
+      {/* SHELTER & SIMULATOR UNIFIED RIGHT SIDEBAR DRAWER */}
+      <div className="w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl overflow-hidden shrink-0">
+        {/* SECTION 1: FLOOD ZONE SIMULATOR INTEGRATED INTO SIDEBAR (NO FLOATING OVERLAY!) */}
+        <div className="p-4 bg-slate-950 text-white border-b border-slate-800 space-y-3 shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-400">
+                <Waves className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div>
+                <h3 className="font-heading font-black text-xs tracking-wider uppercase text-white">
+                  Flood Hazard Simulator
+                </h3>
+                <span className="text-[10px] text-slate-400">5 Klang Valley Basins · Live Detour</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-bold">
+              <Cpu className="w-3 h-3" />
+              <span>Ascend 910 GRU</span>
+            </div>
+          </div>
+
+          {/* 3 Severity Switcher Buttons */}
+          <div className="grid grid-cols-3 gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+            <button
+              onClick={() => setFloodSeverity('normal')}
+              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+                floodSeverity === 'normal'
+                  ? 'bg-sky-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>Normal</span>
+              <span className="text-[9px] opacity-80">Safe (0.45m)</span>
+            </button>
+            <button
+              onClick={() => setFloodSeverity('warning')}
+              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+                floodSeverity === 'warning'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>Warning</span>
+              <span className="text-[9px] opacity-80">+0.8m Rise</span>
+            </button>
+            <button
+              onClick={() => setFloodSeverity('danger')}
+              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+                floodSeverity === 'danger'
+                  ? 'bg-red-600 text-white shadow-md font-extrabold animate-pulse'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>Danger</span>
+              <span className="text-[9px] opacity-80">Peak (1.85m)</span>
+            </button>
+          </div>
+
+          {/* Dynamic Avoidance Status Banner */}
+          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <Route className="w-3.5 h-3.5 text-[#1677FF]" />
+              <span>
+                {floodSeverity === 'normal'
+                  ? 'Direct corridor active via Federal Highway'
+                  : 'Hazard avoidance active: Diverting via elevated bypass'}
+              </span>
+            </div>
+            {floodSeverity !== 'normal' && (
+              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-600/40">
+                0 Hazards
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* SECTION 2: TRANSPORT MODE SWITCHER */}
+        <div className="p-4 pb-2 border-b border-slate-100 bg-slate-50/50 shrink-0">
+          <div className="flex items-center justify-between mb-2.5">
             <div>
-              <h2 className="font-heading font-extrabold text-base md:text-lg text-slate-900">
+              <h2 className="font-heading font-extrabold text-base text-slate-900">
                 Evacuation Relief Centers
               </h2>
               <span className="text-[11px] text-slate-500">Maximum 6 Safe Havens Registered</span>
@@ -709,12 +783,12 @@ export function ShelterMapView() {
           </div>
 
           {/* Filter Chips */}
-          <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl mb-3">
+          <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl mb-2.5">
             {(['all', 'open', 'recommended'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setFilter(mode)}
-                className={`flex-1 py-1 text-xs font-bold rounded-lg capitalize transition-colors ${
+                className={`flex-1 py-1 text-xs font-bold rounded-lg capitalize transition-colors cursor-pointer ${
                   filter === mode
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -729,7 +803,7 @@ export function ShelterMapView() {
           <div className="flex items-center justify-between bg-white p-1 rounded-xl border border-slate-200 text-xs">
             <button
               onClick={() => setTransportMode('car')}
-              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors ${
+              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors cursor-pointer ${
                 transportMode === 'car' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -738,7 +812,7 @@ export function ShelterMapView() {
             </button>
             <button
               onClick={() => setTransportMode('bike')}
-              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors ${
+              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors cursor-pointer ${
                 transportMode === 'bike' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -747,7 +821,7 @@ export function ShelterMapView() {
             </button>
             <button
               onClick={() => setTransportMode('walk')}
-              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors ${
+              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors cursor-pointer ${
                 transportMode === 'walk' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -757,7 +831,7 @@ export function ShelterMapView() {
           </div>
         </div>
 
-        {/* Shelters List (6 total, including full/closed examples) */}
+        {/* SECTION 3: SHELTER CARDS LIST */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {filteredShelters.map((s) => {
             const isSelected = s.id === selectedShelter?.id;
@@ -881,10 +955,9 @@ export function ShelterMapView() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Auto redirect to safe shelter-01
                           setSelectedShelterId('shelter-01');
                         }}
-                        className="flex-1 py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md"
+                        className="flex-1 py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
                       >
                         <Compass className="w-3.5 h-3.5" />
                         <span>Reroute to Open Shelter</span>

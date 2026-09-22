@@ -157,26 +157,74 @@ export async function fetchReports(): Promise<CitizenReport[]> {
       lat: 3.1642,
       lon: 101.7031,
       waterDepthCm: 35,
-      status: 'VERIFIED',
-      verifiedBy: 'Huawei ModelArts CV (96.4% confidence)',
+      status: 'OFFICIAL_VERIFIED',
+      verifiedBy: 'Huawei ModelArts PanGu-CV & APM Civil Defense',
       timestampStr: '12 min ago',
       author: 'Ahmad F.',
       upvotes: 28,
-      imageUrl: '/banjir2.jpg'
+      imageUrl: '/banjir2.jpg',
+      description: 'Water spilling over curbside into commercial alleyway. Depth approx 35cm, vehicles wading cautiously.',
+      aiVerification: {
+        verified: true,
+        confidenceScore: 0.974,
+        detectedHazards: ['Curbside Water Spillover', 'Commercial Lane Flooding', 'Vehicle Hydrolock Advisory'],
+        estimatedDepthCm: 36,
+        engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU)',
+        notes: 'PanGu-CV segmentation verified water boundary breaching road surface datum.'
+      },
+      humanVerification: {
+        verifiedBy: 'Captain Roslan (APM Kuala Lumpur)',
+        role: 'Civil Defense Officer',
+        reviewedAt: '8 min ago',
+        verdict: 'APPROVED',
+        officialNotes: 'Confirmed by patrolling APM Unit 4. Sandbag barriers dispatched.'
+      }
     },
     {
       id: 'rep-02',
-      title: 'Submerged Drain & Road Clogged',
+      title: 'Submerged Drain & Road Clogged at Seksyen 25',
       location: 'Taman Sri Muda, Seksyen 25',
       lat: 3.0315,
       lon: 101.5360,
       waterDepthCm: 50,
-      status: 'VERIFIED',
-      verifiedBy: 'Huawei ModelArts CV (98.1% confidence)',
-      timestampStr: '25 min ago',
+      status: 'AI_VERIFIED',
+      verifiedBy: 'Gemini 2.5 Flash Vision (Pending Authority Approval)',
+      timestampStr: '4 min ago',
       author: 'Sarah T.',
-      upvotes: 41,
-      imageUrl: '/banjir3.jfif'
+      upvotes: 14,
+      imageUrl: '/banjir3.jfif',
+      description: 'Monsoon drain overflowed onto Jalan Khidmat. Wheel hubs submerged on sedan cars.',
+      aiVerification: {
+        verified: true,
+        confidenceScore: 0.982,
+        detectedHazards: ['Drain Inundation', 'Vehicle Wheel Submergence', 'Severe Hydroplaning Hazard'],
+        estimatedDepthCm: 52,
+        engine: 'Gemini 2.5 Flash Vision (Google AI Studio)',
+        notes: 'Multimodal vision confirmed sedan car wheels submerged past 50cm threshold. Awaiting authority confirmation.'
+      }
+    },
+    {
+      id: 'rep-03',
+      title: 'Sungai Rasau Underpass Water Accumulation',
+      location: 'Sungai Rasau, Klang',
+      lat: 3.0510,
+      lon: 101.4880,
+      waterDepthCm: 42,
+      status: 'AI_VERIFIED',
+      verifiedBy: 'Huawei ModelArts PanGu-CV (Pending Authority Approval)',
+      timestampStr: 'Just now',
+      author: 'Kamal R.',
+      upvotes: 6,
+      imageUrl: '/banjir2.jpg',
+      description: 'Water ponding rapidly underneath the railway flyover. Low-clearance cars stranded.',
+      aiVerification: {
+        verified: true,
+        confidenceScore: 0.965,
+        detectedHazards: ['Underpass Ponding', 'Railway Bridge Drainage Congestion'],
+        estimatedDepthCm: 44,
+        engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU)',
+        notes: 'Surface water depth exceeds 40cm. Immediate hazard review recommended.'
+      }
     }
   ];
 }

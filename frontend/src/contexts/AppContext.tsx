@@ -17,6 +17,8 @@ interface AppContextType {
   setSelectedLocation: (loc: string) => void;
   addReport: (r: CitizenReport) => void;
   upvoteReport: (id: string) => void;
+  approveReport: (id: string, reviewerName: string, role: string, notes?: string) => void;
+  rejectReport: (id: string, reason?: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -59,6 +61,46 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const approveReport = (id: string, reviewerName: string, role: string, notes?: string) => {
+    setReports((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              status: 'OFFICIAL_VERIFIED',
+              humanVerification: {
+                verifiedBy: reviewerName,
+                role: (role as any) || 'Civil Defense Officer',
+                reviewedAt: 'Just now',
+                verdict: 'APPROVED',
+                officialNotes: notes || 'Verified on ground by APM responder unit.',
+              },
+            }
+          : item
+      )
+    );
+  };
+
+  const rejectReport = (id: string, reason?: string) => {
+    setReports((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              status: 'REJECTED',
+              humanVerification: {
+                verifiedBy: 'District Duty Officer',
+                role: 'Civil Defense Officer',
+                reviewedAt: 'Just now',
+                verdict: 'REJECTED',
+                officialNotes: reason || 'Flagged as inaccurate / non-flooded image upon ground survey.',
+              },
+            }
+          : item
+      )
+    );
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -75,7 +117,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         selectedLocation,
         setSelectedLocation,
         addReport,
-        upvoteReport
+        upvoteReport,
+        approveReport,
+        rejectReport
       }}
     >
       {children}
