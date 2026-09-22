@@ -43,28 +43,28 @@ export function FamilySosModal({ isOpen, onClose, depthCm, onProceedToNavigation
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 md:p-4">
+      <div className="w-full max-w-[420px] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6 flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white">
-              <ShieldAlert className="w-7 h-7" />
+        <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
+              <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xs font-bold text-red-200 uppercase tracking-wider">Life-Safety Protocol</span>
-              <h3 className="font-heading font-extrabold text-xl text-white">Family LifeLine SOS Broadcast</h3>
+              <span className="text-[10px] font-bold text-red-200 uppercase tracking-wider block">Life-Safety Protocol</span>
+              <h3 className="font-heading font-extrabold text-base text-white">Family SOS Broadcast</h3>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/20 text-white">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-white/20 text-white cursor-pointer">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-4">
-          <p className="text-xs md:text-sm text-slate-600 leading-relaxed">
-            Broadcasting will immediately alert your registered family circle and emergency contacts via <b>Telegram Bot API</b> with your real-time GPS coordinates, flood depth, and target shelter route.
+        <div className="p-4 space-y-3.5">
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Immediately alerts your registered family contacts via <b>Telegram Bot API</b> with live GPS, flood depth, and target shelter route.
           </p>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">

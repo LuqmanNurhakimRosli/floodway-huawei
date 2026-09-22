@@ -88,6 +88,57 @@ export async function fetchShelters(): Promise<Shelter[]> {
       routeStatus: 'ADVISORY',
       distanceKm: 0.6,
       travelTimeMin: 4
+    },
+    {
+      id: 'shelter-04',
+      name: 'Dewan Komuniti Seksyen 7 Shah Alam',
+      category: 'Community Hall',
+      lat: 3.0850,
+      lon: 101.5420,
+      address: 'Jalan Plumbum 7/95, Seksyen 7, 40000 Shah Alam, Selangor',
+      status: 'FULL',
+      currentCapacity: 250,
+      maxCapacity: 250,
+      contact: '+603-5510 4432',
+      facilities: ['Relief Supply Staging', 'Temporary Mats', 'Emergency Water'],
+      elevationM: 18.2,
+      routeStatus: 'ADVISORY',
+      distanceKm: 3.4,
+      travelTimeMin: 11
+    },
+    {
+      id: 'shelter-05',
+      name: 'Balai Raya Taman Sri Muda',
+      category: 'Neighborhood Hall',
+      lat: 3.0380,
+      lon: 101.5340,
+      address: 'Jalan Khidmat 25/34, Taman Sri Muda, 40400 Shah Alam',
+      status: 'CLOSED',
+      currentCapacity: 120,
+      maxCapacity: 120,
+      contact: '+603-5122 8990',
+      facilities: ['Inundated Road Access - Relocate to SK Seksyen 24'],
+      elevationM: 9.8,
+      routeStatus: 'BLOCKED',
+      distanceKm: 2.1,
+      travelTimeMin: 9
+    },
+    {
+      id: 'shelter-06',
+      name: 'Masjid Sultan Salahuddin Abdul Aziz',
+      category: 'Designated State Sanctuary',
+      lat: 3.0782,
+      lon: 101.5205,
+      address: 'Persiaran Masjid, Seksyen 14, 40000 Shah Alam, Selangor',
+      status: 'OPEN',
+      currentCapacity: 450,
+      maxCapacity: 1000,
+      contact: '+603-5519 9988',
+      facilities: ['Mass Sanctuary (High Ground)', 'Clean Water Borehole', 'Medical Tents', 'Helipad Access'],
+      elevationM: 28.5,
+      routeStatus: 'CLEAR',
+      distanceKm: 5.6,
+      travelTimeMin: 15
     }
   ];
 }

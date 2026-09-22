@@ -48,7 +48,7 @@ export interface Shelter {
   lat: number;
   lon: number;
   address: string;
-  status: 'OPEN' | 'FULL' | 'STANDBY';
+  status: 'OPEN' | 'FULL' | 'STANDBY' | 'CLOSED';
   currentCapacity: number;
   maxCapacity: number;
   contact: string;
