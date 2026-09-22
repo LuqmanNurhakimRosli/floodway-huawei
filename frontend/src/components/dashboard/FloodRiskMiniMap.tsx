@@ -1,120 +1,111 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, Navigation, Shield, AlertTriangle, Layers, Maximize2 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Polyline, Polygon } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { MapPin, Maximize2, Shield } from 'lucide-react';
+
+const userDotIcon = new L.DivIcon({
+  className: 'user-mini-icon',
+  html: `
+    <div style="position: relative; width: 20px; height: 20px;">
+      <div style="position: absolute; inset: -4px; background: rgba(22, 119, 255, 0.4); border-radius: 50%; animation: pulse-ring 2s infinite;"></div>
+      <div style="position: absolute; inset: 2px; background: #1677FF; border: 2px solid white; border-radius: 50%;"></div>
+    </div>
+  `,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+});
+
+const shelterPinIcon = new L.DivIcon({
+  className: 'shelter-mini-icon',
+  html: `
+    <div style="background: #10B981; color: white; width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+  `,
+  iconSize: [26, 26],
+  iconAnchor: [13, 13],
+});
+
+const MINI_ROUTE: [number, number][] = [
+  [3.1610, 101.7010],
+  [3.1420, 101.6860],
+  [3.1020, 101.6350],
+  [3.0450, 101.5280],
+];
+
+const MINI_HAZARD: [number, number][] = [
+  [3.1660, 101.7000],
+  [3.1645, 101.7070],
+  [3.1590, 101.7050],
+  [3.1605, 101.6980],
+];
 
 export function FloodRiskMiniMap() {
   const navigate = useNavigate();
-  const [mapMode, setMapMode] = useState<'radar' | 'satellite'>('radar');
 
   return (
-    <div className="rounded-2xl bg-[#071322] border border-slate-800 text-white overflow-hidden shadow-sm flex flex-col h-full min-h-[340px]">
-      {/* Mini-map Top Header */}
-      <div className="px-4 py-3 bg-[#0B1E38]/90 border-b border-slate-800/80 flex items-center justify-between">
+    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col h-full min-h-[380px]">
+      {/* Mini-map Header */}
+      <div className="px-5 py-3.5 flex items-center justify-between border-b border-slate-100 bg-white">
         <div className="flex items-center gap-2">
-          <Map className="w-4 h-4 text-[#1677FF]" />
-          <span className="font-heading font-bold text-sm text-slate-200">Geospatial Flood Risk Radar</span>
+          <div className="p-1.5 rounded-lg bg-blue-50 text-[#1677FF]">
+            <MapPin className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 leading-none">Geospatial Flood Risk Radar</h3>
+            <span className="text-[11px] text-slate-400 font-medium">OpenStreetMap live evacuation corridor</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setMapMode(mapMode === 'radar' ? 'satellite' : 'radar')}
-            className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-medium text-slate-300 flex items-center gap-1"
-          >
-            <Layers className="w-3 h-3" />
-            <span>{mapMode === 'radar' ? 'Satellite' : 'Radar'}</span>
-          </button>
-          <button
-            onClick={() => navigate('/map')}
-            className="px-2.5 py-1 rounded bg-[#1677FF] hover:bg-[#0958D9] text-[11px] font-bold text-white flex items-center gap-1 shadow-xs"
-          >
-            <span>Open Full Map</span>
-            <Maximize2 className="w-3 h-3" />
-          </button>
-        </div>
+
+        <button
+          onClick={() => navigate('/map')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors"
+        >
+          <span>Full Map</span>
+          <Maximize2 className="w-3.5 h-3.5" />
+        </button>
       </div>
 
-      {/* Geospatial Interactive Canvas (SVG Radar simulation) */}
-      <div className="relative flex-1 bg-[#050E1A] overflow-hidden p-4">
-        {/* River Channel SVG Line */}
-        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="floodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#DC2626" stopOpacity="0.45" />
-              <stop offset="100%" stopColor="#EF4444" stopOpacity="0.15" />
-            </linearGradient>
-          </defs>
-
-          {/* Grid lines */}
-          <line x1="0" y1="25%" x2="100%" y2="25%" stroke="#1E293B" strokeWidth="1" strokeDasharray="3,3" />
-          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#1E293B" strokeWidth="1" strokeDasharray="3,3" />
-          <line x1="0" y1="75%" x2="100%" y2="75%" stroke="#1E293B" strokeWidth="1" strokeDasharray="3,3" />
-
-          {/* River Basin Polygon */}
-          <path
-            d="M 20 280 Q 120 180 240 190 T 450 110 T 700 80"
-            fill="none"
-            stroke="#1D4ED8"
-            strokeWidth="14"
-            strokeOpacity="0.4"
+      {/* Embedded Real Leaflet Tile View */}
+      <div className="relative flex-1 w-full min-h-[300px]">
+        <MapContainer
+          center={[3.1050, 101.6150]}
+          zoom={11}
+          zoomControl={false}
+          attributionControl={false}
+          dragging={true}
+          className="w-full h-full z-0"
+        >
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            subdomains={['a', 'b', 'c', 'd']}
           />
 
-          {/* Flood Risk Inundation Polygon */}
-          <polygon
-            points="60,240 180,160 260,190 320,130 140,260"
-            fill="url(#floodGrad)"
-            stroke="#DC2626"
-            strokeWidth="1.5"
-            className="animate-pulse"
+          <Polygon
+            positions={MINI_HAZARD}
+            pathOptions={{ color: '#DC2626', fillColor: '#EF4444', fillOpacity: 0.35, weight: 1.5 }}
           />
 
-          {/* Safe Route Polyline to Shelter */}
-          <path
-            d="M 120 220 L 160 140 L 290 90 L 360 70"
-            fill="none"
-            stroke="#10B981"
-            strokeWidth="4"
-            strokeDasharray="6,4"
+          <Polyline
+            positions={MINI_ROUTE}
+            pathOptions={{ color: '#10B981', weight: 4, opacity: 0.9, dashArray: '6, 6' }}
           />
-        </svg>
 
-        {/* User Location Marker */}
-        <div className="absolute left-[110px] top-[210px] flex flex-col items-center pointer-events-none">
-          <div className="w-5 h-5 rounded-full bg-[#1677FF] border-2 border-white flex items-center justify-center shadow-lg shadow-blue-500/50 animate-pulse">
-            <div className="w-2 h-2 rounded-full bg-white" />
-          </div>
-          <span className="text-[10px] font-bold text-blue-300 bg-slate-900/90 px-1.5 py-0.5 rounded mt-1 border border-blue-500/40">
-            You Are Here
-          </span>
-        </div>
+          <Marker position={[3.1610, 101.7010]} icon={userDotIcon} />
+          <Marker position={[3.0450, 101.5280]} icon={shelterPinIcon} />
+        </MapContainer>
 
-        {/* Blocked Road Marker */}
-        <div className="absolute left-[200px] top-[140px] flex items-center gap-1 bg-red-950/90 border border-red-500/70 px-2 py-0.5 rounded shadow-lg">
-          <AlertTriangle className="w-3 h-3 text-red-400" />
-          <span className="text-[10px] font-bold text-red-300">Jalan Raja Muda Blocked</span>
-        </div>
-
-        {/* Safe Shelter Destination Pin */}
-        <div className="absolute left-[340px] top-[50px] flex flex-col items-center">
-          <div className="w-7 h-7 rounded-xl bg-emerald-500 border-2 border-white flex items-center justify-center shadow-lg shadow-emerald-500/40">
-            <Shield className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-[10px] font-bold text-emerald-300 bg-slate-900/90 px-1.5 py-0.5 rounded mt-1 border border-emerald-500/40 whitespace-nowrap">
-            SK Seksyen 24 (1.2 km)
-          </span>
-        </div>
-
-        {/* Floating Status Overlay Pill */}
-        <div className="absolute bottom-3 left-3 right-3 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-3 py-2 flex items-center justify-between text-xs">
+        {/* Floating status pill */}
+        <div className="absolute bottom-3 left-3 right-3 z-10 bg-slate-900/90 backdrop-blur-md rounded-xl p-2.5 text-white flex items-center justify-between text-xs border border-slate-700/80">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-slate-300 font-medium">3 Roads Blocked · 2 Safe Corridors Open</span>
+            <span className="font-semibold text-slate-200">Corridor Clear to SK Seksyen 24</span>
           </div>
-          <button
-            onClick={() => navigate('/map')}
-            className="text-[#60A5FA] hover:text-white font-bold text-xs flex items-center gap-1"
-          >
-            <span>Details</span>
-            <Navigation className="w-3 h-3" />
-          </button>
+          <span className="text-[11px] font-bold text-blue-400">12.4 km · ~14 min</span>
         </div>
       </div>
     </div>

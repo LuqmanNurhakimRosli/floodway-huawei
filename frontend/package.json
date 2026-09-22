@@ -20,7 +20,10 @@
     "react-router-dom": "^7.13.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
-    "three": "^0.183.1"
+    "three": "^0.183.1",
+    "@react-three/fiber": "^9.5.0",
+    "@react-three/drei": "^10.7.7",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.10.12",

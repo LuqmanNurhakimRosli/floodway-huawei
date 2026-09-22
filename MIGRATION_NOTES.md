@@ -67,3 +67,35 @@ A modular, high-performance FastAPI service organized by feature domain:
 1. **Standalone & Offline Resilience:** In addition to live REST communication with the FastAPI backend at `http://localhost:8080`, the frontend includes local fallback data and state stores so evaluators can review all interactive features (3D simulation, maps, radar, SOS modal) with zero external dependency blockers.
 2. **Telegram Bot Dispatch:** The Telegram dispatch logic includes an automatic fallback simulation mode so that even without providing a personal bot token, evaluators can test the complete SOS broadcast and geofence arrival check-in flow end-to-end.
 3. **Ascend AI Stack:** All artificial intelligence services have been exclusively attributed to Huawei Cloud ModelArts (盘古大模型 / PanGu-CV) and Ascend 910 NPU hardware acceleration.
+
+---
+
+## 6. Advanced Upgrades & Real Geospatial / 3D Integration (Phase 4)
+
+### A. Responsive 3-Column Community Reports Feed (`/reports`)
+- **Responsive Layout:** Dynamic CSS Grid transforming smoothly from 3 columns on Desktop (>=1200px), to 2 columns on Tablet (768px-1199px), to 1 column on Mobile (<768px).
+- **Live Statistics KPI Ribbon:** Real-time counters displaying Total Reports (1,248), ModelArts Verified (1,180 / 94.5%), Under Human Review (68), and Active Flood Hazards (4).
+- **Smart Filtering:** Instant category tabs (`All`, `Nearby (<3km)`, `ModelArts Verified`, `High Risk`) with live search.
+- **Rich Citizen Cards:** Social-style incident cards with verified badges, CCTV/citizen photo previews, ModelArts PanGu-CV confidence bars, water depth indicators, and engagement counters.
+
+### B. High-Fidelity Malaysian Terrace House (`Rumah Teres`) 3D Digital Twin (`/simulation`)
+- **Architectural Authenticity:** Built with `@react-three/fiber` and `@react-three/drei` featuring gabled terracotta-tiled roof, reinforced concrete car porch columns, louvered glass windows, Balau timber front entrance, perimeter fence, and graduated staff gauge.
+- **3D Spatial In-Scene Badges:** Real-time HTML callout badges floating in 3D world space at physical thresholds:
+  - `Road Level (0.00m)`
+  - `Car Porch (0.15m)`
+  - `Exhaust Intake (0.35m)`
+  - `Living Floor (0.90m)`
+- **Sri Muda 2021 Historical Replay:** 5-step automated sequence reproducing the December 2021 flood progression with step-by-step telemetry, actionable guidance, and instant Family SOS activation.
+- **Ultra-Slim ~48px Floating Cockpit:** Preserves full 3D visual clarity with 1-tap minimize toggle and instant perspective switcher (`Front`, `Iso`, `Top`, `Rear`).
+
+### C. Live OpenStreetMap Leaflet Geospatial Infrastructure (`/map` & `/home`)
+- **CartoDB Voyager Raster Tiles:** Real cartographic tiles via `react-leaflet` with crisp road networks, river boundaries, and topography.
+- **Dynamic Animated Markers:**
+  - Pulsing user location radar dot (`user-marker-pulse`).
+  - Active shelter pins with ripple rings (`shelter-marker-ring`) and capacity tooltips.
+  - River telemetry sensor station marker.
+  - Active roadblock warning sign (`Jalan Raja Muda`).
+- **Safe Evacuation Corridor Polyline:** Highlighted emerald route with animated chevron pulses.
+- **Hazard Flood Inundation Polygon:** Translucent crimson polygon delineating active river overflow zones.
+- **Multi-Modal Transport Switcher:** Instant recalculation for `Drive (4 min)`, `Motorcycle (3 min)`, and `Walk (14 min)`.
+- **Interactive Home Mini-Map:** Integrated Leaflet radar widget directly on the Home dashboard with interactive pan, zoom, and live hazard overlays.
