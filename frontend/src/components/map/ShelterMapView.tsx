@@ -216,29 +216,93 @@ const FLOOD_BASINS = [
   },
 ];
 
-// ROUTE 1: Direct Standard Route (Used in NORMAL baseline)
-const DIRECT_ROUTE: [number, number][] = [
-  [3.1610, 101.7010], // Kampung Baru
-  [3.1550, 101.6970],
-  [3.1420, 101.6860],
-  [3.1250, 101.6680],
-  [3.1020, 101.6350],
-  [3.0780, 101.5950],
-  [3.0550, 101.5520], // Near Batu Tiga low ground
-  [3.0450, 101.5280], // SK Seksyen 24 Shah Alam
-];
+// Dynamic GPS Route Generator connecting user to ANY selected shelter
+const calculateRouteForShelter = (
+  destLat: number,
+  destLon: number,
+  severity: 'normal' | 'warning' | 'danger'
+): { route: [number, number][]; roadblocks: [number, number][]; isDetour: boolean } => {
+  const startLat = 3.1610;
+  const startLon = 101.7005;
 
-// ROUTE 2: Dynamic Flood-Avoidance Route (Diverts via Elevated Highway to skirt flooded basins)
-const AVOIDANCE_ROUTE: [number, number][] = [
-  [3.1610, 101.7010], // Kampung Baru
-  [3.1520, 101.6940], // Divert south away from riverbank
-  [3.1380, 101.6790], // Elevated SMART / Kerinchi Link Bypass
-  [3.1180, 101.6520], // Federal Highway Elevated Viaduct
-  [3.0950, 101.6210], // Subang High-Ridge Crossing
-  [3.0680, 101.5780], // KESAS Elevated Flyover (Bypasses flooded Batu Tiga basin!)
-  [3.0520, 101.5440], // Persiaran Jubli Perak High Ridge (Skirts Sri Muda north boundary!)
-  [3.0450, 101.5280], // SK Seksyen 24 Shah Alam Safe Sanctuary
-];
+  const dLat = destLat - startLat;
+  const dLon = destLon - startLon;
+  const dist = Math.hypot(dLat, dLon);
+
+  // Immediate shelter (< 1km, e.g. Dewan Sultan Sulaiman)
+  if (dist < 0.015) {
+    return {
+      route: [
+        [startLat, startLon],
+        [startLat + 0.0015, startLon + 0.0010],
+        [destLat, destLon],
+      ],
+      roadblocks: severity === 'danger' ? [[startLat + 0.003, startLon - 0.002]] : [],
+      isDetour: severity !== 'normal',
+    };
+  }
+
+  // Northern shelters (Titiwangsa, Sentul)
+  if (destLat > startLat) {
+    if (severity === 'danger' || severity === 'warning') {
+      return {
+        route: [
+          [startLat, startLon],
+          [3.1660, 101.7045],
+          [3.1720, 101.7090], // Elevated Tun Razak / Jalan Kuantan Bypass
+          [3.1765, 101.7050],
+          [destLat, destLon],
+        ],
+        roadblocks: [[3.1670, 101.6980]],
+        isDetour: true,
+      };
+    }
+    return {
+      route: [
+        [startLat, startLon],
+        [3.1680, 101.7015],
+        [3.1740, 101.7040],
+        [destLat, destLon],
+      ],
+      roadblocks: [],
+      isDetour: false,
+    };
+  }
+
+  // Southern / Western shelters (UM, MBPJ, Shah Alam)
+  if (severity === 'normal') {
+    return {
+      route: [
+        [startLat, startLon],
+        [3.1520, 101.6930],
+        [3.1360, 101.6780],
+        [3.1180, 101.6560],
+        [destLat + 0.01, destLon + 0.01],
+        [destLat, destLon],
+      ],
+      roadblocks: [],
+      isDetour: false,
+    };
+  }
+
+  // Warning / Danger: Skirt basins via elevated highway corridor
+  return {
+    route: [
+      [startLat, startLon],
+      [3.1500, 101.6880], // Divert south-west away from river basin
+      [3.1350, 101.6720], // Elevated Kerinchi Link Bypass
+      [3.1150, 101.6480], // Elevated Federal Highway Viaduct
+      [3.0900, 101.6150], // Subang High-Ridge Crossing
+      [destLat + 0.005, destLon + 0.005],
+      [destLat, destLon],
+    ],
+    roadblocks: [
+      [3.1640, 101.6970], // Riverbank inundation
+      [3.0800, 101.5400], // Low-lying drainage roadblock
+    ],
+    isDetour: true,
+  };
+};
 
 // Map Camera Controller for GPS Follower
 function NavigationMapController({
@@ -299,10 +363,17 @@ export function ShelterMapView() {
 
   const transport = getTransportDetails();
 
-  // Pick active route: If flood severity is Warning or Danger, intelligently avoid flooded basins!
-  const activeRoute = useMemo(() => {
-    return floodSeverity === 'normal' ? DIRECT_ROUTE : AVOIDANCE_ROUTE;
-  }, [floodSeverity]);
+  // Dynamic route calculation: Automatically recalculates to whichever shelter is selected!
+  const routeCalculation = useMemo(() => {
+    return calculateRouteForShelter(
+      selectedShelter.lat,
+      selectedShelter.lon,
+      floodSeverity
+    );
+  }, [selectedShelter.lat, selectedShelter.lon, floodSeverity]);
+
+  const activeRoute = routeCalculation.route;
+  const activeRoadblocks = routeCalculation.roadblocks;
 
   // Interpolate GPS coordinates along the activeRoute
   const currentGpsPosition = useMemo((): [number, number] => {
@@ -442,7 +513,7 @@ export function ShelterMapView() {
                     Est. Surge: {severityTokens.depth} ({severityTokens.label})
                   </span>
                   <span className="text-[10px] text-blue-600 font-bold block mt-1">
-                    Huawei ModelArts Ascend 910 GRU Model
+                    Predictive Hydrodynamic Model
                   </span>
                 </div>
               </Popup>
@@ -693,28 +764,28 @@ export function ShelterMapView() {
 
       {/* SHELTER & SIMULATOR UNIFIED RIGHT SIDEBAR DRAWER */}
       <div className="w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl overflow-hidden shrink-0">
-        {/* SECTION 1: FLOOD ZONE SIMULATOR INTEGRATED INTO SIDEBAR (NO FLOATING OVERLAY!) */}
-        <div className="p-4 bg-slate-950 text-white border-b border-slate-800 space-y-3 shrink-0">
+        {/* SECTION 1: FLOOD ZONE SIMULATOR INTEGRATED INTO SIDEBAR (HARMONIZED SYSTEM CARD) */}
+        <div className="p-4 bg-[#111C33] text-white border-b border-slate-700/60 space-y-3 shrink-0 shadow-inner">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-400">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-sm">
                 <Waves className="w-4 h-4 text-cyan-400" />
               </div>
               <div>
-                <h3 className="font-heading font-black text-xs tracking-wider uppercase text-white">
+                <h3 className="font-heading font-extrabold text-xs tracking-wider uppercase text-white">
                   Flood Hazard Simulator
                 </h3>
-                <span className="text-[10px] text-slate-400">5 Klang Valley Basins · Live Detour</span>
+                <span className="text-[10px] text-slate-300/80">5 Klang Valley Basins · Live Detour</span>
               </div>
             </div>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-bold">
-              <Cpu className="w-3 h-3" />
-              <span>Ascend 910 GRU</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-400/30 text-[10px] font-semibold">
+              <Shield className="w-3 h-3 text-cyan-400" />
+              <span>Predictive Engine</span>
             </div>
           </div>
 
           {/* 3 Severity Switcher Buttons */}
-          <div className="grid grid-cols-3 gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+          <div className="grid grid-cols-3 gap-1.5 bg-[#091122]/90 p-1.5 rounded-xl border border-slate-700/60 text-[11px] font-bold">
             <button
               onClick={() => setFloodSeverity('normal')}
               className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${

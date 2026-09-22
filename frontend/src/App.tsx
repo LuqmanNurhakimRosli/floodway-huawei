@@ -9,6 +9,7 @@ import { SimulationPage } from './pages/SimulationPage';
 import { ReportPage } from './pages/ReportPage';
 import { NavigationPage } from './pages/NavigationPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { HouseStudio360 } from './components/sandbox/HouseStudio360';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -27,6 +28,7 @@ export function App() {
           <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
           <Route path="/shelters" element={<Navigate to="/map" replace />} />
           <Route path="/simulation" element={<ProtectedRoute><SimulationPage /></ProtectedRoute>} />
+          <Route path="/studio" element={<ProtectedRoute><HouseStudio360 /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
           <Route path="/navigation/:shelterId" element={<ProtectedRoute><NavigationPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

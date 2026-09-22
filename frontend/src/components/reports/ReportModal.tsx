@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   X,
   UploadCloud,
@@ -6,11 +6,11 @@ import {
   ShieldCheck,
   Camera,
   MapPin,
-  Cpu,
   Sparkles,
-  AlertTriangle,
   Send,
-  Radio
+  Radio,
+  FileImage,
+  Trash2
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -25,17 +25,50 @@ interface Props {
 export function ReportModal({ isOpen, onClose }: Props) {
   const { addReport, selectedLocation } = useApp();
   const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('Monsoon Drain Overflowing into Residential Road');
-  const [location, setLocation] = useState(selectedLocation || 'Jalan Raja Muda Musa, Kampung Baru');
+  const [location, setLocation] = useState(selectedLocation || 'Kampung Baru, Kuala Lumpur');
   const [depthCm, setDepthCm] = useState(38);
   const [selectedImage, setSelectedImage] = useState('/banjir2.jpg');
-  const [selectedEngine, setSelectedEngine] = useState<'modelarts' | 'gemini'>('modelarts');
+  const [customFileName, setCustomFileName] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const [analyzing, setAnalyzing] = useState(false);
   const [aiResult, setAiResult] = useState<AiVerificationResult | null>(null);
 
   if (!isOpen) return null;
+
+  // Real File Upload Handler (File Input & Drag & Drop)
+  const handleFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file (JPG, PNG, WebP).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        setSelectedImage(e.target.result as string);
+        setCustomFileName(file.name);
+        setAiResult(null); // Reset analysis on new image
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
 
   const handleRunAiVerification = async () => {
     setAnalyzing(true);
@@ -43,7 +76,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
       imageUrl: selectedImage,
       userDescription: title,
       reportedDepthCm: depthCm,
-      engine: selectedEngine,
+      engine: 'gemini',
     });
     setAiResult(result);
     setAnalyzing(false);
@@ -52,17 +85,13 @@ export function ReportModal({ isOpen, onClose }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Default AI verification fallback if user submits before clicking separate verify button
     const finalAi: AiVerificationResult = aiResult || {
       verified: true,
-      confidenceScore: selectedEngine === 'gemini' ? 0.982 : 0.974,
+      confidenceScore: 0.98,
       detectedHazards: ['Road Inundation', 'Drain Backflow', 'Curb Submergence'],
       estimatedDepthCm: depthCm,
-      engine:
-        selectedEngine === 'gemini'
-          ? 'Gemini 2.5 Flash Vision (Google AI Studio)'
-          : 'Huawei ModelArts PanGu-CV (Ascend 910 NPU)',
-      notes: 'Automated AI visual inference verified standing murky floodwater breach.',
+      engine: 'Automated Visual AI',
+      notes: 'Automated AI visual assessment confirmed surface flood breach.',
     };
 
     addReport({
@@ -72,13 +101,13 @@ export function ReportModal({ isOpen, onClose }: Props) {
       lat: 3.1642,
       lon: 101.7031,
       waterDepthCm: depthCm,
-      status: 'AI_VERIFIED', // Initial status: AI verified, awaiting Human Authority sign-off
-      verifiedBy: `${finalAi.engine} (Pending Authority Sign-off)`,
+      status: 'AI_VERIFIED',
+      verifiedBy: 'Automated Visual Verification',
       timestampStr: 'Just now',
       author: user?.name || 'Citizen Responder',
       upvotes: 1,
       imageUrl: selectedImage,
-      description: `Reported flood incident. Depth approximately ${depthCm}cm. Automatically verified by multimodal vision AI.`,
+      description: `Reported flood incident. Depth approximately ${depthCm}cm. Automatically verified by visual AI.`,
       aiVerification: finalAi,
     });
 
@@ -96,7 +125,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
             </div>
             <div>
               <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest block">
-                Two-Layer Citizen Reporting
+                Citizen Reporting
               </span>
               <h3 className="font-heading font-bold text-base md:text-lg text-white">
                 Submit Flood Photo for Verification
@@ -173,77 +202,117 @@ export function ReportModal({ isOpen, onClose }: Props) {
             </div>
           </div>
 
-          {/* Image Selection Preview */}
+          {/* REAL IMAGE UPLOAD DROPZONE */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Incident Photo (Evidence)
+              Upload Flood Photo (Evidence)
             </label>
-            <div className="grid grid-cols-2 gap-2">
-              <div
-                onClick={() => setSelectedImage('/banjir2.jpg')}
-                className={`relative rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
-                  selectedImage === '/banjir2.jpg'
-                    ? 'border-[#1677FF] ring-2 ring-[#1677FF]/40 shadow-sm'
-                    : 'border-slate-200 opacity-70 hover:opacity-100'
-                }`}
-              >
-                <img src="/banjir2.jpg" alt="Flood Photo 1" className="w-full h-24 object-cover" />
-                <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">
-                  Photo 1 (Kampung Baru)
-                </span>
-              </div>
 
-              <div
-                onClick={() => setSelectedImage('/banjir3.jfif')}
-                className={`relative rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
-                  selectedImage === '/banjir3.jfif'
-                    ? 'border-[#1677FF] ring-2 ring-[#1677FF]/40 shadow-sm'
-                    : 'border-slate-200 opacity-70 hover:opacity-100'
-                }`}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+
+            <div
+              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all ${
+                isDragging
+                  ? 'border-[#1677FF] bg-blue-50/50'
+                  : 'border-slate-300 hover:border-[#1677FF] hover:bg-slate-50'
+              }`}
+            >
+              {selectedImage ? (
+                <div className="flex items-center gap-3 text-left">
+                  <img
+                    src={selectedImage}
+                    alt="Preview"
+                    className="w-20 h-20 rounded-xl object-cover border border-slate-200 shadow-xs"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span className="font-bold text-xs text-slate-900 block truncate">
+                      {customFileName || 'Flood Incident Photo'}
+                    </span>
+                    <span className="text-[11px] text-slate-400 block mt-0.5">
+                      Ready for automated visual verification
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="mt-2 text-[11px] font-bold text-[#1677FF] hover:underline flex items-center gap-1"
+                    >
+                      <UploadCloud className="w-3.5 h-3.5" />
+                      <span>Choose Different Photo</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-4 space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 text-[#1677FF] flex items-center justify-center mx-auto">
+                    <UploadCloud className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-800 block">
+                      Click to upload photo or drag & drop
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      Supports JPG, PNG, WebP up to 10MB
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick preset options */}
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-[10px] text-slate-400 font-semibold">Or use incident samples:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedImage('/banjir2.jpg');
+                  setCustomFileName('banjir_kampung_baru.jpg');
+                  setAiResult(null);
+                }}
+                className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
               >
-                <img src="/banjir3.jfif" alt="Flood Photo 2" className="w-full h-24 object-cover" />
-                <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">
-                  Photo 2 (Taman Sri Muda)
-                </span>
-              </div>
+                Sample 1 (Kampung Baru)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedImage('/banjir3.jfif');
+                  setCustomFileName('banjir_sri_muda.jpg');
+                  setAiResult(null);
+                }}
+                className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
+              >
+                Sample 2 (Sri Muda)
+              </button>
             </div>
           </div>
 
-          {/* Layer 1: AI Vision Verification Section */}
+          {/* Automated Visual AI Verification Section */}
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
                 <ShieldCheck className="w-4 h-4 text-[#1677FF]" />
-                <span>Layer 1: Multimodal AI Vision Verification</span>
+                <span>Automated Visual Verification</span>
               </div>
-              <div className="flex items-center gap-1 text-[10px] font-bold bg-white p-0.5 rounded-lg border border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setSelectedEngine('modelarts')}
-                  className={`px-2 py-0.5 rounded ${
-                    selectedEngine === 'modelarts'
-                      ? 'bg-[#1677FF] text-white'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  ModelArts
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedEngine('gemini')}
-                  className={`px-2 py-0.5 rounded ${
-                    selectedEngine === 'gemini'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Gemini Flash
-                </button>
-              </div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#1677FF] border border-blue-200">
+                AI Active
+              </span>
             </div>
 
             <p className="text-[11px] text-slate-500 leading-snug">
-              Multimodal AI scans for genuine water breach landmarks, vehicles, and depth thresholds before forwarding to civil defense officers.
+              Multimodal vision analyzes water inundation, vehicle hydrolock hazard, and depth thresholds.
             </p>
 
             <button
@@ -254,13 +323,13 @@ export function ReportModal({ isOpen, onClose }: Props) {
             >
               {analyzing ? (
                 <>
-                  <Cpu className="w-3.5 h-3.5 animate-spin text-blue-400" />
-                  <span>Analyzing Image with {selectedEngine === 'gemini' ? 'Gemini 2.5 Flash' : 'PanGu-CV'}...</span>
+                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Analyzing Photo for Flood Inundation...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Run Layer 1 AI Image Analysis</span>
+                  <span>Run Visual AI Assessment</span>
                 </>
               )}
             </button>
@@ -270,15 +339,11 @@ export function ReportModal({ isOpen, onClose }: Props) {
                 <div className="flex items-center justify-between font-bold">
                   <span className="flex items-center gap-1 text-emerald-700">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    AI Verification Passed ({Math.round(aiResult.confidenceScore * 100)}% Confidence)
+                    Visual Verification Passed ({Math.round(aiResult.confidenceScore * 100)}% Confidence)
                   </span>
-                  <span className="text-[10px] text-slate-500 font-mono">{aiResult.engine}</span>
                 </div>
                 <div className="text-[11px] text-slate-600">
                   <b>Detected:</b> {aiResult.detectedHazards.join(', ')}
-                </div>
-                <div className="text-[10px] text-emerald-800 italic">
-                  "{aiResult.notes}"
                 </div>
               </div>
             )}
@@ -288,7 +353,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
           <div className="text-[11px] text-slate-500 p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-1.5">
             <Radio className="w-3.5 h-3.5 text-[#1677FF] shrink-0 mt-0.5" />
             <span>
-              <b>Workflow:</b> Submitting will mark this report as <b>AI Verified</b>. It will be routed to the <b>Authority Review Desk</b> where civil defense officers verify and gazette it.
+              <b>Workflow:</b> Submitting will mark this report as <b>AI Verified</b>. It will route to the <b>Operations Desk</b> to be published publicly.
             </span>
           </div>
 

@@ -26,7 +26,7 @@ export function DashboardSidebar() {
 
   return (
     <aside
-      className={`hidden md:flex flex-col bg-[#071426] text-white border-r border-[#1E293B] transition-all duration-300 select-none z-30 shrink-0 ${
+      className={`hidden md:flex flex-col bg-[#071426] text-white border-r border-[#1E293B] transition-all duration-300 select-none z-30 shrink-0 sticky top-0 h-screen ${
         isCollapsed ? 'w-[76px]' : 'w-[260px]'
       }`}
     >
@@ -39,9 +39,9 @@ export function DashboardSidebar() {
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-heading font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
-                FloodWay <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-[#1677FF]/20 text-[#60A5FA] border border-[#1677FF]/40">2.0</span>
+                FloodWay
               </span>
-              <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Huawei ICT 2026</span>
+              <span className="text-[10px] text-blue-400/90 font-medium tracking-wider uppercase">Life-Safety Intelligence</span>
             </div>
           )}
         </div>
@@ -93,15 +93,15 @@ export function DashboardSidebar() {
         ))}
       </nav>
 
-      {/* Huawei Cloud Sustainability Footer */}
+      {/* System Status Footer */}
       {!isCollapsed && (
-        <div className="p-4 m-3 rounded-xl bg-gradient-to-b from-slate-900 to-[#0B1E38] border border-slate-800/80">
-          <div className="flex items-center gap-2 mb-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="text-xs font-semibold text-slate-200">Huawei ModelArts</span>
+        <div className="p-3.5 m-3 rounded-xl bg-[#0B1E38]/80 border border-slate-800/80">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-semibold text-slate-200">LifeLine Active</span>
           </div>
           <p className="text-[11px] text-slate-400 leading-relaxed">
-            Safer Communities, Stronger Tomorrow. Powered by Ascend AI & IoTDA.
+            Real-time flood prediction & community safety dispatch.
           </p>
         </div>
       )}

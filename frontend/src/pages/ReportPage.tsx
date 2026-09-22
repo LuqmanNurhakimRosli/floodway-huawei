@@ -51,15 +51,15 @@ export function ReportPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="font-heading font-black text-2xl text-slate-900 tracking-tight">
-                    FloodWay 2.0
+                    FloodWay
                   </h1>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    Two-Layer Verification
+                    Verified Incident Reports
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium">
-                  Layer 1: Huawei ModelArts / Gemini Multimodal AI · Layer 2: Civil Defense Authority Gazette
+                  Real-time citizen flood reports verified by automated visual AI and emergency operations.
                 </p>
               </div>
             </div>
@@ -93,15 +93,15 @@ export function ReportPage() {
               <span className="font-heading font-extrabold text-2xl text-[#1677FF] block">
                 {reports.filter((r) => r.status === 'AI_VERIFIED' || r.status === 'OFFICIAL_VERIFIED').length}
               </span>
-              <span className="text-[11px] font-semibold text-blue-800 uppercase">Layer 1: AI Verified</span>
+              <span className="text-[11px] font-semibold text-blue-800 uppercase">AI Screened</span>
             </div>
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-100 text-center">
               <span className="font-heading font-extrabold text-2xl text-amber-700 block">{pendingCount}</span>
-              <span className="text-[11px] font-semibold text-amber-800 uppercase">Pending Authority Gazette</span>
+              <span className="text-[11px] font-semibold text-amber-800 uppercase">Pending Review</span>
             </div>
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-center">
               <span className="font-heading font-extrabold text-2xl text-emerald-700 block">{officialCount}</span>
-              <span className="text-[11px] font-semibold text-emerald-800 uppercase">Layer 2: Dual Gazetted</span>
+              <span className="text-[11px] font-semibold text-emerald-800 uppercase">Live Published</span>
             </div>
           </div>
 
