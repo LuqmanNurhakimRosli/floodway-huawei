@@ -1,91 +1,89 @@
-export type LayerCategory = 'basemap' | 'eo' | 'damage' | 'infrastructure' | 'routing';
+export type FloodPhase = 'NORMAL' | 'ADVISORY' | 'WARNING' | 'DANGER';
 
-export interface MapLayer {
+export interface User {
   id: string;
   name: string;
-  category: LayerCategory;
-  visible: boolean;
-  opacity: number;
-  color: string;
-  featureCount?: number;
-  description: string;
-  badge?: string;
+  email: string;
+  phone: string;
+  isDemo?: boolean;
 }
 
-export type DamageSeverity = 'DESTROYED' | 'MAJOR_DAMAGE' | 'MINOR_DAMAGE' | 'NO_CHANGE';
-
-export interface DamageFeatureProperties {
+export interface FamilyContact {
   id: string;
   name: string;
-  feature_type: 'building' | 'bridge' | 'facility' | 'road_block' | 'flood_zone';
-  damage_class: DamageSeverity;
-  confidence: number;
+  relation: string;
+  phone: string;
+  notifyOnSos: boolean;
+}
+
+export interface IoTStationTelemetry {
+  deviceId: string;
+  name: string;
+  mountHeightCm: number;
+  distanceCm: number;
+  waterLevelM: number;
+  waterDepthCm: number;
+  stage: 'Normal' | 'Alert' | 'Warning' | 'Danger';
+  batteryPct: number;
+  isOnline: boolean;
+  lastUpdated: string;
+}
+
+export interface ForecastData {
   source: string;
-  timestamp: string;
-  operational_tag: string;
-  notes?: string;
+  horizonsMin: number[];
+  p10: number[];
+  p50: number[];
+  p90: number[];
+  peakLevelM: number;
+  timeToPeakMin: number;
+  timeToDangerMin: number | null;
+  confidenceScore: number;
 }
 
-export interface CriticalFacility {
+export interface Shelter {
   id: string;
   name: string;
-  type: 'hospital' | 'bridge' | 'shelter' | 'staging_base';
-  coordinates: [number, number]; // [lat, lng]
-  status: 'operational' | 'compromised' | 'submerged' | 'alert';
-  capacity?: string;
-  details: string;
+  category: string;
+  lat: number;
+  lon: number;
+  address: string;
+  status: 'OPEN' | 'FULL' | 'STANDBY';
+  currentCapacity: number;
+  maxCapacity: number;
+  contact: string;
+  facilities: string[];
+  elevationM: number;
+  routeStatus: 'CLEAR' | 'ADVISORY' | 'BLOCKED';
+  distanceKm: number;
+  travelTimeMin: number;
 }
 
-export interface RouteAnalysis {
+export interface CitizenReport {
   id: string;
   title: string;
-  origin: string;
-  destination: string;
-  distanceKm: number;
-  estTimeMin: number;
-  riskLevel: 'LOW' | 'MODERATE' | 'CRITICAL';
-  status: 'viable' | 'caution' | 'impassable';
-  confidence: number;
-  reason: string;
-  coordinates: [number, number][]; // Array of [lat, lng]
-}
-
-export interface ScenarioStats {
-  aoiAreaKm2: number;
-  floodAreaKm2: number;
-  damagedStructuresCount: number;
-  destroyedCount: number;
-  majorDamageCount: number;
-  minorDamageCount: number;
-  impassableRoadsCount: number;
-  viableCorridorsCount: number;
-  criticalFacilitiesCount: number;
-  overallConfidence: number;
-  dataLatencyHours: number;
-}
-
-export interface DisasterScenario {
-  id: string;
-  name: string;
-  subtitle: string;
   location: string;
-  country: string;
-  center: [number, number]; // [lat, lng]
-  zoom: number;
-  bbox: [number, number, number, number]; // [minLat, minLng, maxLat, maxLng]
-  eventDate: string;
-  lastSatellitePass: string;
-  sensor: string;
-  processingModel: string;
-  stats: ScenarioStats;
-  criticalFacilities: CriticalFacility[];
-  candidateRoutes: RouteAnalysis[];
-  floodExtentGeoJson: GeoJSON.FeatureCollection;
-  damagePolygonsGeoJson: GeoJSON.FeatureCollection;
-  roadNetworkGeoJson: GeoJSON.FeatureCollection;
-  sitrepLogs: Array<{
-    time: string;
-    level: 'INFO' | 'WARNING' | 'ALERT' | 'SUCCESS';
-    message: string;
-  }>;
+  lat: number;
+  lon: number;
+  waterDepthCm: number;
+  status: 'VERIFIED' | 'UNDER_REVIEW' | 'RESOLVED';
+  verifiedBy: string;
+  timestampStr: string;
+  author: string;
+  upvotes: number;
+  imageUrl?: string;
+}
+
+export interface SosEvent {
+  id: string;
+  timestamp: string;
+  userName: string;
+  phone: string;
+  lat: number;
+  lon: number;
+  waterDepthCm: number;
+  shelterName: string;
+  note?: string;
+  telegramSent: boolean;
+  status: 'ACTIVE' | 'ARRIVED' | 'RESOLVED';
 }

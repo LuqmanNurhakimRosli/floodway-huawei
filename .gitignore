@@ -1,31 +1,29 @@
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
-
-# Build outputs
-frontend/dist/
-dist/
-build/
+*/node_modules/
 
 # Python
 __pycache__/
+*/__pycache__/
+*/*/__pycache__/
 *.py[cod]
 *$py.class
-*.so
-.venv/
 venv/
+.venv/
 env/
-ENV/
 
-# System and IDE
+# Build artifacts
+dist/
+build/
+*/dist/
+
+# Environment variables
+.env
+.env.local
+*.local
+
+# Editor & OS
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-*.log
-.wrangler/
-
-# Models & Big Binaries (>50MB)
-ml/checkpoints/*.pth
-!ml/checkpoints/.gitkeep

@@ -1,0 +1,194 @@
+FloodWay/
+├── docs/                              # AI documentation system
+│   ├── 00_PROJECT_CONTEXT.md
+│   ├── 01_ARCHITECTURE.md
+│   ├── 02_TECH_STACK.md
+│   ├── 03_FEATURES.md
+│   ├── 04_FOLDER_STRUCTURE.md
+│   ├── 05_DATABASE_SCHEMA.md
+│   ├── 06_API_REFERENCE.md
+│   ├── 07_IOT_SYSTEM.md
+│   ├── 08_3D_MODULE.md
+│   ├── 09_AI_HANDOVER.md
+│   ├── 10_DEVELOPMENT_LOG.md
+│   ├── 11_TODO.md
+│   ├── 12_PROMPT_LIBRARY.md
+│   ├── 13_KNOWN_ISSUES.md
+│   ├── 14_CODING_CONVENTIONS.md
+│   └── PROJECT_STRUCTURE.txt
+│
+├── src/
+│   ├── main.tsx
+│   ├── App.tsx
+│   ├── App.css
+│   ├── index.css
+│   ├── docs.tsx
+│   │
+│   ├── pages/
+│   │   ├── index.ts
+│   │   ├── HomePage.tsx
+│   │   ├── ShelterPage.tsx
+│   │   ├── NavigationPage.tsx
+│   │   ├── ReportPage.tsx
+│   │   ├── ReportPage.css
+│   │   ├── SimulationPage.tsx
+│   │   ├── ProfilePage.tsx
+│   │   ├── WelcomePage.tsx
+│   │   ├── SignUpPage.tsx
+│   │   ├── LoadingPage.tsx
+│   │   ├── LocationPage.tsx
+│   │   └── FutureWorkPage.tsx
+│   │
+│   ├── components/
+│   │   ├── BottomNav.tsx
+│   │   ├── IoTWidget.tsx
+│   │   ├── EmergencyAlert.tsx
+│   │   ├── FloodReportLayer.tsx
+│   │   ├── FloodZoneLayer.tsx
+│   │   ├── FloodTimeline.tsx
+│   │   ├── FloodTimelineScrubber.tsx
+│   │   ├── ForecastOverlay.tsx
+│   │   ├── RiskIndicator.tsx
+│   │   ├── WeatherCard.tsx
+│   │   ├── AlertCard.tsx
+│   │   ├── UserAvatar.tsx
+│   │   ├── WhatsAppAlertBanner.tsx
+│   │   │
+│   │   ├── report/
+│   │   │   ├── ReportForm.tsx
+│   │   │   ├── ReportForm.css
+│   │   │   ├── ReportCard.tsx
+│   │   │   ├── ReportCard.css
+│   │   │   ├── AIVerification.tsx
+│   │   │   ├── AIVerification.css
+│   │   │   ├── ModeratorPanel.tsx
+│   │   │   ├── ModeratorPanel.css
+│   │   │   ├── MapScreen.tsx
+│   │   │   ├── MapScreen.css
+│   │   │   ├── EmergencyMode.tsx
+│   │   │   ├── EmergencyMode.css
+│   │   │   └── report.css
+│   │   │
+│   │   └── ui/
+│   │       ├── alert.tsx
+│   │       ├── badge.tsx
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── input.tsx
+│   │       ├── label.tsx
+│   │       └── progress.tsx
+│   │
+│   ├── store/
+│   │   ├── AppContext.tsx
+│   │   └── index.ts
+│   │
+│   ├── contexts/
+│   │   └── AuthContext.tsx
+│   │
+│   ├── services/
+│   │   ├── floodService.ts
+│   │   └── reportsService.ts
+│   │
+│   ├── hooks/
+│   │   ├── useBluetooth.ts
+│   │   ├── useCamera.ts
+│   │   └── useGeolocation.ts
+│   │
+│   ├── utils/
+│   │   ├── aiVerification.ts
+│   │   ├── openai.ts
+│   │   ├── pathfinding.ts
+│   │   └── predictionGenerator.ts
+│   │
+│   ├── types/
+│   │   ├── app.ts
+│   │   ├── report.ts
+│   │   └── flood.ts
+│   │
+│   ├── data/
+│   │   ├── locations.ts
+│   │   └── floodZones.ts
+│   │
+│   ├── lib/
+│   │   ├── firebase.ts
+│   │   └── utils.ts
+│   │
+│   ├── screens/              # Legacy (unused)
+│   │   ├── index.ts
+│   │   ├── WelcomeScreen.tsx
+│   │   ├── LocationScreen.tsx
+│   │   ├── PredictionScreen.tsx
+│   │   ├── ShelterScreen.tsx
+│   │   └── NavigationScreen.tsx
+│   │
+│   └── assets/
+│       └── react.svg
+│
+├── backend/
+│   ├── main.py
+│   └── requirements.txt
+│
+├── public/
+│   ├── _redirects
+│   ├── banjir2.jpg
+│   ├── banjir3.jfif
+│   ├── cctv image.jpg
+│   ├── city.glb
+│   ├── favicon.svg
+│   ├── floodway logo.png
+│   ├── otter-mascot.svg
+│   ├── vite.svg
+│   └── water-level.png
+│
+├── Borneo HackWKDN Submition/     # Hackathon submission
+│   ├── Link_video.txt
+│   └── Report FloodWay.pdf
+│
+├── Navigation app/                 # Legacy prototypes
+│   ├── NavigationPage.tsx
+│   ├── NavigationScreen.tsx
+│   ├── ShelterPage.tsx
+│   ├── ShelterScreen.tsx
+│   ├── locations.ts
+│   └── pathfinding.ts
+│
+├── report feature/                 # Legacy standalone report
+│   └── src/
+│       ├── App.tsx
+│       ├── main.tsx
+│       ├── index.css
+│       ├── types.ts
+│       ├── assets/
+│       ├── components/
+│       ├── hooks/
+│       └── utils/
+│
+├── nothing/                        # ML experiments
+│   ├── flood-prediction-model.ipynb
+│   └── flood_detector.keras
+│
+├── .env                            # Environment variables (GITIGNORED)
+├── .gitignore
+├── index.html
+├── package.json
+├── package-lock.json
+├── vite.config.ts
+├── tsconfig.json
+├── tsconfig.app.json
+├── tsconfig.node.json
+├── eslint.config.js
+├── components.json
+├── firestore.rules
+├── netlify.toml
+├── CLAUDE.md
+├── README.md
+├── CONTRIBUTING.md
+├── TEAM_GUIDE.md
+├── PROJECT_OVERVIEW.md
+├── PROJECT_REPORT.md
+├── arch.md
+├── flood_detector.h5
+├── flood_detector.tflite
+├── flood_detection_using_ann.ipynb
+├── _MalaysiaFloodDataset_MalaysiaFloodDataset.csv
+└── city.glb

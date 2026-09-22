@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+httpx>=0.27
+pydantic>=2
+numpy
+torch            # CPU build is enough; skip if backend only calls ModelArts (then drop flood_core torch import)
+firebase-admin   # if verifying Firebase ID tokens
+huaweicloudsdkcore
+huaweicloudsdksmn
