@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, Suspense } from 'react';
+import React, { useRef, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
@@ -22,54 +22,59 @@ const CARPORT_DEPTH = 5.0;
 const WALL_HEIGHT = 3.3;
 const ROOF_PEAK_H = 1.9;
 
+// Materials defined at module scope so HMR replaces them cleanly on every save.
+// (useMemo with [] would cache the first-created objects and ignore updates.)
+const MATS = {
+  // Walls
+  wallMain: new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.85 }),
+  wallCharcoal: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.70 }),
+  wallAccent: new THREE.MeshStandardMaterial({ color: '#c2410c', roughness: 0.65 }),
+  timberBatten: new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.50 }),
+
+  // Roof & Fascia
+  roofClay: new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.40, metalness: 0.10 }),
+  roofRidge: new THREE.MeshStandardMaterial({ color: '#7c2d12', roughness: 0.45 }),
+  fasciaTrim: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.75 }),
+  gutter: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.35, metalness: 0.6 }),
+
+  // Windows & Doors
+  doorWood: new THREE.MeshStandardMaterial({ color: '#451a03', roughness: 0.35 }),
+  handleMetal: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
+  windowAlum: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.25, metalness: 0.6 }),
+  // Light-blue transparent glass — NO transmission, works without an env map
+  windowGlass: new THREE.MeshStandardMaterial({
+    color: '#7dd3fc',
+    roughness: 0.05,
+    metalness: 0.15,
+    transparent: true,
+    opacity: 0.45,
+  }),
+
+  // Porch, Ground & Street
+  porchTiles: new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.75 }),
+  curbConcrete: new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.90 }),
+  roadAsphalt: new THREE.MeshStandardMaterial({ color: '#181e26', roughness: 0.95 }),
+  grassLawn: new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.85 }),
+  boundaryWall: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 }),
+  gateSteel: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.30, metalness: 0.75 }),
+
+  // Sedan Car
+  carBody: new THREE.MeshStandardMaterial({ color: '#1d4ed8', roughness: 0.20, metalness: 0.75 }),
+  carGlass: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.10, metalness: 0.4 }),
+  carTire: new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.95 }),
+  carAlloyRim: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
+  carLightFront: new THREE.MeshBasicMaterial({ color: '#fef08a' }),
+  carLightTail: new THREE.MeshBasicMaterial({ color: '#ef4444' }),
+
+  // Landscaping
+  potClay: new THREE.MeshStandardMaterial({ color: '#ea580c', roughness: 0.80 }),
+  foliage: new THREE.MeshStandardMaterial({ color: '#16a34a', roughness: 0.75 }),
+};
+
 function CompleteTerraceHouseModel() {
-  const mats = useMemo(() => ({
-    // Walls
-    wallMain: new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.85 }),
-    wallCharcoal: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.70 }),
-    wallAccent: new THREE.MeshStandardMaterial({ color: '#c2410c', roughness: 0.65 }),
-    timberBatten: new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.50 }),
+  // Use module-level materials (HMR-safe)
+  const mats = MATS;
 
-    // Roof & Fascia
-    roofClay: new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.40, metalness: 0.10 }),
-    roofRidge: new THREE.MeshStandardMaterial({ color: '#7c2d12', roughness: 0.45 }),
-    fasciaTrim: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.75 }),
-    gutter: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.35, metalness: 0.6 }),
-
-    // Windows & Doors
-    doorWood: new THREE.MeshStandardMaterial({ color: '#451a03', roughness: 0.35 }),
-    handleMetal: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
-    windowAlum: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.25, metalness: 0.6 }),
-    // MeshPhysicalMaterial+transmission needs an env map or it renders pitch-black.
-    // Plain MeshStandardMaterial with transparency works without any env map.
-    windowGlass: new THREE.MeshStandardMaterial({
-      color: '#7dd3fc',
-      roughness: 0.05,
-      metalness: 0.15,
-      transparent: true,
-      opacity: 0.45,
-    }),
-
-    // Porch, Ground & Street
-    porchTiles: new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.75 }),
-    curbConcrete: new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.90 }),
-    roadAsphalt: new THREE.MeshStandardMaterial({ color: '#181e26', roughness: 0.95 }),
-    grassLawn: new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.85 }),
-    boundaryWall: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 }),
-    gateSteel: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.30, metalness: 0.75 }),
-
-    // Sedan Car
-    carBody: new THREE.MeshStandardMaterial({ color: '#1d4ed8', roughness: 0.20, metalness: 0.75 }),
-    carGlass: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.10, metalness: 0.4 }),
-    carTire: new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.95 }),
-    carAlloyRim: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
-    carLightFront: new THREE.MeshBasicMaterial({ color: '#fef08a' }),
-    carLightTail: new THREE.MeshBasicMaterial({ color: '#ef4444' }),
-
-    // Landscaping
-    potClay: new THREE.MeshStandardMaterial({ color: '#ea580c', roughness: 0.80 }),
-    foliage: new THREE.MeshStandardMaterial({ color: '#16a34a', roughness: 0.75 }),
-  }), []);
 
   // Roof Slope calculations
   // Horizontal half-width = LOT_WIDTH / 2 = 3.6m. Rise = 1.9m
