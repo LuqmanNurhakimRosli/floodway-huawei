@@ -135,9 +135,19 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white border border-emerald-200 text-xs text-slate-700 space-y-1">
-            <span className="font-bold block text-slate-900">Automated Telegram Dispatch:</span>
-            <p className="italic text-slate-600">
+          <div className="p-4 rounded-2xl bg-white border border-emerald-200 text-xs text-slate-700 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-900">Telegram Bot Dispatch (@floodway_bot):</span>
+              <a
+                href="https://t.me/floodway_bot"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] font-bold text-sky-600 hover:text-sky-800 underline underline-offset-2"
+              >
+                Open @floodway_bot
+              </a>
+            </div>
+            <p className="italic text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               "✅ Luqman Nurhakim has SAFELY ARRIVED at {shelter.name} at {new Date().toLocaleTimeString()}! Geofence verified. Family loop complete."
             </p>
           </div>

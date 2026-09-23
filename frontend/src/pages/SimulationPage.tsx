@@ -47,26 +47,97 @@ export function SimulationPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Sri Muda Replay Sequence
-  const [isReplaying, setIsReplaying] = useState(false);
-  const [replayIndex, setReplayIndex] = useState(0);
-  const replaySteps = [0.00, 0.18, 0.40, 0.95, 1.65];
+  // Automated Progressive Flood Simulation: Normal -> Porch -> Vehicle Stall -> Danger Breach -> Auto-SOS
+  const [isPlayingSimulation, setIsPlayingSimulation] = useState(false);
+  const [playStepIndex, setPlayStepIndex] = useState(0);
 
+  const SIMULATION_STEPS = useMemo(() => [
+    {
+      id: 'normal',
+      title: 'Normal Baseline (0.00m)',
+      subtitle: 'Clear skies, zero flood risk',
+      depthM: 0.00,
+      rain: 0,
+      saturation: 30,
+      weather: 'daylight' as WeatherMode,
+      camPos: [13, 8.5, 20] as [number, number, number],
+      camTarget: [0, 1.6, 4] as [number, number, number],
+    },
+    {
+      id: 'porch',
+      title: 'Porch Spillover (0.20m)',
+      subtitle: 'Monsoon downpour begins. Curbside water spills into driveway',
+      depthM: 0.20,
+      rain: 55,
+      saturation: 65,
+      weather: 'storm' as WeatherMode,
+      camPos: [6, 4.5, 14] as [number, number, number],
+      camTarget: [0, 1.2, 7] as [number, number, number],
+    },
+    {
+      id: 'vehicle',
+      title: 'Vehicle Stall Hazard (0.40m)',
+      subtitle: 'Longkang flooded. Sedan exhaust pipe submerged, evacuation urged',
+      depthM: 0.40,
+      rain: 95,
+      saturation: 85,
+      weather: 'storm' as WeatherMode,
+      camPos: [-5, 3.5, 12] as [number, number, number],
+      camTarget: [-1.4, 0.8, 6.5] as [number, number, number],
+    },
+    {
+      id: 'danger',
+      title: 'CRITICAL INUNDATION (1.10m)',
+      subtitle: 'Living room floor breached! Main DB safety hazard! Triggering SOS...',
+      depthM: 1.10,
+      rain: 140,
+      saturation: 98,
+      weather: 'storm' as WeatherMode,
+      camPos: [10, 6.5, 16] as [number, number, number],
+      camTarget: [0, 1.6, 3] as [number, number, number],
+    },
+  ], []);
+
+  // Simulation Play Runner
   useEffect(() => {
-    if (!isReplaying) return;
-    const timer = setInterval(() => {
-      setReplayIndex((prev) => {
-        const next = (prev + 1) % replaySteps.length;
-        const newLvl = replaySteps[next];
-        setLevelM(newLvl);
-        if (newLvl > 0.20) setWeatherMode('storm');
-        else setWeatherMode('daylight');
-        return next;
-      });
-    }, 2200);
+    if (!isPlayingSimulation) return;
 
-    return () => clearInterval(timer);
-  }, [isReplaying]);
+    const currentStep = SIMULATION_STEPS[playStepIndex];
+    if (currentStep) {
+      setLevelM(currentStep.depthM);
+      setRainfallMmHr(currentStep.rain);
+      setSoilSaturationPct(currentStep.saturation);
+      setWeatherMode(currentStep.weather);
+      if (controlsRef.current && currentStep.camPos && currentStep.camTarget) {
+        controlsRef.current.object.position.set(...currentStep.camPos);
+        controlsRef.current.target.set(...currentStep.camTarget);
+        controlsRef.current.update();
+      }
+    }
+
+    // Advance to next step or trigger Danger SOS
+    const timer = setTimeout(() => {
+      if (playStepIndex < SIMULATION_STEPS.length - 1) {
+        setPlayStepIndex((prev) => prev + 1);
+      } else {
+        // Reached DANGER! Stop playing and auto pop-up Emergency SOS Broadcast!
+        setIsPlayingSimulation(false);
+        setIsSosOpen(true);
+      }
+    }, 2800);
+
+    return () => clearTimeout(timer);
+  }, [isPlayingSimulation, playStepIndex, SIMULATION_STEPS]);
+
+  const startSimulationPlay = () => {
+    setIsSosOpen(false);
+    setPlayStepIndex(0);
+    setIsPlayingSimulation(true);
+  };
+
+  const stopSimulationPlay = () => {
+    setIsPlayingSimulation(false);
+  };
 
   // Phase computation
   const phase = useMemo(() => {
@@ -118,6 +189,7 @@ export function SimulationPage() {
     camPos?: [number, number, number],
     camTarget?: [number, number, number]
   ) => {
+    stopSimulationPlay();
     setLevelM(depth);
     setRainfallMmHr(rain);
     setSoilSaturationPct(saturation);
@@ -191,7 +263,7 @@ export function SimulationPage() {
             <Suspense fallback={null}>
               <TerraceHouseScene
                 waterLevelM={levelM}
-                showCallouts={true}
+                showCallouts={!isSosOpen}
                 weatherMode={weatherMode}
               />
             </Suspense>
@@ -230,11 +302,62 @@ export function SimulationPage() {
             </button>
           </div>
 
-          {/* Top Right Fullscreen & Camera Presets */}
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5">
+          {/* Active Simulation Progression Banner */}
+          {isPlayingSimulation && (
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-2xl bg-[#091122]/95 backdrop-blur-md border border-emerald-500/50 text-white shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-3 max-w-[92vw]">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+              <div className="text-xs">
+                <span className="font-extrabold text-emerald-400 mr-1.5">
+                  Demo [{playStepIndex + 1}/4]:
+                </span>
+                <span className="font-bold text-white">
+                  {SIMULATION_STEPS[playStepIndex]?.title}
+                </span>
+                <span className="hidden md:inline text-slate-300 ml-1.5">
+                  · {SIMULATION_STEPS[playStepIndex]?.subtitle}
+                </span>
+              </div>
+              <button
+                onClick={stopSimulationPlay}
+                className="text-[10px] uppercase font-extrabold text-amber-300 hover:text-white px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-400/30 cursor-pointer shrink-0 ml-1"
+              >
+                Stop
+              </button>
+            </div>
+          )}
+
+          {/* Top Right Fullscreen, Simulation Play & Weather Controls */}
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            {/* Automated Simulation Play/Pause Button */}
             <button
-              onClick={() => setWeatherMode(weatherMode === 'daylight' ? 'storm' : 'daylight')}
-              className={`p-2 rounded-xl border backdrop-blur-md text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-lg ${
+              onClick={isPlayingSimulation ? stopSimulationPlay : startSimulationPlay}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-xl cursor-pointer border ${
+                isPlayingSimulation
+                  ? 'bg-amber-500 hover:bg-amber-600 text-slate-950 border-amber-300 animate-pulse'
+                  : 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400/50 shadow-emerald-900/30 hover:scale-105 active:scale-95'
+              }`}
+              title={isPlayingSimulation ? 'Pause Simulation' : 'Run Automated Flood Inundation & Danger Demo'}
+            >
+              {isPlayingSimulation ? (
+                <>
+                  <Pause className="w-3.5 h-3.5 fill-current" />
+                  <span>Step {playStepIndex + 1}/4</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span className="hidden sm:inline">Play Simulation</span>
+                  <span className="sm:hidden">Play</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                stopSimulationPlay();
+                setWeatherMode(weatherMode === 'daylight' ? 'storm' : 'daylight');
+              }}
+              className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl border backdrop-blur-md text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-lg ${
                 weatherMode === 'daylight'
                   ? 'bg-amber-500/20 border-amber-400/40 text-amber-300 hover:bg-amber-500/30'
                   : 'bg-blue-500/20 border-blue-400/40 text-blue-300 hover:bg-blue-500/30'
@@ -242,12 +365,12 @@ export function SimulationPage() {
               title="Toggle Daylight / Storm Weather"
             >
               {weatherMode === 'daylight' ? <Sun className="w-4 h-4" /> : <CloudRain className="w-4 h-4" />}
-              <span className="hidden sm:inline">{weatherMode === 'daylight' ? 'Sunny Morning' : 'Monsoon Storm'}</span>
+              <span className="hidden md:inline">{weatherMode === 'daylight' ? 'Sunny Morning' : 'Monsoon Storm'}</span>
             </button>
 
             <button
               onClick={toggleFullscreen}
-              className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
+              className="p-1.5 sm:p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
               title="Toggle Fullscreen"
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
