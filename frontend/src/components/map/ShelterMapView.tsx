@@ -764,34 +764,35 @@ export function ShelterMapView() {
 
       {/* SHELTER & SIMULATOR UNIFIED RIGHT SIDEBAR DRAWER */}
       <div className="w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl shrink-0 h-full md:h-auto overflow-hidden">
-        {/* SECTION 1: FLOOD ZONE SIMULATOR INTEGRATED INTO SIDEBAR (HARMONIZED SYSTEM CARD) */}
-        <div className="p-4 bg-gradient-to-b from-[#0f1d3a] via-[#102a52] to-[#1a3a6e] text-white border-b border-blue-900/40 space-y-3 shrink-0 shadow-sm">
+        {/* SECTION 1: FLOOD HAZARD SIMULATOR — light white/blue card matching sidebar */}
+        <div className="p-4 bg-white border-b border-slate-200 space-y-3 shrink-0">
+          {/* Header row */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-sm">
-                <Waves className="w-4 h-4 text-cyan-400" />
+              <div className="w-8 h-8 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center shadow-sm">
+                <Waves className="w-4 h-4 text-[#1677FF]" />
               </div>
               <div>
-                <h3 className="font-heading font-extrabold text-xs tracking-wider uppercase text-white">
+                <h3 className="font-heading font-extrabold text-xs tracking-wider uppercase text-slate-800">
                   Flood Hazard Simulator
                 </h3>
-                <span className="text-[10px] text-slate-300/80">5 Klang Valley Basins · Live Detour</span>
+                <span className="text-[10px] text-slate-500">5 Klang Valley Basins · Live Detour</span>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-400/30 text-[10px] font-semibold">
-              <Shield className="w-3 h-3 text-cyan-400" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#1677FF] border border-blue-200 text-[10px] font-semibold">
+              <Shield className="w-3 h-3" />
               <span>Predictive Engine</span>
             </div>
           </div>
 
-          {/* 3 Severity Switcher Buttons */}
-          <div className="grid grid-cols-3 gap-1.5 bg-[#0a1628]/80 p-1.5 rounded-xl border border-blue-900/50 text-[11px] font-bold">
+          {/* 3 Severity Switcher Buttons — light segmented control */}
+          <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-[11px] font-bold">
             <button
               onClick={() => setFloodSeverity('normal')}
-              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
                 floodSeverity === 'normal'
-                  ? 'bg-sky-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1677FF] text-white shadow-md'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-white'
               }`}
             >
               <span>Normal</span>
@@ -799,10 +800,10 @@ export function ShelterMapView() {
             </button>
             <button
               onClick={() => setFloodSeverity('warning')}
-              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
                 floodSeverity === 'warning'
-                  ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-amber-500 text-white shadow-md font-extrabold'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-white'
               }`}
             >
               <span>Warning</span>
@@ -810,10 +811,10 @@ export function ShelterMapView() {
             </button>
             <button
               onClick={() => setFloodSeverity('danger')}
-              className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
                 floodSeverity === 'danger'
-                  ? 'bg-red-600 text-white shadow-md font-extrabold animate-pulse'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-red-500 text-white shadow-md font-extrabold'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-white'
               }`}
             >
               <span>Danger</span>
@@ -821,10 +822,16 @@ export function ShelterMapView() {
             </button>
           </div>
 
-          {/* Dynamic Avoidance Status Banner */}
-          <div className="p-2.5 rounded-xl bg-[#091220]/70 border border-blue-800/40 text-[11px] flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-slate-300">
-              <Route className="w-3.5 h-3.5 text-[#1677FF]" />
+          {/* Dynamic Avoidance Status Banner — light version */}
+          <div className={`p-2.5 rounded-xl text-[11px] flex items-center justify-between border ${
+            floodSeverity === 'normal'
+              ? 'bg-blue-50 border-blue-200'
+              : floodSeverity === 'warning'
+              ? 'bg-amber-50 border-amber-200'
+              : 'bg-red-50 border-red-200'
+          }`}>
+            <div className="flex items-center gap-1.5 text-slate-700">
+              <Route className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
               <span>
                 {floodSeverity === 'normal'
                   ? 'Direct corridor active via Federal Highway'
@@ -832,7 +839,11 @@ export function ShelterMapView() {
               </span>
             </div>
             {floodSeverity !== 'normal' && (
-              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-600/40">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ml-2 shrink-0 ${
+                floodSeverity === 'warning'
+                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                  : 'bg-red-100 text-red-800 border border-red-300'
+              }`}>
                 0 Hazards
               </span>
             )}
