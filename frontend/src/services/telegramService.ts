@@ -105,6 +105,14 @@ export async function sendTelegramMessage(
   }
 }
 
+function escapeHtml(text: string): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 /**
  * 1. FLOOD ALERT / EMERGENCY SOS BROADCAST
  * Triggered automatically when flood reaches DANGER or user taps 1-Tap SOS.
@@ -121,12 +129,12 @@ export async function dispatchEmergencySosAlert(payload: {
   const message =
     `🚨 <b>FLOODWAY 2.0 · CRITICAL FLOOD INUNDATION ALERT</b>\n\n` +
     `⚠️ <b>STATUS: CRITICAL FLOOD BREACH DETECTED</b>\n` +
-    `👤 <b>Citizen:</b> ${payload.userName} (${payload.phone})\n` +
-    `🌊 <b>Water Depth:</b> ${payload.waterDepthCm} cm (Main DB Board & Living Room Floor Breached)\n` +
-    `🏛 <b>Designated Refuge:</b> ${payload.shelterName}\n` +
+    `👤 <b>Citizen:</b> ${escapeHtml(payload.userName)} (${escapeHtml(payload.phone)})\n` +
+    `🌊 <b>Water Depth:</b> ${payload.waterDepthCm} cm (Main DB Board &amp; Living Room Floor Breached)\n` +
+    `🏛 <b>Designated Refuge:</b> ${escapeHtml(payload.shelterName)}\n` +
     `📍 <b>GPS Coordinates:</b> <a href="${mapLink}">${payload.lat.toFixed(4)}, ${payload.lon.toFixed(4)}</a>\n\n` +
     `⚡ <i>Action Taken: Electrical cut-off confirmed. Immediate safe evacuation in progress.</i>\n` +
-    `📡 <i>Connected via Huawei Cloud ModelArts & Telegram Bot @floodway_bot. Arrival confirmation will follow automatically.</i>`;
+    `📡 <i>Connected via Huawei Cloud ModelArts &amp; Telegram Bot @floodway_bot. Arrival confirmation will follow automatically.</i>`;
 
   return sendTelegramMessage(message);
 }
@@ -155,13 +163,13 @@ export async function dispatchArrivalCheckin(payload: {
 
   const message =
     `✅ <b>FLOODWAY 2.0 · SAFE SHELTER ARRIVAL CONFIRMED</b>\n\n` +
-    `👤 <b>Evacuee:</b> ${payload.userName}\n` +
-    `🏛 <b>Destination:</b> <b>${payload.shelterName}</b>\n` +
-    `📅 <b>Date:</b> ${dateText}\n` +
-    `🕒 <b>Time:</b> ${timeText}\n` +
-    `🛡 <b>Geofence Status:</b> Confirmed inside shelter perimeter (<50m).\n` +
-    `📋 <b>Status:</b> Safe & Registered with NADMA Relief Command.\n\n` +
-    `<i>Family safety loop safely closed via FloodWay 2.0 & Telegram Bot @floodway_bot.</i>`;
+    `👤 <b>Evacuee:</b> ${escapeHtml(payload.userName)}\n` +
+    `🏛 <b>Destination:</b> <b>${escapeHtml(payload.shelterName)}</b>\n` +
+    `📅 <b>Date:</b> ${escapeHtml(dateText)}\n` +
+    `🕒 <b>Time:</b> ${escapeHtml(timeText)}\n` +
+    `🛡 <b>Geofence Status:</b> Confirmed inside shelter perimeter (&lt;50m).\n` +
+    `📋 <b>Status:</b> Safe &amp; Registered with NADMA Relief Command.\n\n` +
+    `<i>Family safety loop safely closed via FloodWay 2.0 &amp; Telegram Bot @floodway_bot.</i>`;
 
   return sendTelegramMessage(message);
 }
@@ -184,11 +192,11 @@ export async function dispatchFloodIncidentReportAlert(payload: {
 
   const message =
     `📢 <b>FLOODWAY 2.0 · LIVE FLOOD HAZARD ALERT</b>\n\n` +
-    `⚠️ <b>Incident:</b> ${payload.title}\n` +
-    `📍 <b>Location:</b> ${payload.location}\n` +
+    `⚠️ <b>Incident:</b> ${escapeHtml(payload.title)}\n` +
+    `📍 <b>Location:</b> ${escapeHtml(payload.location)}\n` +
     `🌊 <b>Reported Depth:</b> ${payload.waterDepthCm} cm\n` +
     `📸 <b>Visual Evidence:</b> ${payload.hasPhotoEvidence ? 'Verified Photo Upload Attached' : 'Citizen Ground-Truth Report'}\n` +
-    `👤 <b>Reported by:</b> ${payload.author} on ${dateText}\n\n` +
+    `👤 <b>Reported by:</b> ${escapeHtml(payload.author)} on ${escapeHtml(dateText)}\n\n` +
     `🚨 <i>Take immediate precautions! Avoid this location and navigate to safe shelters via FloodWay 2.0 Map.</i>`;
 
   return sendTelegramMessage(message);
