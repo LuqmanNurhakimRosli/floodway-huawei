@@ -763,9 +763,9 @@ export function ShelterMapView() {
       </div>
 
       {/* SHELTER & SIMULATOR UNIFIED RIGHT SIDEBAR DRAWER */}
-      <div className="w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl overflow-hidden shrink-0">
+      <div className="w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl shrink-0 h-full md:h-auto overflow-hidden">
         {/* SECTION 1: FLOOD ZONE SIMULATOR INTEGRATED INTO SIDEBAR (HARMONIZED SYSTEM CARD) */}
-        <div className="p-4 bg-[#111C33] text-white border-b border-slate-700/60 space-y-3 shrink-0 shadow-inner">
+        <div className="p-4 bg-gradient-to-b from-[#0f1d3a] via-[#102a52] to-[#1a3a6e] text-white border-b border-blue-900/40 space-y-3 shrink-0 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-sm">
@@ -785,7 +785,7 @@ export function ShelterMapView() {
           </div>
 
           {/* 3 Severity Switcher Buttons */}
-          <div className="grid grid-cols-3 gap-1.5 bg-[#091122]/90 p-1.5 rounded-xl border border-slate-700/60 text-[11px] font-bold">
+          <div className="grid grid-cols-3 gap-1.5 bg-[#0a1628]/80 p-1.5 rounded-xl border border-blue-900/50 text-[11px] font-bold">
             <button
               onClick={() => setFloodSeverity('normal')}
               className={`py-1.5 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
@@ -822,7 +822,7 @@ export function ShelterMapView() {
           </div>
 
           {/* Dynamic Avoidance Status Banner */}
-          <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-[#091220]/70 border border-blue-800/40 text-[11px] flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-slate-300">
               <Route className="w-3.5 h-3.5 text-[#1677FF]" />
               <span>
@@ -840,7 +840,7 @@ export function ShelterMapView() {
         </div>
 
         {/* SECTION 2: TRANSPORT MODE SWITCHER */}
-        <div className="p-4 pb-2 border-b border-slate-100 bg-slate-50/50 shrink-0">
+        <div className="p-4 pb-2 border-b border-slate-100 bg-white shrink-0">
           <div className="flex items-center justify-between mb-2.5">
             <div>
               <h2 className="font-heading font-extrabold text-base text-slate-900">
@@ -903,7 +903,7 @@ export function ShelterMapView() {
         </div>
 
         {/* SECTION 3: SHELTER CARDS LIST */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 overscroll-contain">
           {filteredShelters.map((s) => {
             const isSelected = s.id === selectedShelter?.id;
             const capPct = Math.round((s.currentCapacity / s.maxCapacity) * 100);

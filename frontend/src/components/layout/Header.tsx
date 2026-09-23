@@ -26,7 +26,7 @@ export function Header() {
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/70 transition-colors text-xs md:text-sm font-semibold text-slate-800 border border-slate-200"
           >
             <MapPin className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
-            <span className="truncate max-w-[160px] md:max-w-[240px]">{selectedLocation}</span>
+            <span className="truncate max-w-[90px] sm:max-w-[160px] md:max-w-[240px]">{selectedLocation}</span>
             <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
           </button>
 

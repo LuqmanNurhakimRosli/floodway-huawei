@@ -19,8 +19,11 @@ export function IoTHeaderPopover() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200/80 transition-colors"
       >
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span>IoT 12/14 Online</span>
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+        {/* Full label — hidden on very small phones */}
+        <span className="hidden sm:inline">IoT 12/14 Online</span>
+        {/* Icon-only on xs */}
+        <Radio className="w-3.5 h-3.5 sm:hidden" />
         <ChevronDown className="w-3 h-3 text-slate-400" />
       </button>
 
