@@ -84,18 +84,19 @@ export function SimulationPage() {
     setCameraPreset(preset);
     if (!controlsRef.current) return;
     if (preset === 'front') {
-      controlsRef.current.object.position.set(0, 3.2, 12.5);
-      controlsRef.current.target.set(0, 1.2, 0);
+      controlsRef.current.object.position.set(0, 4.2, 22);
+      controlsRef.current.target.set(0, 1.6, 5);
     } else if (preset === 'iso') {
-      controlsRef.current.object.position.set(11, 9, 13);
-      controlsRef.current.target.set(0, 1.2, 0);
+      controlsRef.current.object.position.set(13, 8.5, 20);
+      controlsRef.current.target.set(0, 1.6, 4);
     } else if (preset === 'top') {
-      controlsRef.current.object.position.set(0, 18, 0.1);
-      controlsRef.current.target.set(0, 0, 0);
+      controlsRef.current.object.position.set(0, 24, 4);
+      controlsRef.current.target.set(0, 0, 4);
     } else if (preset === 'rear') {
-      controlsRef.current.object.position.set(0, 5, -13);
-      controlsRef.current.target.set(0, 1.2, 0);
+      controlsRef.current.object.position.set(0, 7, -18);
+      controlsRef.current.target.set(0, 1.6, -2);
     }
+    controlsRef.current.update();
   };
 
   const toggleFullscreen = () => {
@@ -108,7 +109,7 @@ export function SimulationPage() {
     }
   };
 
-  // Preset Scenario Handler — also snaps camera to the most revealing angle for each scenario
+  // Preset Scenario Handler — snaps camera to the exact perspective illustrating the flood mechanism
   const applyPreset = (
     depth: number,
     rain: number,
@@ -138,7 +139,7 @@ export function SimulationPage() {
         <div ref={canvasContainerRef} className="relative flex-1 w-full h-full overflow-hidden bg-gradient-to-b from-[#7ec0ee] to-[#d6eefe]">
           <Canvas
             shadows
-            camera={{ position: [0, 3.2, 12.5], fov: 48 }}
+            camera={{ position: [13, 8.5, 20], fov: 45 }}
             className="w-full h-full cursor-grab active:cursor-grabbing"
           >
             {/* Dynamic Sky & Lighting */}
@@ -172,7 +173,7 @@ export function SimulationPage() {
             <Suspense fallback={null}>
               <TerraceHouseScene
                 waterLevelM={levelM}
-                showCallouts={false}
+                showCallouts={true}
                 weatherMode={weatherMode}
               />
               <ContactShadows position={[0, 0.01, 0]} opacity={0.6} scale={30} blur={1.5} far={8} />
@@ -180,10 +181,11 @@ export function SimulationPage() {
 
             <OrbitControls
               ref={controlsRef}
+              target={[0, 1.6, 4]}
               makeDefault
               maxPolarAngle={Math.PI / 2 - 0.04}
               minDistance={4}
-              maxDistance={32}
+              maxDistance={35}
               enableDamping
               dampingFactor={0.06}
             />
@@ -202,7 +204,7 @@ export function SimulationPage() {
             </div>
 
             <button
-              onClick={() => applyPreset(0.00, 0, 30, 'daylight', [0, 3.2, 12.5], [0, 1.2, 0])}
+              onClick={() => applyPreset(0.00, 0, 30, 'daylight', [13, 8.5, 20], [0, 1.6, 4])}
               className="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-lg"
               title="Reset Baseline"
             >
@@ -325,28 +327,32 @@ export function SimulationPage() {
                 </span>
                 <div className="grid grid-cols-2 gap-1.5 text-[11px]">
                   <button
-                    onClick={() => applyPreset(0.00, 0, 30, 'daylight', [0, 3.2, 12.5], [0, 1.2, 0])}
-                    className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-slate-200 transition-colors"
+                    onClick={() => applyPreset(0.00, 0, 30, 'daylight', [13, 8.5, 20], [0, 1.6, 4])}
+                    className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-slate-200 transition-colors cursor-pointer"
                   >
-                    🌱 Normal Baseline (0.00m)
+                    <div className="font-bold text-emerald-400">🌱 Normal Baseline</div>
+                    <div className="text-[10px] text-slate-400">0.00m · Dry Sunny Baseline</div>
                   </button>
                   <button
-                    onClick={() => applyPreset(0.20, 45, 60, 'daylight', [-6, 1.6, 14], [0, 0.4, 4])}
-                    className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-amber-300 transition-colors"
+                    onClick={() => applyPreset(0.20, 55, 65, 'daylight', [9, 5.5, 17], [0, 0.8, 9])}
+                    className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-amber-300 transition-colors cursor-pointer"
                   >
-                    🚗 Porch Spillover (0.20m)
+                    <div className="font-bold text-amber-300">🚗 Porch Spillover</div>
+                    <div className="text-[10px] text-slate-400">0.20m · Curbside Overflow</div>
                   </button>
                   <button
-                    onClick={() => applyPreset(0.40, 85, 80, 'storm', [-5, 1.2, 13], [0, 0.5, 2])}
-                    className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-orange-400 transition-colors"
+                    onClick={() => applyPreset(0.40, 95, 85, 'storm', [-9, 4.5, 15], [-1.4, 0.6, 8.5])}
+                    className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-orange-400 transition-colors cursor-pointer"
                   >
-                    ⚠️ Vehicle Stall (0.40m)
+                    <div className="font-bold text-orange-400">⚠️ Vehicle Stall</div>
+                    <div className="text-[10px] text-slate-400">0.40m · Exhaust Submerged</div>
                   </button>
                   <button
-                    onClick={() => applyPreset(0.95, 140, 95, 'storm', [11, 9, 13], [0, 1.2, 0])}
-                    className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-red-400 transition-colors"
+                    onClick={() => applyPreset(0.95, 160, 98, 'storm', [8, 6.0, 14], [0, 1.2, 4])}
+                    className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-red-400 transition-colors cursor-pointer"
                   >
-                    🚨 Living Floor Breach (0.95m)
+                    <div className="font-bold text-red-400">🚨 Living Floor Breach</div>
+                    <div className="text-[10px] text-slate-400">0.95m · Interior Ingress (+60cm)</div>
                   </button>
                 </div>
               </div>

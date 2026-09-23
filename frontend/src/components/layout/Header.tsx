@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon } from 'lucide-react';
+import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon, Waves } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { IoTHeaderPopover } from '../dashboard/IoTHeaderPopover';
@@ -16,18 +16,27 @@ export function Header() {
     'Pantai Dalam, Kuala Lumpur'
   ];
 
+  const shortLocation = selectedLocation.split(',')[0].trim();
+
   return (
-    <header className="h-16 bg-white border-b border-slate-200/80 px-4 md:px-6 flex items-center justify-between sticky top-0 z-20 shadow-xs">
-      {/* Left: Location Selector & Telemetry Pill */}
-      <div className="flex items-center gap-3">
-        <div className="relative">
+    <header className="h-16 bg-white border-b border-slate-200/80 px-3 sm:px-4 md:px-6 flex items-center justify-between sticky top-0 z-20 shadow-xs">
+      {/* Left: Brand Icon on Mobile & Clean Location Selector */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="md:hidden flex items-center gap-1.5 shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0958D9] to-[#1677FF] flex items-center justify-center text-white shadow-sm">
+            <Waves className="w-4 h-4" />
+          </div>
+        </div>
+
+        <div className="relative min-w-0">
           <button
             onClick={() => setShowLocationMenu(!showLocationMenu)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/70 transition-colors text-xs md:text-sm font-semibold text-slate-800 border border-slate-200"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/70 transition-colors text-xs md:text-sm font-semibold text-slate-800 border border-slate-200 cursor-pointer"
           >
             <MapPin className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
-            <span className="truncate max-w-[90px] sm:max-w-[160px] md:max-w-[240px]">{selectedLocation}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+            <span className="sm:hidden font-bold truncate max-w-[110px]">{shortLocation}</span>
+            <span className="hidden sm:inline truncate max-w-[180px] md:max-w-[260px]">{selectedLocation}</span>
+            <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
           </button>
 
           {showLocationMenu && (

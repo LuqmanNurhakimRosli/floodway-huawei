@@ -334,6 +334,7 @@ export function ShelterMapView() {
   const [selectedShelterId, setSelectedShelterId] = useState<string>('shelter-01');
   const [filter, setFilter] = useState<'all' | 'open' | 'recommended'>('all');
   const [transportMode, setTransportMode] = useState<'car' | 'bike' | 'walk'>('car');
+  const [mobileTab, setMobileTab] = useState<'map' | 'shelters'>('map');
 
   // Interactive Flood Severity state (Normal, Warning, Danger)
   const [floodSeverity, setFloodSeverity] = useState<'normal' | 'warning' | 'danger'>('warning');
@@ -344,10 +345,20 @@ export function ShelterMapView() {
   const [navElapsedSec, setNavElapsedSec] = useState(0);
   const [hasArrived, setHasArrived] = useState(false);
 
-  // Selected shelter object
-  const selectedShelter = shelters.find((s) => s.id === selectedShelterId) || shelters[0];
+  // Fallback coords if shelters array is still loading
+  const FALLBACK_LAT = 3.1642;
+  const FALLBACK_LON = 101.7118;
+
+  // Selected shelter object with fallback
+  const selectedShelter = (shelters && shelters.length > 0)
+    ? (shelters.find((s) => s.id === selectedShelterId) || shelters[0])
+    : undefined;
+
+  const currentDestLat = selectedShelter?.lat ?? FALLBACK_LAT;
+  const currentDestLon = selectedShelter?.lon ?? FALLBACK_LON;
 
   const filteredShelters = useMemo(() => {
+    if (!shelters || shelters.length === 0) return [];
     return shelters.filter((s) => {
       if (filter === 'open') return s.status === 'OPEN';
       if (filter === 'recommended') return s.routeStatus === 'CLEAR' && s.status === 'OPEN';
@@ -366,11 +377,11 @@ export function ShelterMapView() {
   // Dynamic route calculation: Automatically recalculates to whichever shelter is selected!
   const routeCalculation = useMemo(() => {
     return calculateRouteForShelter(
-      selectedShelter.lat,
-      selectedShelter.lon,
+      currentDestLat,
+      currentDestLon,
       floodSeverity
     );
-  }, [selectedShelter.lat, selectedShelter.lon, floodSeverity]);
+  }, [currentDestLat, currentDestLon, floodSeverity]);
 
   const activeRoute = routeCalculation.route;
   const activeRoadblocks = routeCalculation.roadblocks;
@@ -473,8 +484,34 @@ export function ShelterMapView() {
       {/* Floating In-Page Action Switcher Dock */}
       <InPageActionDock />
 
+      {/* Mobile Top View Switcher */}
+      <div className="md:hidden flex items-center bg-white border-b border-slate-200 p-2 gap-2 z-20 shrink-0">
+        <button
+          onClick={() => setMobileTab('map')}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileTab === 'map'
+              ? 'bg-[#1677FF] text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <Compass className="w-3.5 h-3.5" />
+          <span>Interactive Map</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('shelters')}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            mobileTab === 'shelters'
+              ? 'bg-[#1677FF] text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          <Shield className="w-3.5 h-3.5" />
+          <span>Relief Centers & Simulator ({filteredShelters.length})</span>
+        </button>
+      </div>
+
       {/* Real OpenStreetMap Leaflet Canvas (Clean HD Tiles - Zero Watermarks - Zero Floating Overlays) */}
-      <div className="relative flex-1 h-full min-h-[350px]">
+      <div className={`relative flex-1 h-full min-h-[350px] ${mobileTab === 'shelters' ? 'hidden md:block' : 'block'}`}>
         <MapContainer
           center={[3.1050, 101.6200]}
           zoom={12}
@@ -755,15 +792,36 @@ export function ShelterMapView() {
             <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
             <span>Roadblock Avoided</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1677FF]" />
-            <span>Live GPS</span>
+        </div>
+
+        {/* Mobile floating quick drawer trigger */}
+        <div className="absolute bottom-4 left-3 right-3 z-10 md:hidden flex items-center justify-between p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xl text-slate-800">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+              <Shield className="w-4 h-4 text-[#1677FF]" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-heading font-extrabold text-xs text-slate-900 truncate">
+                {selectedShelter?.name || 'Selected Shelter'}
+              </div>
+              <div className="text-[10px] text-slate-500 flex items-center gap-2">
+                <span>{selectedShelter?.distanceKm ?? 0.8} km away</span>
+                <span>·</span>
+                <span className="text-emerald-600 font-bold">{selectedShelter?.status ?? 'OPEN'}</span>
+              </div>
+            </div>
           </div>
+          <button
+            onClick={() => setMobileTab('shelters')}
+            className="px-3 py-1.5 rounded-xl bg-[#1677FF] text-white text-xs font-bold shrink-0 shadow-sm cursor-pointer"
+          >
+            All Shelters & Sim ↗
+          </button>
         </div>
       </div>
 
       {/* SHELTER & SIMULATOR UNIFIED RIGHT SIDEBAR DRAWER */}
-      <div className="w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl shrink-0 h-full md:h-auto overflow-hidden">
+      <div className={`w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl shrink-0 h-full overflow-hidden ${mobileTab === 'map' ? 'hidden md:flex' : 'flex'}`}>
         {/* SECTION 1: FLOOD HAZARD SIMULATOR — light white/blue card matching sidebar */}
         <div className="p-4 bg-white border-b border-slate-200 space-y-3 shrink-0">
           {/* Header row */}
@@ -914,7 +972,7 @@ export function ShelterMapView() {
         </div>
 
         {/* SECTION 3: SHELTER CARDS LIST */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 overscroll-contain">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 overscroll-contain pb-28 md:pb-6">
           {filteredShelters.map((s) => {
             const isSelected = s.id === selectedShelter?.id;
             const capPct = Math.round((s.currentCapacity / s.maxCapacity) * 100);

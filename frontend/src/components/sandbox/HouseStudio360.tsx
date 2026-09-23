@@ -23,13 +23,24 @@ const WALL_HEIGHT = 3.3;
 const ROOF_PEAK_H = 1.9;
 
 // Materials defined at module scope so HMR replaces them cleanly on every save.
-// (useMemo with [] would cache the first-created objects and ignore updates.)
 const MATS = {
   // Walls
-  wallMain: new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.85 }),
+  wallMain: new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.85 }),
+  wallInterior: new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.90 }),
   wallCharcoal: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.70 }),
-  wallAccent: new THREE.MeshStandardMaterial({ color: '#c2410c', roughness: 0.65 }),
+  wallAccent: new THREE.MeshStandardMaterial({ color: '#ea580c', roughness: 0.65 }),
   timberBatten: new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.50 }),
+
+  // Flooring & Drainage
+  woodFloor: new THREE.MeshStandardMaterial({ color: '#c29b68', roughness: 0.60 }),
+  porchTiles: new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.75 }),
+  curbConcrete: new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.90 }),
+  longkangDrain: new THREE.MeshStandardMaterial({ color: '#64748b', roughness: 0.95 }),
+  drainCover: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.40, metalness: 0.7 }),
+  roadAsphalt: new THREE.MeshStandardMaterial({ color: '#181e26', roughness: 0.95 }),
+  grassLawn: new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.85 }),
+  boundaryWall: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 }),
+  gateSteel: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.30, metalness: 0.75 }),
 
   // Roof & Fascia
   roofClay: new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.40, metalness: 0.10 }),
@@ -40,27 +51,27 @@ const MATS = {
   // Windows & Doors
   doorWood: new THREE.MeshStandardMaterial({ color: '#451a03', roughness: 0.35 }),
   handleMetal: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
-  windowAlum: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.25, metalness: 0.6 }),
-  // Light-blue transparent glass — NO transmission, works without an env map
+  windowAlum: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.25, metalness: 0.6 }),
+  // Crystal clear window glass so interior living room is visible!
   windowGlass: new THREE.MeshStandardMaterial({
-    color: '#7dd3fc',
+    color: '#bae6fd',
     roughness: 0.05,
-    metalness: 0.15,
+    metalness: 0.10,
     transparent: true,
-    opacity: 0.45,
+    opacity: 0.35,
   }),
 
-  // Porch, Ground & Street
-  porchTiles: new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.75 }),
-  curbConcrete: new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.90 }),
-  roadAsphalt: new THREE.MeshStandardMaterial({ color: '#181e26', roughness: 0.95 }),
-  grassLawn: new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.85 }),
-  boundaryWall: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 }),
-  gateSteel: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.30, metalness: 0.75 }),
+  // Living Room Furnishings
+  sofaFabric: new THREE.MeshStandardMaterial({ color: '#1e3a5f', roughness: 0.80 }),
+  sofaCushion: new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.85 }),
+  coffeeTable: new THREE.MeshStandardMaterial({ color: '#5c2e0b', roughness: 0.45 }),
+  tvScreen: new THREE.MeshStandardMaterial({ color: '#020617', roughness: 0.10, metalness: 0.85 }),
+  tvConsole: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.70 }),
+  rugFabric: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.90 }),
 
   // Sedan Car
-  carBody: new THREE.MeshStandardMaterial({ color: '#1d4ed8', roughness: 0.20, metalness: 0.75 }),
-  carGlass: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.10, metalness: 0.4 }),
+  carBody: new THREE.MeshStandardMaterial({ color: '#2563eb', roughness: 0.20, metalness: 0.75 }),
+  carGlass: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.10, metalness: 0.5 }),
   carTire: new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.95 }),
   carAlloyRim: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
   carLightFront: new THREE.MeshBasicMaterial({ color: '#fef08a' }),
@@ -122,6 +133,22 @@ function CompleteTerraceHouseModel() {
         <primitive object={mats.curbConcrete} />
       </mesh>
 
+      {/* Monsoon Drainage Trench (Longkang) along street curb */}
+      <group position={[0, 0.02, HOUSE_DEPTH / 2 + CARPORT_DEPTH + 0.45]}>
+        {/* Drain trough */}
+        <mesh position={[0, -0.06, 0]} receiveShadow>
+          <boxGeometry args={[LOT_WIDTH + 6, 0.18, 0.35]} />
+          <primitive object={mats.longkangDrain} />
+        </mesh>
+        {/* Steel Grating covers across driveway ingress */}
+        {[-3, -1.8, -0.6, 0.6, 1.8, 3].map((gx) => (
+          <mesh key={`grate-${gx}`} position={[gx, 0.02, 0]} castShadow>
+            <boxGeometry args={[1.05, 0.03, 0.32]} />
+            <primitive object={mats.drainCover} />
+          </mesh>
+        ))}
+      </group>
+
       {/* 2. BOUNDARY WALLS & CARPORT SLAB */}
       {/* Tiled Carport Driveway Apron */}
       <mesh position={[0, 0.08, HOUSE_DEPTH / 2 + CARPORT_DEPTH / 2]} receiveShadow>
@@ -171,34 +198,84 @@ function CompleteTerraceHouseModel() {
         ))}
       </group>
 
-      {/* 3. MAIN HOUSE LIVING ENCLOSURE */}
-      <mesh position={[0, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[LOT_WIDTH, WALL_HEIGHT, HOUSE_DEPTH]} />
+      {/* 3. MAIN HOUSE LIVING ENCLOSURE WITH REAL HOLLOW WALLS & INTERIOR */}
+      {/* Raised Ground Floor Slab (+0.35m datum) */}
+      <mesh position={[0, 0.175, 0]} receiveShadow castShadow>
+        <boxGeometry args={[LOT_WIDTH - 0.2, 0.35, HOUSE_DEPTH - 0.2]} />
+        <primitive object={mats.woodFloor} />
+      </mesh>
+
+      {/* Left Exterior Party Wall */}
+      <mesh position={[-LOT_WIDTH / 2 + 0.1, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.2, WALL_HEIGHT, HOUSE_DEPTH]} />
         <primitive object={mats.wallMain} />
       </mesh>
 
-      {/* Front Architectural Feature Wall (Warm Terracotta Orange Accent) */}
-      <mesh position={[-1.6, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 + 0.05]} castShadow>
-        <boxGeometry args={[3.2, WALL_HEIGHT - 0.2, 0.1]} />
+      {/* Right Exterior Party Wall */}
+      <mesh position={[LOT_WIDTH / 2 - 0.1, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.2, WALL_HEIGHT, HOUSE_DEPTH]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Rear Exterior Wall */}
+      <mesh position={[0, WALL_HEIGHT / 2, -HOUSE_DEPTH / 2 + 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[LOT_WIDTH, WALL_HEIGHT, 0.2]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Front Facade Piers & Walls with openings for Window and Door */}
+      {/* Front Left Pier */}
+      <mesh position={[-LOT_WIDTH / 2 + 0.45, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[0.9, WALL_HEIGHT, 0.2]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Front Center Pier / Feature Wall */}
+      <mesh position={[0.2, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[1.2, WALL_HEIGHT, 0.22]} />
         <primitive object={mats.wallAccent} />
       </mesh>
 
-      {/* Front Decorative Timber Battens */}
-      {[-2.8, -2.4, -2.0, -1.6, -1.2, -0.8].map((lx) => (
-        <mesh key={`batten-${lx}`} position={[lx, WALL_HEIGHT * 0.65, HOUSE_DEPTH / 2 + 0.12]} castShadow>
-          <boxGeometry args={[0.08, 1.5, 0.05]} />
+      {/* Front Right Pier */}
+      <mesh position={[LOT_WIDTH / 2 - 0.45, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[0.9, WALL_HEIGHT, 0.2]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Wall beneath front window (sill wall) */}
+      <mesh position={[-1.6, 0.45, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[2.5, 0.9, 0.2]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Wall above front window (lintel) */}
+      <mesh position={[-1.6, 2.75, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[2.5, 0.9, 0.2]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Wall above front entrance door (lintel) */}
+      <mesh position={[1.8, 2.75, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+        <boxGeometry args={[1.6, 0.9, 0.2]} />
+        <primitive object={mats.wallMain} />
+      </mesh>
+
+      {/* Front Decorative Vertical Timber Battens on Accent Wall */}
+      {[-0.2, 0.0, 0.2, 0.4, 0.6].map((lx) => (
+        <mesh key={`batten-${lx}`} position={[lx, WALL_HEIGHT * 0.65, HOUSE_DEPTH / 2 + 0.03]} castShadow>
+          <boxGeometry args={[0.06, 1.5, 0.04]} />
           <primitive object={mats.timberBatten} />
         </mesh>
       ))}
 
       {/* Front Porch Entrance Step (+0.30m) */}
-      <mesh position={[1.4, 0.18, HOUSE_DEPTH / 2 + 0.8]} receiveShadow castShadow>
-        <boxGeometry args={[2.8, 0.36, 1.6]} />
+      <mesh position={[1.8, 0.18, HOUSE_DEPTH / 2 + 0.8]} receiveShadow castShadow>
+        <boxGeometry args={[1.8, 0.36, 1.6]} />
         <primitive object={mats.porchTiles} />
       </mesh>
 
       {/* Solid Dark Mahogany Front Door with Frame */}
-      <group position={[1.6, 1.35, HOUSE_DEPTH / 2 + 0.06]}>
+      <group position={[1.8, 1.35, HOUSE_DEPTH / 2 - 0.05]}>
         <mesh castShadow>
           <boxGeometry args={[1.2, 2.25, 0.12]} />
           <primitive object={mats.wallCharcoal} />
@@ -207,33 +284,119 @@ function CompleteTerraceHouseModel() {
           <boxGeometry args={[1.05, 2.1, 0.08]} />
           <primitive object={mats.doorWood} />
         </mesh>
-        {/* Steel Handle */}
+        {/* Steel Lever Handle */}
         <mesh position={[-0.38, 0, 0.08]} castShadow>
           <cylinderGeometry args={[0.02, 0.02, 0.35, 12]} />
           <primitive object={mats.handleMetal} />
         </mesh>
         {/* Entrance Light Sconce */}
-        <mesh position={[0.7, 0.45, 0.08]} castShadow>
+        <mesh position={[0.7, 0.45, 0.12]} castShadow>
           <boxGeometry args={[0.12, 0.22, 0.1]} />
           <primitive object={mats.wallCharcoal} />
         </mesh>
       </group>
 
-      {/* Front Living Room Aluminium Picture Window */}
-      <group position={[-1.6, 1.65, HOUSE_DEPTH / 2 + 0.08]}>
+      {/* Front Living Room Aluminium Picture Window (Real Opening & Clear Glass) */}
+      <group position={[-1.6, 1.65, HOUSE_DEPTH / 2 - 0.1]}>
+        {/* Outer Frame */}
         <mesh castShadow>
-          <boxGeometry args={[2.2, 1.45, 0.1]} />
+          <boxGeometry args={[2.5, 1.5, 0.12]} />
           <primitive object={mats.windowAlum} />
         </mesh>
+        {/* Center Mullion Divider */}
+        <mesh position={[0, 0, 0.02]} castShadow>
+          <boxGeometry args={[0.06, 1.45, 0.08]} />
+          <primitive object={mats.windowAlum} />
+        </mesh>
+        {/* Crystal Clear Glass Pane */}
         <mesh position={[0, 0, 0.01]}>
-          <planeGeometry args={[2.0, 1.25]} />
+          <planeGeometry args={[2.38, 1.38]} />
           <primitive object={mats.windowGlass} />
         </mesh>
-        {/* Window Concrete Sill */}
-        <mesh position={[0, -0.76, 0.06]} castShadow>
-          <boxGeometry args={[2.3, 0.08, 0.22]} />
+        {/* Concrete Window Sill */}
+        <mesh position={[0, -0.78, 0.08]} castShadow>
+          <boxGeometry args={[2.6, 0.08, 0.24]} />
           <primitive object={mats.curbConcrete} />
         </mesh>
+      </group>
+
+      {/* 3b. REAL FURNISHED LIVING ROOM INTERIOR (VISIBLE THROUGH WINDOW & CUTAWAY) */}
+      <group position={[0, 0.35, 0]}>
+        {/* Warm Ambient Indoor Light */}
+        <pointLight position={[-1.2, 2.4, 4.2]} intensity={1.5} color="#fef3c7" distance={7} />
+
+        {/* Modern Sectional L-Sofa in Navy */}
+        <group position={[-1.6, 0, 4.0]}>
+          {/* Main Seat */}
+          <mesh position={[0, 0.24, 0]} castShadow receiveShadow>
+            <boxGeometry args={[1.8, 0.30, 0.85]} />
+            <primitive object={mats.sofaFabric} />
+          </mesh>
+          {/* Backrest */}
+          <mesh position={[0, 0.52, -0.32]} castShadow>
+            <boxGeometry args={[1.8, 0.36, 0.22]} />
+            <primitive object={mats.sofaFabric} />
+          </mesh>
+          {/* Cream Throw Cushions */}
+          {[-0.5, 0.5].map((cx) => (
+            <mesh key={`cushion-${cx}`} position={[cx, 0.44, -0.16]} castShadow>
+              <boxGeometry args={[0.38, 0.28, 0.14]} />
+              <primitive object={mats.sofaCushion} />
+            </mesh>
+          ))}
+          {/* Sofa Chaise Return */}
+          <mesh position={[-0.6, 0.24, 0.8]} castShadow receiveShadow>
+            <boxGeometry args={[0.6, 0.30, 0.75]} />
+            <primitive object={mats.sofaFabric} />
+          </mesh>
+        </group>
+
+        {/* Coffee Table */}
+        <group position={[-1.6, 0, 5.2]}>
+          <mesh position={[0, 0.20, 0]} castShadow receiveShadow>
+            <boxGeometry args={[1.1, 0.08, 0.55]} />
+            <primitive object={mats.coffeeTable} />
+          </mesh>
+          {/* Table Legs */}
+          {[[-0.45, -0.18], [0.45, -0.18], [-0.45, 0.18], [0.45, 0.18]].map(([tx, tz], i) => (
+            <mesh key={`tleg-${i}`} position={[tx, 0.08, tz]} castShadow>
+              <cylinderGeometry args={[0.02, 0.02, 0.16, 8]} />
+              <primitive object={mats.handleMetal} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* TV Console Cabinet against center feature wall */}
+        <group position={[0.2, 0, 3.2]}>
+          <mesh position={[0, 0.24, 0]} castShadow>
+            <boxGeometry args={[1.1, 0.40, 0.40]} />
+            <primitive object={mats.tvConsole} />
+          </mesh>
+          {/* TV Panel */}
+          <mesh position={[0, 0.85, 0]} castShadow>
+            <boxGeometry args={[1.2, 0.65, 0.06]} />
+            <primitive object={mats.tvScreen} />
+          </mesh>
+        </group>
+
+        {/* Duplex Wall Outlets (+0.45m datum - electrical safety hazard point) */}
+        <mesh position={[-LOT_WIDTH / 2 + 0.22, 0.45, 4.5]}>
+          <boxGeometry args={[0.02, 0.12, 0.18]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+
+        {/* Main Distribution Board (DB Box at +1.60m) */}
+        <group position={[-LOT_WIDTH / 2 + 0.22, 1.60, 5.5]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.04, 0.45, 0.35]} />
+            <primitive object={mats.wallCharcoal} />
+          </mesh>
+          {/* Switch LED */}
+          <mesh position={[0.025, 0.10, 0]}>
+            <sphereGeometry args={[0.02, 8, 8]} />
+            <meshBasicMaterial color="#10b981" />
+          </mesh>
+        </group>
       </group>
 
       {/* 4. CARPORT AWNING & PILLARS */}
