@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, ContactShadows } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import {
   ArrowLeft,
   Play,
@@ -139,6 +139,18 @@ export function SimulationPage() {
         <div ref={canvasContainerRef} className="relative flex-1 w-full h-full overflow-hidden bg-gradient-to-b from-[#7ec0ee] to-[#d6eefe]">
           <Canvas
             shadows
+            gl={{
+              antialias: true,
+              powerPreference: 'default',
+              preserveDrawingBuffer: false,
+              failIfMajorPerformanceCaveat: false,
+            }}
+            onCreated={({ gl }) => {
+              gl.domElement.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault();
+                console.warn('WebGL context lost handled gracefully');
+              });
+            }}
             camera={{ position: [13, 8.5, 20], fov: 45 }}
             className="w-full h-full cursor-grab active:cursor-grabbing"
           >
@@ -152,11 +164,17 @@ export function SimulationPage() {
                   position={[12, 18, 10]}
                   intensity={1.8}
                   castShadow
-                  shadow-mapSize={[2048, 2048]}
+                  shadow-mapSize={[1024, 1024]}
                   shadow-camera-left={-15}
                   shadow-camera-right={15}
                   shadow-camera-top={15}
                   shadow-camera-bottom={-15}
+                />
+                {/* 360 Exterior Soft Fill Light so left and rear slopes/walls are beautifully sunlit */}
+                <directionalLight
+                  position={[-12, 14, -10]}
+                  intensity={0.65}
+                  color="#fffbeb"
                 />
                 <hemisphereLight intensity={0.5} groundColor="#1e3a24" color="#dbeafe" />
               </>
@@ -176,7 +194,6 @@ export function SimulationPage() {
                 showCallouts={true}
                 weatherMode={weatherMode}
               />
-              <ContactShadows position={[0, 0.01, 0]} opacity={0.6} scale={30} blur={1.5} far={8} />
             </Suspense>
 
             <OrbitControls

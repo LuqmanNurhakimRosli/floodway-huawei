@@ -1,6 +1,6 @@
 import React, { useRef, useState, useMemo, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, ContactShadows } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import {
   RotateCcw,
@@ -25,10 +25,10 @@ const ROOF_PEAK_H = 1.9;
 // Materials defined at module scope so HMR replaces them cleanly on every save.
 const MATS = {
   // Walls
-  wallMain: new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.85 }),
-  wallInterior: new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.90 }),
+  wallMain: new THREE.MeshStandardMaterial({ color: '#fae8a4', roughness: 0.80 }), // Light yellow 360 exterior paint
+  wallInterior: new THREE.MeshStandardMaterial({ color: '#fefce8', roughness: 0.90 }), // Warm ivory interior
   wallCharcoal: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.70 }),
-  wallAccent: new THREE.MeshStandardMaterial({ color: '#ea580c', roughness: 0.65 }),
+  wallAccent: new THREE.MeshStandardMaterial({ color: '#f59e0b', roughness: 0.65 }), // Warm timber accent
   timberBatten: new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.50 }),
 
   // Flooring & Drainage
@@ -39,11 +39,11 @@ const MATS = {
   drainCover: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.40, metalness: 0.7 }),
   roadAsphalt: new THREE.MeshStandardMaterial({ color: '#181e26', roughness: 0.95 }),
   grassLawn: new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.85 }),
-  boundaryWall: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.85 }),
+  boundaryWall: new THREE.MeshStandardMaterial({ color: '#fef3c7', roughness: 0.85 }), // Light cream boundary
   gateSteel: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.30, metalness: 0.75 }),
 
-  // Roof & Fascia
-  roofClay: new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.40, metalness: 0.10 }),
+  // Roof & Fascia (DoubleSide ensures both slopes render reliably from all angles)
+  roofClay: new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.45, metalness: 0.10, side: THREE.DoubleSide }),
   roofRidge: new THREE.MeshStandardMaterial({ color: '#7c2d12', roughness: 0.45 }),
   fasciaTrim: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.75 }),
   gutter: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.35, metalness: 0.6 }),
@@ -108,15 +108,13 @@ function CompleteTerraceHouseModel() {
     <group position={[0, 0, 0]}>
       {/* 1. STREET & SITE BASELINE */}
       {/* Green Turf Ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow material={mats.grassLawn}>
         <planeGeometry args={[34, 34]} />
-        <primitive object={mats.grassLawn} />
       </mesh>
 
       {/* Front Asphalt Road */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, HOUSE_DEPTH / 2 + CARPORT_DEPTH + 3.8]} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, HOUSE_DEPTH / 2 + CARPORT_DEPTH + 3.8]} receiveShadow material={mats.roadAsphalt}>
         <planeGeometry args={[34, 7.5]} />
-        <primitive object={mats.roadAsphalt} />
       </mesh>
 
       {/* Road Dashed Markings */}
@@ -128,136 +126,115 @@ function CompleteTerraceHouseModel() {
       ))}
 
       {/* Raised Concrete Curb */}
-      <mesh position={[0, 0.075, HOUSE_DEPTH / 2 + CARPORT_DEPTH + 0.15]} receiveShadow castShadow>
+      <mesh position={[0, 0.075, HOUSE_DEPTH / 2 + CARPORT_DEPTH + 0.15]} receiveShadow castShadow material={mats.curbConcrete}>
         <boxGeometry args={[LOT_WIDTH + 6, 0.15, 0.28]} />
-        <primitive object={mats.curbConcrete} />
       </mesh>
 
       {/* Monsoon Drainage Trench (Longkang) along street curb */}
       <group position={[0, 0.02, HOUSE_DEPTH / 2 + CARPORT_DEPTH + 0.45]}>
         {/* Drain trough */}
-        <mesh position={[0, -0.06, 0]} receiveShadow>
+        <mesh position={[0, -0.06, 0]} receiveShadow material={mats.longkangDrain}>
           <boxGeometry args={[LOT_WIDTH + 6, 0.18, 0.35]} />
-          <primitive object={mats.longkangDrain} />
         </mesh>
         {/* Steel Grating covers across driveway ingress */}
         {[-3, -1.8, -0.6, 0.6, 1.8, 3].map((gx) => (
-          <mesh key={`grate-${gx}`} position={[gx, 0.02, 0]} castShadow>
+          <mesh key={`grate-${gx}`} position={[gx, 0.02, 0]} castShadow material={mats.drainCover}>
             <boxGeometry args={[1.05, 0.03, 0.32]} />
-            <primitive object={mats.drainCover} />
           </mesh>
         ))}
       </group>
 
       {/* 2. BOUNDARY WALLS & CARPORT SLAB */}
       {/* Tiled Carport Driveway Apron */}
-      <mesh position={[0, 0.08, HOUSE_DEPTH / 2 + CARPORT_DEPTH / 2]} receiveShadow>
+      <mesh position={[0, 0.08, HOUSE_DEPTH / 2 + CARPORT_DEPTH / 2]} receiveShadow material={mats.porchTiles}>
         <boxGeometry args={[LOT_WIDTH, 0.16, CARPORT_DEPTH]} />
-        <primitive object={mats.porchTiles} />
       </mesh>
 
       {/* Left Party Wall */}
-      <mesh position={[-LOT_WIDTH / 2 - 0.1, 0.75, (HOUSE_DEPTH + CARPORT_DEPTH) / 2 - 2.5]} castShadow receiveShadow>
+      <mesh position={[-LOT_WIDTH / 2 - 0.1, 0.75, (HOUSE_DEPTH + CARPORT_DEPTH) / 2 - 2.5]} castShadow receiveShadow material={mats.boundaryWall}>
         <boxGeometry args={[0.2, 1.35, HOUSE_DEPTH + CARPORT_DEPTH]} />
-        <primitive object={mats.boundaryWall} />
       </mesh>
 
       {/* Right Party Wall */}
-      <mesh position={[LOT_WIDTH / 2 + 0.1, 0.75, (HOUSE_DEPTH + CARPORT_DEPTH) / 2 - 2.5]} castShadow receiveShadow>
+      <mesh position={[LOT_WIDTH / 2 + 0.1, 0.75, (HOUSE_DEPTH + CARPORT_DEPTH) / 2 - 2.5]} castShadow receiveShadow material={mats.boundaryWall}>
         <boxGeometry args={[0.2, 1.35, HOUSE_DEPTH + CARPORT_DEPTH]} />
-        <primitive object={mats.boundaryWall} />
       </mesh>
 
       {/* Rear Boundary Wall */}
-      <mesh position={[0, 0.85, -HOUSE_DEPTH / 2 - 2.5]} castShadow receiveShadow>
+      <mesh position={[0, 0.85, -HOUSE_DEPTH / 2 - 2.5]} castShadow receiveShadow material={mats.boundaryWall}>
         <boxGeometry args={[LOT_WIDTH + 0.4, 1.5, 0.2]} />
-        <primitive object={mats.boundaryWall} />
       </mesh>
 
       {/* Front Entrance Gate Posts */}
-      <mesh position={[-LOT_WIDTH / 2, 0.95, HOUSE_DEPTH / 2 + CARPORT_DEPTH]} castShadow>
+      <mesh position={[-LOT_WIDTH / 2, 0.95, HOUSE_DEPTH / 2 + CARPORT_DEPTH]} castShadow material={mats.wallCharcoal}>
         <boxGeometry args={[0.42, 1.75, 0.42]} />
-        <primitive object={mats.wallCharcoal} />
       </mesh>
-      <mesh position={[LOT_WIDTH / 2, 0.95, HOUSE_DEPTH / 2 + CARPORT_DEPTH]} castShadow>
+      <mesh position={[LOT_WIDTH / 2, 0.95, HOUSE_DEPTH / 2 + CARPORT_DEPTH]} castShadow material={mats.wallCharcoal}>
         <boxGeometry args={[0.42, 1.75, 0.42]} />
-        <primitive object={mats.wallCharcoal} />
       </mesh>
 
       {/* Black Sliding Autogate */}
       <group position={[0.3, 0.65, HOUSE_DEPTH / 2 + CARPORT_DEPTH]}>
-        <mesh castShadow>
+        <mesh castShadow material={mats.gateSteel}>
           <boxGeometry args={[5.2, 1.15, 0.06]} />
-          <primitive object={mats.gateSteel} />
         </mesh>
         {[-2.0, -1.2, -0.4, 0.4, 1.2, 2.0].map((gx) => (
-          <mesh key={`gate-slat-${gx}`} position={[gx, 0, 0.04]} castShadow>
+          <mesh key={`gate-slat-${gx}`} position={[gx, 0, 0.04]} castShadow material={mats.timberBatten}>
             <boxGeometry args={[0.06, 0.95, 0.02]} />
-            <primitive object={mats.timberBatten} />
           </mesh>
         ))}
       </group>
 
       {/* 3. MAIN HOUSE LIVING ENCLOSURE WITH REAL HOLLOW WALLS & INTERIOR */}
       {/* Raised Ground Floor Slab (+0.35m datum) */}
-      <mesh position={[0, 0.175, 0]} receiveShadow castShadow>
+      <mesh position={[0, 0.175, 0]} receiveShadow castShadow material={mats.woodFloor}>
         <boxGeometry args={[LOT_WIDTH - 0.2, 0.35, HOUSE_DEPTH - 0.2]} />
-        <primitive object={mats.woodFloor} />
       </mesh>
 
       {/* Left Exterior Party Wall */}
-      <mesh position={[-LOT_WIDTH / 2 + 0.1, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>
+      <mesh position={[-LOT_WIDTH / 2 + 0.1, WALL_HEIGHT / 2, 0]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[0.2, WALL_HEIGHT, HOUSE_DEPTH]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Right Exterior Party Wall */}
-      <mesh position={[LOT_WIDTH / 2 - 0.1, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>
+      <mesh position={[LOT_WIDTH / 2 - 0.1, WALL_HEIGHT / 2, 0]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[0.2, WALL_HEIGHT, HOUSE_DEPTH]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Rear Exterior Wall */}
-      <mesh position={[0, WALL_HEIGHT / 2, -HOUSE_DEPTH / 2 + 0.1]} castShadow receiveShadow>
+      <mesh position={[0, WALL_HEIGHT / 2, -HOUSE_DEPTH / 2 + 0.1]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[LOT_WIDTH, WALL_HEIGHT, 0.2]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Front Facade Piers & Walls with openings for Window and Door */}
       {/* Front Left Pier */}
-      <mesh position={[-LOT_WIDTH / 2 + 0.45, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+      <mesh position={[-LOT_WIDTH / 2 + 0.45, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[0.9, WALL_HEIGHT, 0.2]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Front Center Pier / Feature Wall */}
-      <mesh position={[0.2, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+      <mesh position={[0.2, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow material={mats.wallAccent}>
         <boxGeometry args={[1.2, WALL_HEIGHT, 0.22]} />
-        <primitive object={mats.wallAccent} />
       </mesh>
 
       {/* Front Right Pier */}
-      <mesh position={[LOT_WIDTH / 2 - 0.45, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+      <mesh position={[LOT_WIDTH / 2 - 0.45, WALL_HEIGHT / 2, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[0.9, WALL_HEIGHT, 0.2]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Wall beneath front window (sill wall) */}
-      <mesh position={[-1.6, 0.45, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+      <mesh position={[-1.6, 0.45, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[2.5, 0.9, 0.2]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Wall above front window (lintel) */}
-      <mesh position={[-1.6, 2.75, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+      <mesh position={[-1.6, 2.75, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[2.5, 0.9, 0.2]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Wall above front entrance door (lintel) */}
-      <mesh position={[1.8, 2.75, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow>
+      <mesh position={[1.8, 2.75, HOUSE_DEPTH / 2 - 0.1]} castShadow receiveShadow material={mats.wallMain}>
         <boxGeometry args={[1.6, 0.9, 0.2]} />
-        <primitive object={mats.wallMain} />
       </mesh>
 
       {/* Front Decorative Vertical Timber Battens on Accent Wall */}
@@ -431,69 +408,82 @@ function CompleteTerraceHouseModel() {
       {/* Front Gable Wall — nudged 1.5 cm outward to remove z-fight with main wall */}
       <mesh
         geometry={gableShape}
+        material={mats.wallMain}
         position={[0, WALL_HEIGHT + 0.015, HOUSE_DEPTH / 2 + 0.015]}
         castShadow
         receiveShadow
-      >
-        <primitive object={mats.wallMain} />
-      </mesh>
+      />
 
       {/* Rear Gable Wall — nudged 1.5 cm outward */}
       <mesh
         geometry={gableShape}
+        material={mats.wallMain}
         position={[0, WALL_HEIGHT + 0.015, -HOUSE_DEPTH / 2 - 0.015]}
         castShadow
         receiveShadow
-      >
-        <primitive object={mats.wallMain} />
-      </mesh>
+      />
 
       {/* Left Roof Slope (Terracotta Clay Tiles) */}
       <mesh
+        material={mats.roofClay}
         position={[-halfWidth / 2, WALL_HEIGHT + ROOF_PEAK_H / 2, 0]}
         rotation={[0, 0, pitchAngle]}
         castShadow
         receiveShadow
       >
         <boxGeometry args={[slopeHypot, 0.14, totalRoofLength]} />
-        <primitive object={mats.roofClay} />
       </mesh>
 
       {/* Right Roof Slope (Terracotta Clay Tiles) */}
       <mesh
+        material={mats.roofClay}
         position={[halfWidth / 2, WALL_HEIGHT + ROOF_PEAK_H / 2, 0]}
         rotation={[0, 0, -pitchAngle]}
         castShadow
         receiveShadow
       >
         <boxGeometry args={[slopeHypot, 0.14, totalRoofLength]} />
-        <primitive object={mats.roofClay} />
       </mesh>
 
       {/* Dark Ridge Cap along apex */}
-      <mesh position={[0, WALL_HEIGHT + ROOF_PEAK_H + 0.08, 0]} castShadow>
+      <mesh
+        material={mats.roofRidge}
+        position={[0, WALL_HEIGHT + ROOF_PEAK_H + 0.06, 0]}
+        castShadow
+      >
         <boxGeometry args={[0.34, 0.16, totalRoofLength + 0.1]} />
-        <primitive object={mats.roofRidge} />
       </mesh>
 
       {/* Dark Fascia Rakes along eaves */}
-      <mesh position={[-LOT_WIDTH / 2 - 0.18, WALL_HEIGHT - 0.05, 0]} castShadow>
+      <mesh
+        material={mats.fasciaTrim}
+        position={[-LOT_WIDTH / 2 - 0.18, WALL_HEIGHT - 0.05, 0]}
+        castShadow
+      >
         <boxGeometry args={[0.06, 0.22, totalRoofLength + 0.05]} />
-        <primitive object={mats.fasciaTrim} />
       </mesh>
-      <mesh position={[LOT_WIDTH / 2 + 0.18, WALL_HEIGHT - 0.05, 0]} castShadow>
+      <mesh
+        material={mats.fasciaTrim}
+        position={[LOT_WIDTH / 2 + 0.18, WALL_HEIGHT - 0.05, 0]}
+        castShadow
+      >
         <boxGeometry args={[0.06, 0.22, totalRoofLength + 0.05]} />
-        <primitive object={mats.fasciaTrim} />
       </mesh>
 
       {/* Rainwater Gutters */}
-      <mesh position={[-LOT_WIDTH / 2 - 0.24, WALL_HEIGHT - 0.14, 0]} castShadow>
+      <mesh
+        material={mats.gutter}
+        position={[-LOT_WIDTH / 2 - 0.24, WALL_HEIGHT - 0.14, 0]}
+        castShadow
+      >
         <boxGeometry args={[0.10, 0.08, totalRoofLength + 0.05]} />
-        <primitive object={mats.gutter} />
       </mesh>
-      <mesh position={[LOT_WIDTH / 2 + 0.24, WALL_HEIGHT - 0.14, 0]} castShadow>
+      <mesh
+        material={mats.gutter}
+        position={[LOT_WIDTH / 2 + 0.24, WALL_HEIGHT - 0.14, 0]}
+        castShadow
+      >
         <boxGeometry args={[0.10, 0.08, totalRoofLength + 0.05]} />
-        <primitive object={mats.gutter} />
       </mesh>
 
       {/* 6. PARKED BLUE SEDAN CAR */}
@@ -679,6 +669,12 @@ export function HouseStudio360() {
       <div className="relative flex-1 w-full h-full bg-gradient-to-b from-[#7ec0ee] to-[#cce8fd]">
         <Canvas
           shadows
+          gl={{
+            antialias: true,
+            powerPreference: 'default',
+            preserveDrawingBuffer: false,
+            failIfMajorPerformanceCaveat: false,
+          }}
           camera={{ position: [0, 3.5, 17], fov: 45 }}
           className="w-full h-full cursor-grab active:cursor-grabbing"
         >
@@ -686,21 +682,27 @@ export function HouseStudio360() {
           <fog attach="fog" args={['#7ec0ee', 30, 85]} />
 
           <ambientLight intensity={1.1} />
+          {/* Main Key Sun Light */}
           <directionalLight
             position={[14, 20, 12]}
-            intensity={2.0}
+            intensity={1.8}
             castShadow
-            shadow-mapSize={[2048, 2048]}
+            shadow-mapSize={[1024, 1024]}
             shadow-camera-left={-16}
             shadow-camera-right={16}
             shadow-camera-top={16}
             shadow-camera-bottom={-16}
           />
+          {/* 360 Exterior Soft Fill Light so left and rear slopes/walls are beautifully sunlit */}
+          <directionalLight
+            position={[-12, 14, -10]}
+            intensity={0.65}
+            color="#fffbeb"
+          />
           <hemisphereLight intensity={0.5} groundColor="#1e3a24" color="#dbeafe" />
 
           <Suspense fallback={null}>
             <CompleteTerraceHouseModel />
-            <ContactShadows position={[0, 0.01, 0]} opacity={0.65} scale={32} blur={1.6} far={8} />
           </Suspense>
 
           <OrbitControls
