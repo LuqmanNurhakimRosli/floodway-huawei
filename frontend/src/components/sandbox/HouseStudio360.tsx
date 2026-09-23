@@ -40,13 +40,14 @@ function CompleteTerraceHouseModel() {
     doorWood: new THREE.MeshStandardMaterial({ color: '#451a03', roughness: 0.35 }),
     handleMetal: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.20, metalness: 0.90 }),
     windowAlum: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.25, metalness: 0.6 }),
-    windowGlass: new THREE.MeshPhysicalMaterial({
-      color: '#38bdf8',
-      roughness: 0.1,
-      transmission: 0.8,
+    // MeshPhysicalMaterial+transmission needs an env map or it renders pitch-black.
+    // Plain MeshStandardMaterial with transparency works without any env map.
+    windowGlass: new THREE.MeshStandardMaterial({
+      color: '#7dd3fc',
+      roughness: 0.05,
+      metalness: 0.15,
       transparent: true,
-      opacity: 0.7,
-      metalness: 0.2
+      opacity: 0.45,
     }),
 
     // Porch, Ground & Street
@@ -259,20 +260,20 @@ function CompleteTerraceHouseModel() {
       </group>
 
       {/* 5. COMPLETE SOLID CLAY TILE GABLE ROOF */}
-      {/* Front Gable Wall (Solid Attic Wall) */}
+      {/* Front Gable Wall — nudged 1.5 cm outward to remove z-fight with main wall */}
       <mesh
         geometry={gableShape}
-        position={[0, WALL_HEIGHT, HOUSE_DEPTH / 2 - 0.09]}
+        position={[0, WALL_HEIGHT + 0.015, HOUSE_DEPTH / 2 + 0.015]}
         castShadow
         receiveShadow
       >
         <primitive object={mats.wallMain} />
       </mesh>
 
-      {/* Rear Gable Wall (Solid Attic Wall) */}
+      {/* Rear Gable Wall — nudged 1.5 cm outward */}
       <mesh
         geometry={gableShape}
-        position={[0, WALL_HEIGHT, -HOUSE_DEPTH / 2 - 0.09]}
+        position={[0, WALL_HEIGHT + 0.015, -HOUSE_DEPTH / 2 - 0.015]}
         castShadow
         receiveShadow
       >
@@ -385,6 +386,35 @@ function CompleteTerraceHouseModel() {
             </mesh>
           </group>
         ))}
+      </group>
+
+      {/* 6b. REAR KITCHEN WINDOW — visible from rear/iso camera */}
+      <group position={[0.8, 1.55, -HOUSE_DEPTH / 2 - 0.06]}>
+        <mesh castShadow>
+          <boxGeometry args={[1.4, 1.0, 0.1]} />
+          <primitive object={mats.windowAlum} />
+        </mesh>
+        <mesh position={[0, 0, 0.01]}>
+          <planeGeometry args={[1.2, 0.82]} />
+          <primitive object={mats.windowGlass} />
+        </mesh>
+        {/* Concrete sill */}
+        <mesh position={[0, -0.54, 0.06]} castShadow>
+          <boxGeometry args={[1.5, 0.07, 0.18]} />
+          <primitive object={mats.curbConcrete} />
+        </mesh>
+      </group>
+
+      {/* 6c. LEFT-SIDE AIRWELL WINDOW — visible from left/iso camera */}
+      <group position={[-LOT_WIDTH / 2 - 0.06, 1.65, -HOUSE_DEPTH / 4]}>
+        <mesh castShadow rotation={[0, Math.PI / 2, 0]}>
+          <boxGeometry args={[1.1, 0.9, 0.1]} />
+          <primitive object={mats.windowAlum} />
+        </mesh>
+        <mesh position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <planeGeometry args={[0.92, 0.74]} />
+          <primitive object={mats.windowGlass} />
+        </mesh>
       </group>
 
       {/* 7. LANDSCAPING */}

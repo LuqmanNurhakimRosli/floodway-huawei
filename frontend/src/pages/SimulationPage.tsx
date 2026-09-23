@@ -108,12 +108,24 @@ export function SimulationPage() {
     }
   };
 
-  // Preset Scenario Handler
-  const applyPreset = (depth: number, rain: number, saturation: number, weather: WeatherMode) => {
+  // Preset Scenario Handler — also snaps camera to the most revealing angle for each scenario
+  const applyPreset = (
+    depth: number,
+    rain: number,
+    saturation: number,
+    weather: WeatherMode,
+    camPos?: [number, number, number],
+    camTarget?: [number, number, number]
+  ) => {
     setLevelM(depth);
     setRainfallMmHr(rain);
     setSoilSaturationPct(saturation);
     setWeatherMode(weather);
+    if (camPos && camTarget && controlsRef.current) {
+      controlsRef.current.object.position.set(...camPos);
+      controlsRef.current.target.set(...camTarget);
+      controlsRef.current.update();
+    }
   };
 
   return (
@@ -181,18 +193,21 @@ export function SimulationPage() {
           <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
             <div className="px-3.5 py-1.5 rounded-2xl bg-[#091122]/85 backdrop-blur-md border border-slate-700/80 text-white shadow-xl flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${weatherMode === 'daylight' ? 'bg-amber-400' : 'bg-blue-400 animate-pulse'}`} />
-              <span className="font-heading font-extrabold text-xs tracking-wider uppercase">
+              <span className="font-heading font-extrabold text-xs tracking-wider uppercase hidden sm:inline">
                 3D Digital Twin · {weatherMode === 'daylight' ? 'Sunny Baseline' : 'Storm Inundation'}
+              </span>
+              <span className="font-heading font-extrabold text-xs tracking-wider uppercase sm:hidden">
+                {weatherMode === 'daylight' ? '☀️ Dry' : '🌧️ Storm'}
               </span>
             </div>
 
             <button
-              onClick={() => applyPreset(0.00, 0, 30, 'daylight')}
+              onClick={() => applyPreset(0.00, 0, 30, 'daylight', [0, 3.2, 12.5], [0, 1.2, 0])}
               className="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-lg"
               title="Reset Baseline"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
+              <span className="hidden sm:inline">Reset</span>
             </button>
           </div>
 
@@ -222,7 +237,7 @@ export function SimulationPage() {
 
           {/* EXPANDABLE BOTTOM ENVIRONMENTAL CONTROLS DRAWER */}
           {isDrawerOpen && (
-            <div className="absolute bottom-20 left-4 right-4 md:left-6 md:right-auto md:w-[480px] z-20 bg-[#091428]/95 backdrop-blur-xl rounded-3xl border border-slate-700/80 p-4 shadow-2xl text-white animate-in slide-in-from-bottom-5 space-y-4">
+            <div className="absolute bottom-20 left-4 right-4 md:left-6 md:right-auto md:w-[480px] z-20 bg-[#091428]/95 backdrop-blur-xl rounded-3xl border border-slate-700/80 p-4 shadow-2xl text-white animate-in slide-in-from-bottom-5 space-y-4 max-h-[65vh] overflow-y-auto">
               <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-blue-400" />
@@ -310,25 +325,25 @@ export function SimulationPage() {
                 </span>
                 <div className="grid grid-cols-2 gap-1.5 text-[11px]">
                   <button
-                    onClick={() => applyPreset(0.00, 0, 30, 'daylight')}
+                    onClick={() => applyPreset(0.00, 0, 30, 'daylight', [0, 3.2, 12.5], [0, 1.2, 0])}
                     className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-slate-200 transition-colors"
                   >
                     🌱 Normal Baseline (0.00m)
                   </button>
                   <button
-                    onClick={() => applyPreset(0.20, 45, 60, 'daylight')}
+                    onClick={() => applyPreset(0.20, 45, 60, 'daylight', [-6, 1.6, 14], [0, 0.4, 4])}
                     className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-amber-300 transition-colors"
                   >
                     🚗 Porch Spillover (0.20m)
                   </button>
                   <button
-                    onClick={() => applyPreset(0.40, 85, 80, 'storm')}
+                    onClick={() => applyPreset(0.40, 85, 80, 'storm', [-5, 1.2, 13], [0, 0.5, 2])}
                     className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-orange-400 transition-colors"
                   >
                     ⚠️ Vehicle Stall (0.40m)
                   </button>
                   <button
-                    onClick={() => applyPreset(0.95, 140, 95, 'storm')}
+                    onClick={() => applyPreset(0.95, 140, 95, 'storm', [11, 9, 13], [0, 1.2, 0])}
                     className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-left border border-slate-700/60 font-semibold text-red-400 transition-colors"
                   >
                     🚨 Living Floor Breach (0.95m)
