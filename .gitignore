@@ -19,11 +19,19 @@ build/
 
 # Environment variables
 .env
-.env.local
+.env.*
+*.env
+**/.env
+**/.env.*
 *.local
+**/*.local
+!.env.example
+!**/.env.example
 
 # Editor & OS
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+files (*)/
+

@@ -17,11 +17,15 @@ import {
   AlertOctagon,
   ArrowRight,
   ShieldCheck,
-  Compass,
   Shield,
-  Route
+  Route,
+  MessageSquare,
+  ExternalLink,
+  Compass
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegramService';
 import { InPageActionDock } from './InPageActionDock';
 import { Shelter } from '../../types';
 
@@ -340,10 +344,12 @@ export function ShelterMapView() {
   const [floodSeverity, setFloodSeverity] = useState<'normal' | 'warning' | 'danger'>('warning');
 
   // GPS Navigator 6-Second Simulation State
+  const { user } = useAuth();
   const [isNavigating, setIsNavigating] = useState(false);
   const [navProgress, setNavProgress] = useState(0); // 0 to 1
   const [navElapsedSec, setNavElapsedSec] = useState(0);
   const [hasArrived, setHasArrived] = useState(false);
+  const [arrivalTimestamp, setArrivalTimestamp] = useState<{ date: string; time: string } | null>(null);
 
   // Fallback coords if shelters array is still loading
   const FALLBACK_LAT = 3.1642;
@@ -426,13 +432,30 @@ export function ShelterMapView() {
 
       if (progress >= 1) {
         clearInterval(interval);
+        const dateText = new Date().toLocaleDateString('en-MY', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+        const timeText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        setArrivalTimestamp({ date: dateText, time: timeText });
         setHasArrived(true);
         setFamilySafetyStatus('ARRIVED_SAFE');
+
+        // Automatically dispatch shelter arrival check-in via Telegram Bot
+        dispatchArrivalCheckin({
+          userName: user?.name || 'Luqman Nurhakim',
+          shelterName: selectedShelter?.name || 'Dewan Sultan Sulaiman, Kampung Baru',
+          dateStr: dateText,
+          timeStr: timeText,
+        });
       }
     }, 50);
 
     return () => clearInterval(interval);
-  }, [isNavigating, setFamilySafetyStatus]);
+  }, [isNavigating, setFamilySafetyStatus, selectedShelter?.name, user?.name]);
 
   const handleStartNavigation = (shelter: Shelter) => {
     if (shelter.status === 'FULL' || shelter.status === 'CLOSED') {
@@ -736,14 +759,29 @@ export function ShelterMapView() {
                   Safely Arrived at {selectedShelter?.name || 'Shelter'}
                 </h3>
                 <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                  Geofence check-in successful. Your designated emergency contacts have been notified via Telegram Bot & SMS with your confirmed shelter location.
+                  Geofence check-in successful. Your designated emergency contacts have been automatically notified via <b>Telegram Bot (@{TELEGRAM_CONFIG.BOT_USERNAME})</b> with your arrival confirmation.
                 </p>
               </div>
 
-              <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 text-left text-xs space-y-1.5">
+              <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700 text-left text-xs space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Arrival Time:</span>
-                  <span className="font-bold text-white">Just now</span>
+                  <span className="text-slate-400">Arrival Date & Time:</span>
+                  <span className="font-bold text-white">
+                    {arrivalTimestamp ? `${arrivalTimestamp.date} · ${arrivalTimestamp.time}` : 'Just now'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-emerald-400">
+                  <span className="text-slate-400">Telegram Notification:</span>
+                  <a
+                    href={TELEGRAM_CONFIG.BOT_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-bold flex items-center gap-1 underline underline-offset-2 hover:text-emerald-300"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Dispatched (@{TELEGRAM_CONFIG.BOT_USERNAME})</span>
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Family Safety Status:</span>
@@ -768,9 +806,9 @@ export function ShelterMapView() {
                 </button>
                 <button
                   onClick={() => navigate('/reports')}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/25 cursor-pointer"
                 >
-                  <span>Submit Arrival Report</span>
+                  <span>Live Flood Reports</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>

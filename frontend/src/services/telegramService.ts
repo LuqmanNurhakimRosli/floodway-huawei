@@ -2,9 +2,10 @@
 // Connected to official Bot: @floodway_bot (Huawei Innovation Contest 2026)
 
 export const TELEGRAM_CONFIG = {
-  BOT_TOKEN: '8655142881:AAHY11r7mMfh78ZG_AN9Osh2M7P4T510r74',
-  BOT_USERNAME: 'floodway_bot',
+  BOT_TOKEN: (import.meta as any).env?.VITE_TELEGRAM_BOT_TOKEN || '',
+  BOT_USERNAME: (import.meta as any).env?.VITE_TELEGRAM_BOT_USERNAME || 'floodway_bot',
   BOT_URL: 'https://t.me/floodway_bot',
+  DEFAULT_CHAT_ID: (import.meta as any).env?.VITE_TELEGRAM_DEFAULT_CHAT_ID || '',
   STORAGE_CHAT_KEY: 'floodway_tg_chat_id',
   STORAGE_TOKEN_KEY: 'floodway_tg_token',
 };
@@ -55,7 +56,10 @@ export async function sendTelegramMessage(
   customChatId?: string
 ): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
   const token = customToken || localStorage.getItem(TELEGRAM_CONFIG.STORAGE_TOKEN_KEY) || TELEGRAM_CONFIG.BOT_TOKEN;
-  let chatId = customChatId || localStorage.getItem(TELEGRAM_CONFIG.STORAGE_CHAT_KEY);
+  let chatId =
+    customChatId ||
+    localStorage.getItem(TELEGRAM_CONFIG.STORAGE_CHAT_KEY) ||
+    TELEGRAM_CONFIG.DEFAULT_CHAT_ID;
 
   // If no chat_id is saved yet, attempt auto-sync
   if (!chatId) {
@@ -129,20 +133,63 @@ export async function dispatchEmergencySosAlert(payload: {
 
 /**
  * 2. SHELTER ARRIVAL SAFETY CHECK-IN
- * Triggered automatically when the user reaches the shelter perimeter or completes route.
+ * Triggered automatically when the user reaches the shelter on the map.
  */
 export async function dispatchArrivalCheckin(payload: {
   userName: string;
   shelterName: string;
-  timeStr: string;
+  dateStr?: string;
+  timeStr?: string;
 }): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
+  const dateText =
+    payload.dateStr ||
+    new Date().toLocaleDateString('en-MY', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  const timeText =
+    payload.timeStr ||
+    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
   const message =
     `✅ <b>FLOODWAY 2.0 · SAFE SHELTER ARRIVAL CONFIRMED</b>\n\n` +
-    `🎉 <b>Good news!</b> <b>${payload.userName}</b> has <b>SAFELY ARRIVED</b> at <b>${payload.shelterName}</b>!\n\n` +
-    `🕒 <b>Verified Arrival Time:</b> ${payload.timeStr}\n` +
-    `🛡 <b>Geofence Status:</b> Confirmed inside relief shelter perimeter (<50m).\n` +
-    `📋 <b>Registration:</b> Logged in National Evacuation Registry (NADMA / JKM).\n\n` +
-    `<i>Family loop safely closed via FloodWay 2.0 & Telegram Gateway.</i>`;
+    `👤 <b>Evacuee:</b> ${payload.userName}\n` +
+    `🏛 <b>Destination:</b> <b>${payload.shelterName}</b>\n` +
+    `📅 <b>Date:</b> ${dateText}\n` +
+    `🕒 <b>Time:</b> ${timeText}\n` +
+    `🛡 <b>Geofence Status:</b> Confirmed inside shelter perimeter (<50m).\n` +
+    `📋 <b>Status:</b> Safe & Registered with NADMA Relief Command.\n\n` +
+    `<i>Family safety loop safely closed via FloodWay 2.0 & Telegram Bot @floodway_bot.</i>`;
+
+  return sendTelegramMessage(message);
+}
+
+/**
+ * 3. CITIZEN FLOOD HAZARD REPORT & PHOTO EVIDENCE BROADCAST
+ * Broadcasts an alert to everyone about live flood incidents with uploaded photo evidence.
+ */
+export async function dispatchFloodIncidentReportAlert(payload: {
+  title: string;
+  location: string;
+  waterDepthCm: number;
+  author: string;
+  dateStr?: string;
+  hasPhotoEvidence: boolean;
+}): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
+  const dateText =
+    payload.dateStr ||
+    new Date().toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
+
+  const message =
+    `📢 <b>FLOODWAY 2.0 · LIVE FLOOD HAZARD ALERT</b>\n\n` +
+    `⚠️ <b>Incident:</b> ${payload.title}\n` +
+    `📍 <b>Location:</b> ${payload.location}\n` +
+    `🌊 <b>Reported Depth:</b> ${payload.waterDepthCm} cm\n` +
+    `📸 <b>Visual Evidence:</b> ${payload.hasPhotoEvidence ? 'Verified Photo Upload Attached' : 'Citizen Ground-Truth Report'}\n` +
+    `👤 <b>Reported by:</b> ${payload.author} on ${dateText}\n\n` +
+    `🚨 <i>Take immediate precautions! Avoid this location and navigate to safe shelters via FloodWay 2.0 Map.</i>`;
 
   return sendTelegramMessage(message);
 }

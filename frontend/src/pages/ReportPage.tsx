@@ -51,15 +51,15 @@ export function ReportPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="font-heading font-black text-2xl text-slate-900 tracking-tight">
-                    FloodWay
+                    Flood Hazard Incident Reports & Evidence
                   </h1>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    Verified Incident Reports
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    Live Community Alerts
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium">
-                  Real-time citizen flood reports verified by automated visual AI and emergency operations.
+                  Crowdsourced ground-truth flood hazard reports with photo evidence to alert residents, disaster operations, and responders in real time.
                 </p>
               </div>
             </div>
@@ -78,7 +78,7 @@ export function ReportPage() {
                 className="px-4 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-red-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>🚨 Report Flood Photo</span>
+                <span>🚨 Report Flood with Photo Evidence</span>
               </button>
             </div>
           </div>

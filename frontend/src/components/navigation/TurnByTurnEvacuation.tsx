@@ -30,11 +30,19 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
         if (prev >= 100) {
           clearInterval(interval);
           setHasArrived(true);
+          const dateText = new Date().toLocaleDateString('en-MY', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          });
+          const timeText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           // Automated Geofence Arrival Check-In Dispatch
           dispatchArrivalCheckin({
             userName: user?.name || 'Luqman Nurhakim',
             shelterName: shelter.name,
-            timeStr: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            dateStr: dateText,
+            timeStr: timeText
           });
           setFamilySafetyStatus('ARRIVED_SAFE');
           return 100;

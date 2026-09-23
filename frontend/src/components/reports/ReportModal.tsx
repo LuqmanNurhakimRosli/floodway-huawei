@@ -15,6 +15,7 @@ import {
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { analyzeFloodImage } from '../../services/geminiVisionService';
+import { dispatchFloodIncidentReportAlert } from '../../services/telegramService';
 import { AiVerificationResult } from '../../types';
 
 interface Props {
@@ -94,6 +95,8 @@ export function ReportModal({ isOpen, onClose }: Props) {
       notes: 'Automated AI visual assessment confirmed surface flood breach.',
     };
 
+    const authorName = user?.name || 'Citizen Responder';
+
     addReport({
       id: `rep-${Date.now()}`,
       title: title || 'Water Rising Rapidly on Roadside',
@@ -104,11 +107,20 @@ export function ReportModal({ isOpen, onClose }: Props) {
       status: 'AI_VERIFIED',
       verifiedBy: 'Automated Visual Verification',
       timestampStr: 'Just now',
-      author: user?.name || 'Citizen Responder',
+      author: authorName,
       upvotes: 1,
       imageUrl: selectedImage,
       description: `Reported flood incident. Depth approximately ${depthCm}cm. Automatically verified by visual AI.`,
       aiVerification: finalAi,
+    });
+
+    // Immediately broadcast ground-truth flood incident alert to community via Telegram Bot
+    dispatchFloodIncidentReportAlert({
+      title: title || 'Water Rising Rapidly on Roadside',
+      location,
+      waterDepthCm: depthCm,
+      author: authorName,
+      hasPhotoEvidence: !!selectedImage,
     });
 
     onClose();
@@ -120,15 +132,15 @@ export function ReportModal({ isOpen, onClose }: Props) {
         {/* Modal Header */}
         <div className="p-5 bg-gradient-to-r from-[#071426] to-[#0B1E38] text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-400">
+            <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400">
               <Camera className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest block">
-                Citizen Reporting
+              <span className="text-[10px] font-bold text-red-400 uppercase tracking-widest block">
+                Citizen Ground-Truth Alert
               </span>
               <h3 className="font-heading font-bold text-base md:text-lg text-white">
-                Submit Flood Photo for Verification
+                Report Flood Hazard & Photo Evidence
               </h3>
             </div>
           </div>
