@@ -212,18 +212,41 @@ export async function fetchReports(): Promise<CitizenReport[]> {
       waterDepthCm: 42,
       status: 'AI_VERIFIED',
       verifiedBy: 'Huawei ModelArts PanGu-CV (Pending Authority Approval)',
-      timestampStr: 'Just now',
+      timestampStr: '6 min ago',
       author: 'Kamal R.',
       upvotes: 6,
-      imageUrl: '/banjir2.jpg',
+      imageUrl: '/banjir_underpass.jpg',
       description: 'Water ponding rapidly underneath the railway flyover. Low-clearance cars stranded.',
       aiVerification: {
         verified: true,
         confidenceScore: 0.965,
-        detectedHazards: ['Underpass Ponding', 'Railway Bridge Drainage Congestion'],
+        detectedHazards: ['Underpass Ponding', 'Railway Bridge Drainage Congestion', 'Vehicle Hydrolock Warning'],
         estimatedDepthCm: 44,
         engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU)',
-        notes: 'Surface water depth exceeds 40cm. Immediate hazard review recommended.'
+        notes: 'Underpass basin depth measured at 44cm. Visible AWAS BANJIR warning signs and vehicle wheel submergence verified.'
+      }
+    },
+    {
+      id: 'rep-04',
+      title: 'Monsoon Drain Overflowing into Residential Road',
+      location: 'Seksyen 13, Shah Alam',
+      lat: 3.0845,
+      lon: 101.5321,
+      waterDepthCm: 38,
+      status: 'AI_VERIFIED',
+      verifiedBy: 'Huawei ModelArts PanGu-CV & Gemini Flash',
+      timestampStr: 'Just now',
+      author: 'Farhan M.',
+      upvotes: 9,
+      imageUrl: '/banjir_drain.jpg',
+      description: 'Concrete monsoon drainage canal overflowing with turbulent rainwater spilling over onto neighborhood street.',
+      aiVerification: {
+        verified: true,
+        confidenceScore: 0.985,
+        detectedHazards: ['Canal Overflow', 'Residential Street Inundation', 'Drain Backflow Risk'],
+        estimatedDepthCm: 38,
+        engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU) & Gemini Flash',
+        notes: 'Monsoon drain overflow verified breaching residential road level. High turbulence and silt flow confirmed.'
       }
     }
   ];

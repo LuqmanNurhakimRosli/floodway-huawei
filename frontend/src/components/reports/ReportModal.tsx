@@ -31,8 +31,8 @@ export function ReportModal({ isOpen, onClose }: Props) {
   const [title, setTitle] = useState('Monsoon Drain Overflowing into Residential Road');
   const [location, setLocation] = useState(selectedLocation || 'Kampung Baru, Kuala Lumpur');
   const [depthCm, setDepthCm] = useState(38);
-  const [selectedImage, setSelectedImage] = useState('/banjir2.jpg');
-  const [customFileName, setCustomFileName] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState('/banjir_drain.jpg');
+  const [customFileName, setCustomFileName] = useState<string | null>('banjir_drain_overflow.jpg');
   const [isDragging, setIsDragging] = useState(false);
 
   const [analyzing, setAnalyzing] = useState(false);
@@ -284,30 +284,86 @@ export function ReportModal({ isOpen, onClose }: Props) {
             </div>
 
             {/* Quick preset options */}
-            <div className="mt-2 flex items-center gap-2">
-              <span className="text-[10px] text-slate-400 font-semibold">Or use incident samples:</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedImage('/banjir2.jpg');
-                  setCustomFileName('banjir_kampung_baru.jpg');
-                  setAiResult(null);
-                }}
-                className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
-              >
-                Sample 1 (Kampung Baru)
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedImage('/banjir3.jfif');
-                  setCustomFileName('banjir_sri_muda.jpg');
-                  setAiResult(null);
-                }}
-                className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
-              >
-                Sample 2 (Sri Muda)
-              </button>
+            <div className="mt-2 space-y-1.5">
+              <span className="text-[10px] text-slate-400 font-semibold block">Or select real incident photo sample:</span>
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedImage('/banjir_drain.jpg');
+                    setCustomFileName('banjir_drain_overflow.jpg');
+                    setTitle('Monsoon Drain Overflowing into Residential Road');
+                    setLocation('Seksyen 13, Shah Alam');
+                    setDepthCm(38);
+                    setAiResult(null);
+                  }}
+                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                    selectedImage === '/banjir_drain.jpg'
+                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="block truncate">1. Drain Overflow</span>
+                  <span className="text-[9px] text-slate-400">Seksyen 13 · 38cm</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedImage('/banjir_underpass.jpg');
+                    setCustomFileName('banjir_rasau_underpass.jpg');
+                    setTitle('Sungai Rasau Underpass Water Accumulation');
+                    setLocation('Sungai Rasau, Klang');
+                    setDepthCm(42);
+                    setAiResult(null);
+                  }}
+                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                    selectedImage === '/banjir_underpass.jpg'
+                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="block truncate">2. Underpass Flood</span>
+                  <span className="text-[9px] text-slate-400">Sg Rasau · 42cm</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedImage('/banjir2.jpg');
+                    setCustomFileName('banjir_kampung_baru.jpg');
+                    setTitle('Jalan Raja Muda Musa Water Spillover');
+                    setLocation('Kampung Baru, Kuala Lumpur');
+                    setDepthCm(35);
+                    setAiResult(null);
+                  }}
+                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                    selectedImage === '/banjir2.jpg'
+                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="block truncate">3. Road Spillover</span>
+                  <span className="text-[9px] text-slate-400">Kg Baru · 35cm</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedImage('/banjir3.jfif');
+                    setCustomFileName('banjir_sri_muda.jpg');
+                    setTitle('Submerged Drain & Road Clogged at Seksyen 25');
+                    setLocation('Taman Sri Muda, Seksyen 25');
+                    setDepthCm(50);
+                    setAiResult(null);
+                  }}
+                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                    selectedImage === '/banjir3.jfif'
+                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="block truncate">4. Submerged Road</span>
+                  <span className="text-[9px] text-slate-400">Sri Muda · 50cm</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -347,15 +403,32 @@ export function ReportModal({ isOpen, onClose }: Props) {
             </button>
 
             {aiResult && (
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
+              <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 text-xs text-emerald-950 space-y-2 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between font-bold">
-                  <span className="flex items-center gap-1 text-emerald-700">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Visual Verification Passed ({Math.round(aiResult.confidenceScore * 100)}% Confidence)
+                  <span className="flex items-center gap-1.5 text-emerald-800">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Visual AI Verification Passed ({Math.round(aiResult.confidenceScore * 100)}% Confidence)</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 font-extrabold">
+                    {aiResult.estimatedDepthCm} cm Depth
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-600">
-                  <b>Detected:</b> {aiResult.detectedHazards.join(', ')}
+
+                <div className="p-2 rounded-xl bg-white/80 border border-emerald-200 text-[11px] space-y-1">
+                  <div className="flex items-center gap-1 text-emerald-800 font-bold">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Authenticity: Genuine Field Photo (Deepfake Check Passed)</span>
+                  </div>
+                  <div className="text-slate-700">
+                    <b>Detected Hazards:</b> {aiResult.detectedHazards.join(', ')}
+                  </div>
+                  <p className="text-slate-600 italic text-[10px] mt-1">
+                    "{aiResult.notes}"
+                  </p>
+                </div>
+
+                <div className="text-[10px] text-emerald-700/80 text-right font-medium">
+                  {aiResult.engine}
                 </div>
               </div>
             )}
