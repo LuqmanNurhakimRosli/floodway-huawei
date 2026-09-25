@@ -127,7 +127,7 @@ export async function dispatchEmergencySosAlert(payload: {
 }): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
   const mapLink = `https://maps.google.com/?q=${payload.lat.toFixed(5)},${payload.lon.toFixed(5)}`;
   const message =
-    `🚨 <b>FLOODWAY 2.0 · CRITICAL FLOOD INUNDATION ALERT</b>\n\n` +
+    `🚨 <b>FLOODWAY · CRITICAL FLOOD INUNDATION ALERT</b>\n\n` +
     `⚠️ <b>STATUS: CRITICAL FLOOD BREACH DETECTED</b>\n` +
     `👤 <b>Citizen:</b> ${escapeHtml(payload.userName)} (${escapeHtml(payload.phone)})\n` +
     `🌊 <b>Water Depth:</b> ${payload.waterDepthCm} cm (Main DB Board &amp; Living Room Floor Breached)\n` +
@@ -162,14 +162,14 @@ export async function dispatchArrivalCheckin(payload: {
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const message =
-    `✅ <b>FLOODWAY 2.0 · SAFE SHELTER ARRIVAL CONFIRMED</b>\n\n` +
+    `✅ <b>FLOODWAY · SAFE SHELTER ARRIVAL CONFIRMED</b>\n\n` +
     `👤 <b>Evacuee:</b> ${escapeHtml(payload.userName)}\n` +
     `🏛 <b>Destination:</b> <b>${escapeHtml(payload.shelterName)}</b>\n` +
     `📅 <b>Date:</b> ${escapeHtml(dateText)}\n` +
     `🕒 <b>Time:</b> ${escapeHtml(timeText)}\n` +
     `🛡 <b>Geofence Status:</b> Confirmed inside shelter perimeter (&lt;50m).\n` +
     `📋 <b>Status:</b> Safe &amp; Registered with NADMA Relief Command.\n\n` +
-    `<i>Family safety loop safely closed via FloodWay 2.0 &amp; Telegram Bot @floodway_bot.</i>`;
+    `<i>Family safety loop safely closed via FloodWay &amp; Telegram Bot @floodway_bot.</i>`;
 
   return sendTelegramMessage(message);
 }
@@ -191,13 +191,13 @@ export async function dispatchFloodIncidentReportAlert(payload: {
     new Date().toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
 
   const message =
-    `📢 <b>FLOODWAY 2.0 · LIVE FLOOD HAZARD ALERT</b>\n\n` +
+    `📢 <b>FLOODWAY · LIVE FLOOD HAZARD ALERT</b>\n\n` +
     `⚠️ <b>Incident:</b> ${escapeHtml(payload.title)}\n` +
     `📍 <b>Location:</b> ${escapeHtml(payload.location)}\n` +
     `🌊 <b>Reported Depth:</b> ${payload.waterDepthCm} cm\n` +
     `📸 <b>Visual Evidence:</b> ${payload.hasPhotoEvidence ? 'Verified Photo Upload Attached' : 'Citizen Ground-Truth Report'}\n` +
     `👤 <b>Reported by:</b> ${escapeHtml(payload.author)} on ${escapeHtml(dateText)}\n\n` +
-    `🚨 <i>Take immediate precautions! Avoid this location and navigate to safe shelters via FloodWay 2.0 Map.</i>`;
+    `🚨 <i>Take immediate precautions! Avoid this location and navigate to safe shelters via FloodWay Map.</i>`;
 
   return sendTelegramMessage(message);
 }

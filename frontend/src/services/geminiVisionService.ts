@@ -45,7 +45,7 @@ export async function analyzeFloodImage(
       const dataUrl = await toDataUrl(params.imageUrl);
 
       const promptText =
-        `You are an emergency disaster assessment AI for Huawei ModelArts PanGu-CV & FloodWay 2.0. ` +
+        `You are an emergency disaster assessment AI for Huawei ModelArts PanGu-CV & FloodWay. ` +
         `Analyze this flood image carefully. ` +
         `Incident description provided: "${params.userDescription || 'Flood water breach'}". ` +
         `User estimated depth: ${defaultDepth} cm.\n\n` +

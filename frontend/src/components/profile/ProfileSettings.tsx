@@ -24,7 +24,7 @@ export function ProfileSettings() {
   };
 
   const handleTestTelegram = async () => {
-    const ok = await sendTelegramMessage('🔔 Test alert from FloodWay 2.0. Bot connectivity verified!', tgToken, tgChatId);
+    const ok = await sendTelegramMessage('🔔 Test alert from FloodWay. Bot connectivity verified!', tgToken, tgChatId);
     if (ok) setTestSent(true);
   };
 

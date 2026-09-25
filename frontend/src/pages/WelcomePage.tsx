@@ -29,7 +29,7 @@ export function WelcomePage() {
         </div>
         <div>
           <span className="font-heading font-extrabold text-xl tracking-tight text-white block">
-            FloodWay <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#1677FF]/30 text-[#60A5FA] border border-[#1677FF]/50">2.0</span>
+            FloodWay
           </span>
           <span className="text-[10px] text-slate-400 font-medium">Huawei ICT Competition 2026</span>
         </div>
