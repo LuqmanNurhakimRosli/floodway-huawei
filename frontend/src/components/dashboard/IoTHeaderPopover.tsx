@@ -32,7 +32,7 @@ export function IoTHeaderPopover() {
         <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
             <span className="font-heading font-bold text-sm text-slate-900">Station telemetry (simulated)</span>
-            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-bold">
               {DEMO_SCENARIO.station.id}
             </span>
           </div>

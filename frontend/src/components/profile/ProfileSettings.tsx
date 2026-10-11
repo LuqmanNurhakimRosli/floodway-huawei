@@ -52,7 +52,7 @@ export function ProfileSettings() {
         <div>
           <h2 className="font-heading font-extrabold text-xl text-slate-900">{user?.name || 'Luqman Nurhakim'}</h2>
           <p className="text-xs text-slate-500">{user?.email || 'luqman@floodway.my'} · {user?.phone || '+60 12-345 6789'}</p>
-          <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-[#1677FF] text-[10px] font-bold border border-blue-200">
+          <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-[#1677FF] text-xs font-bold border border-blue-200">
             Registered Citizen Responder
           </span>
         </div>

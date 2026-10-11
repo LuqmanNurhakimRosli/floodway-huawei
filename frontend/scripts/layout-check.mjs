@@ -1,7 +1,7 @@
 // Layout check (Plan B P5-02). Opens each route at several sizes and reports:
 //   - overlapping interactive elements (buttons, links, inputs) that are not nested in each other
 //   - horizontal page scroll
-//   - text under 12px (counted; fails only above MAX_SMALL_TEXT per route, see below)
+//   - text under 12px (fails above MAX_SMALL_TEXT, default 0)
 //   - touch targets under 44x44 on phone widths (counted, informational)
 //
 // Usage (dev server must be running):
@@ -13,7 +13,7 @@ import { chromium } from 'playwright-core';
 const BASE = process.env.BASE ?? 'http://localhost:5173';
 const ROUTES = (process.env.ROUTES ?? '/home,/map,/reports,/live,/profile').split(',');
 const SIZES = (process.env.SIZES ?? '360x740,390x844,768x1024,1024x768,1440x900').split(',').map((s) => s.split('x').map(Number));
-const MAX_SMALL_TEXT = Number(process.env.MAX_SMALL_TEXT ?? Infinity);
+const MAX_SMALL_TEXT = Number(process.env.MAX_SMALL_TEXT ?? 0); // nothing under 12px
 
 const browser = await chromium.launch({ channel: process.env.CHROME_CHANNEL ?? 'chrome', headless: true });
 let failures = 0;

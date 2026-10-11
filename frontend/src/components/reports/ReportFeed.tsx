@@ -85,7 +85,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                     <span className="font-heading font-bold text-xs text-slate-900 block leading-tight">
                       {report.author}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">
+                    <span className="text-xs text-slate-400 font-medium">
                       {report.timestampStr}
                     </span>
                   </div>
@@ -114,7 +114,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                   <MapPin className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
                   <span className="truncate">{shortLocation}</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                   isHighRisk ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
                 }`}>
                   {formatCm(report.waterDepthCm)}
@@ -142,19 +142,19 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 {/* EXACT MAXIMUM 3 FACTOR CHIPS (Clean & Readable) */}
                 <div className="grid grid-cols-3 gap-1.5 pt-1">
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Water Depth</span>
+                    <span className="text-xs font-semibold text-slate-400 block uppercase">Water Depth</span>
                     <span className="font-mono text-xs font-bold text-slate-900">{formatCm(report.waterDepthCm)}</span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Road Risk</span>
-                    <span className={`text-[11px] font-bold ${isHighRisk ? 'text-red-600' : 'text-amber-600'}`}>
+                    <span className="text-xs font-semibold text-slate-400 block uppercase">Road Risk</span>
+                    <span className={`text-xs font-bold ${isHighRisk ? 'text-red-600' : 'text-amber-600'}`}>
                       {isHighRisk ? 'Submerged' : 'Cautious'}
                     </span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                    <span className="text-[10px] font-semibold text-slate-400 block uppercase">Verification</span>
+                    <span className="text-xs font-semibold text-slate-400 block uppercase">Verification</span>
                     <span className="text-xs font-bold text-slate-800">
                       {info.tile}
                     </span>

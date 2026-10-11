@@ -29,6 +29,7 @@ export function RefugeAction() {
           <p className="text-xs/4 font-semibold uppercase tracking-wide text-slate-700">{shelter.status === 'OPEN' ? 'Nearest open refuge' : 'Nearest refuge (not open)'}</p>
           <h2 id="refuge-title" className={`${cardTitle} mt-0.5 text-lg/7`}>{textOr(shelter.name)}</h2>
           <p className="text-sm/5 text-slate-700">{textOr(shelter.category)}</p>
+          <p className="text-xs/4 text-slate-700">Demo shelter list, not an official register.</p>
         </div>
         <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs/4 font-semibold ${shelter.status === 'OPEN' ? 'border-emerald-300 bg-emerald-50 text-emerald-900' : 'border-amber-300 bg-amber-50 text-amber-900'}`}>{shelter.status}</span>
       </div>

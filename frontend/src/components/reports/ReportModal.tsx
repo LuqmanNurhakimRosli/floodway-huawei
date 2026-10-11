@@ -130,7 +130,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
               <Camera className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-red-400 uppercase tracking-widest block">
+              <span className="text-xs font-bold text-red-400 uppercase tracking-widest block">
                 Citizen Ground-Truth Alert
               </span>
               <h3 className="font-heading font-bold text-base md:text-lg text-white">
@@ -168,7 +168,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Location (GPS Auto-Captured)
               </label>
-              <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+              <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
                 <span>Geotagged</span>
               </span>
@@ -200,7 +200,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
               onChange={(e) => setDepthCm(Number(e.target.value))}
               className="w-full accent-[#1677FF] cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+            <div className="flex justify-between text-xs text-slate-400 font-mono">
               <span>5cm (Puddle)</span>
               <span>35cm (Curb)</span>
               <span>75cm (Waist)</span>
@@ -244,7 +244,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     <span className="font-bold text-xs text-slate-900 block truncate">
                       {customFileName || 'Flood Incident Photo'}
                     </span>
-                    <span className="text-[11px] text-slate-400 block mt-0.5">
+                    <span className="text-xs text-slate-400 block mt-0.5">
                       Ready for automated visual verification
                     </span>
                     <button
@@ -253,7 +253,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
                         e.stopPropagation();
                         fileInputRef.current?.click();
                       }}
-                      className="mt-2 text-[11px] font-bold text-[#1677FF] hover:underline flex items-center gap-1"
+                      className="mt-2 text-xs font-bold text-[#1677FF] hover:underline flex items-center gap-1"
                     >
                       <UploadCloud className="w-3.5 h-3.5" />
                       <span>Choose Different Photo</span>
@@ -269,7 +269,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     <span className="text-xs font-bold text-slate-800 block">
                       Click to upload photo or drag & drop
                     </span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-xs text-slate-400">
                       Supports JPG, PNG, WebP up to 10MB
                     </span>
                   </div>
@@ -279,7 +279,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
 
             {/* Quick preset options */}
             <div className="mt-2 space-y-1.5">
-              <span className="text-[10px] text-slate-400 font-semibold block">Or select real incident photo sample:</span>
+              <span className="text-xs text-slate-400 font-semibold block">Or select real incident photo sample:</span>
               <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
                 <button
                   type="button"
@@ -291,14 +291,14 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     setDepthCm(38);
                     setAiResult(null);
                   }}
-                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
                     selectedImage === '/banjir_drain.jpg'
                       ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <span className="block truncate">1. Drain Overflow</span>
-                  <span className="text-[9px] text-slate-400">Seksyen 13 · 38cm</span>
+                  <span className="text-xs text-slate-400">Seksyen 13 · 38cm</span>
                 </button>
                 <button
                   type="button"
@@ -310,14 +310,14 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     setDepthCm(42);
                     setAiResult(null);
                   }}
-                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
                     selectedImage === '/banjir_underpass.jpg'
                       ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <span className="block truncate">2. Underpass Flood</span>
-                  <span className="text-[9px] text-slate-400">Sg Rasau · 42cm</span>
+                  <span className="text-xs text-slate-400">Sg Rasau · 42cm</span>
                 </button>
                 <button
                   type="button"
@@ -329,14 +329,14 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     setDepthCm(35);
                     setAiResult(null);
                   }}
-                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
                     selectedImage === '/banjir2.jpg'
                       ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <span className="block truncate">3. Road Spillover</span>
-                  <span className="text-[9px] text-slate-400">Kg Baru · 35cm</span>
+                  <span className="text-xs text-slate-400">Kg Baru · 35cm</span>
                 </button>
                 <button
                   type="button"
@@ -348,14 +348,14 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     setDepthCm(50);
                     setAiResult(null);
                   }}
-                  className={`text-[10px] p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
+                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
                     selectedImage === '/banjir3.jfif'
                       ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   <span className="block truncate">4. Submerged Road</span>
-                  <span className="text-[9px] text-slate-400">Sri Muda · 50cm</span>
+                  <span className="text-xs text-slate-400">Sri Muda · 50cm</span>
                 </button>
               </div>
             </div>
@@ -368,12 +368,12 @@ export function ReportModal({ isOpen, onClose }: Props) {
                 <ShieldCheck className="w-4 h-4 text-[#1677FF]" />
                 <span>Automated Visual Verification</span>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#1677FF] border border-blue-200">
+              <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-[#1677FF] border border-blue-200">
                 AI Active
               </span>
             </div>
 
-            <p className="text-[11px] text-slate-500 leading-snug">
+            <p className="text-xs text-slate-500 leading-snug">
               Multimodal vision analyzes water inundation, vehicle hydrolock hazard, and depth thresholds.
             </p>
 
@@ -405,7 +405,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
                         <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
                         <span>{aiResult.verified ? 'AI assessment: looks like flooding' : 'AI assessment: could not confirm flooding'} ({Math.round(aiResult.confidenceScore * 100)}% model certainty)</span>
                       </span>
-                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-sky-200/80 text-sky-900 font-bold shrink-0">~{aiResult.estimatedDepthCm} cm</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-sky-200/80 text-sky-900 font-bold shrink-0">~{aiResult.estimatedDepthCm} cm</span>
                     </div>
                     <div className="p-2 rounded-xl bg-white/80 border border-sky-200 text-xs space-y-1">
                       <div className="text-slate-700">
@@ -421,13 +421,13 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     <span>AI check not run. {aiResult.notes}</span>
                   </div>
                 )}
-                <div className="text-[11px] text-slate-600 text-right font-medium">{aiResult.engine}</div>
+                <div className="text-xs text-slate-600 text-right font-medium">{aiResult.engine}</div>
               </div>
             )}
           </div>
 
           {/* Submission Info Notice */}
-          <div className="text-[11px] text-slate-500 p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-1.5">
+          <div className="text-xs text-slate-500 p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-1.5">
             <Radio className="w-3.5 h-3.5 text-[#1677FF] shrink-0 mt-0.5" />
             <span>
               <b>Workflow:</b> The report is saved as <b>unverified</b>. It is marked <b>AI assessed</b> only if you run the AI check above and it judges the photo to show flooding. No agency reviews it in this demo.

@@ -77,7 +77,7 @@ function Chart({ data }: { data: ForecastResponse }) {
         <polygon points={band} fill="#0284C7" fillOpacity="0.14" />
         <polyline points={line(f.p50)} fill="none" stroke="#0369A1" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
         {ticks.map((t) => (
-          <text key={t} x={x(t)} y={H - 8} textAnchor="middle" fontSize="12" fill="#334155">{t === 0 ? 'now' : `+${t}m`}</text>
+          <text key={t} x={x(t)} y={H - 8} textAnchor={t === maxT ? 'end' : t === 0 ? 'start' : 'middle'} fontSize="12" fill="#334155">{t === 0 ? 'now' : `+${t}m`}</text>
         ))}
       </svg>
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs/4 text-slate-700">

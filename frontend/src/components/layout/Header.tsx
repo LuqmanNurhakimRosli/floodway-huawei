@@ -41,7 +41,7 @@ export function Header() {
 
           {showLocationMenu && (
             <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50">
-              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase text-slate-400 border-b border-slate-100">
+              <div className="px-3 py-1.5 text-xs font-semibold uppercase text-slate-400 border-b border-slate-100">
                 Monitored River Basins
               </div>
               {locations.map((loc) => (
@@ -64,7 +64,7 @@ export function Header() {
         </div>
 
         {/* Live operational badge */}
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-700">
+        <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-xs font-semibold text-emerald-700">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
           <span>Demo scenario · simulated sensors</span>
         </div>
@@ -85,7 +85,7 @@ export function Header() {
           </div>
           <div className="hidden xl:flex flex-col">
             <span className="text-xs font-semibold text-slate-800 leading-tight">{user?.name || 'Luqman Nurhakim'}</span>
-            <span className="text-[10px] text-slate-400 font-medium">Citizen Responder</span>
+            <span className="text-xs text-slate-400 font-medium">Citizen Responder</span>
           </div>
         </div>
       </div>

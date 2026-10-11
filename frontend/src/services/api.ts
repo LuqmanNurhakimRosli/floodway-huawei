@@ -1,7 +1,10 @@
 import { Shelter, CitizenReport, ForecastData } from '../types';
 import { mapReport, mapShelter } from '../lib/mappers';
+import { API_BASE } from './vision/config';
 
-const BACKEND_URL = 'http://localhost:8080/api/v1';
+// One backend address for everything: VITE_API_BASE, or http://localhost:8080 in development. (This used to be a
+// hard-coded localhost:8080, so a deployment that set VITE_API_BASE reached the wrong server for shelters and reports.)
+const BACKEND_URL = `${API_BASE}/api/v1`;
 
 export async function fetchTwinState(deviceId = 'fw-node-01') {
   try {

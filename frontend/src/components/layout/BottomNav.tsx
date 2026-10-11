@@ -26,7 +26,7 @@ export function BottomNav() {
           }
         >
           <tab.icon className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] tracking-tight">{tab.label}</span>
+          <span className="text-xs tracking-tight">{tab.label}</span>
         </NavLink>
       ))}
     </nav>

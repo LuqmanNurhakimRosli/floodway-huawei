@@ -55,7 +55,7 @@ export function ReportPage() {
                   <h1 className="font-heading font-black text-2xl text-slate-900 tracking-tight">
                     Flood Hazard Incident Reports & Evidence
                   </h1>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     Demo reports
                   </span>

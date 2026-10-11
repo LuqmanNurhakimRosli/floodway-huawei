@@ -42,7 +42,7 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
               <span className="font-heading font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
                 FloodWay
               </span>
-              <span className="text-[10px] text-blue-400/90 font-medium tracking-wider uppercase">Life-Safety Intelligence</span>
+              <span className="text-xs text-blue-400/90 font-medium tracking-wider uppercase">Life-Safety Intelligence</span>
             </div>
           )}
         </div>
@@ -103,7 +103,7 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs font-semibold text-slate-200">LifeLine Active</span>
           </div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
+          <p className="text-xs text-slate-400 leading-relaxed">
             Real-time flood prediction & community safety dispatch.
           </p>
         </div>

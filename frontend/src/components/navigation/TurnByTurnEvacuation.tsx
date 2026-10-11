@@ -98,15 +98,15 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
         {/* Progress Display */}
         <div className="grid grid-cols-3 gap-3 my-6 text-center">
           <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/60">
-            <span className="text-[11px] font-medium text-slate-400 block">Remaining</span>
+            <span className="text-xs font-medium text-slate-400 block">Remaining</span>
             <span className="font-heading font-extrabold text-xl text-white">{remainingMeters} m</span>
           </div>
           <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/60">
-            <span className="text-[11px] font-medium text-slate-400 block">Est. Time</span>
+            <span className="text-xs font-medium text-slate-400 block">Est. Time</span>
             <span className="font-heading font-extrabold text-xl text-white">~{remainingMinutes} min</span>
           </div>
           <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/60">
-            <span className="text-[11px] font-medium text-slate-400 block">Current Speed</span>
+            <span className="text-xs font-medium text-slate-400 block">Current Speed</span>
             <span className="font-heading font-extrabold text-xl text-emerald-400">32 km/h</span>
           </div>
         </div>
@@ -150,7 +150,7 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
                 href="https://t.me/floodway_bot"
                 target="_blank"
                 rel="noreferrer"
-                className="text-[11px] font-bold text-sky-600 hover:text-sky-800 underline underline-offset-2"
+                className="text-xs font-bold text-sky-600 hover:text-sky-800 underline underline-offset-2"
               >
                 Open @floodway_bot
               </a>

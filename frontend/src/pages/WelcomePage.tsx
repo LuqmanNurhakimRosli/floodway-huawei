@@ -32,7 +32,7 @@ export function WelcomePage() {
           <span className="font-heading font-extrabold text-xl tracking-tight text-white block">
             FloodWay
           </span>
-          <span className="text-[10px] text-slate-400 font-medium">Huawei ICT Competition 2026</span>
+          <span className="text-xs text-slate-400 font-medium">Huawei ICT Competition 2026</span>
         </div>
       </div>
 
