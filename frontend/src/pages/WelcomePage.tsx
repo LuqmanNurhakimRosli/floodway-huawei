@@ -1,3 +1,4 @@
+import { AboutDemo } from '../components/common/AboutDemo';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Waves, Shield, ArrowRight, CheckCircle2, Cpu } from 'lucide-react';
@@ -39,7 +40,7 @@ export function WelcomePage() {
       <div className="max-w-xl mx-auto my-auto w-full text-center py-10">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-950/80 border border-blue-500/40 text-xs font-bold text-blue-400 mb-6 shadow-md">
           <Cpu className="w-3.5 h-3.5 text-[#1677FF]" />
-          <span>Powered by Huawei Cloud ModelArts & Ascend AI</span>
+          <span>Prototype for the Huawei ICT Competition 2026</span>
         </div>
 
         <h1 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl text-white tracking-tight leading-tight">
@@ -93,9 +94,10 @@ export function WelcomePage() {
         </div>
       </div>
 
-      {/* Footer Credentials */}
-      <div className="text-center text-xs text-slate-500 pb-2">
-        <span>© 2026 FloodWay Team · Built with Huawei Cloud ModelArts, IoTDA & Ascend 910 NPU</span>
+      {/* Footer: what is real and what is simulated */}
+      <div className="mx-auto w-full max-w-xl space-y-3 pb-4">
+        <AboutDemo tone="dark" />
+        <p className="text-center text-xs text-slate-400">© 2026 FloodWay Team · Designed for Huawei Cloud; this demo runs on simulated data and calls no Huawei service.</p>
       </div>
     </div>
   );

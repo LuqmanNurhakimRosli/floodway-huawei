@@ -69,7 +69,7 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
           <span>Exit Navigation</span>
         </button>
         <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold uppercase">
-          Safe Evacuation Corridor Active
+          Approximate route (demo)
         </span>
       </div>
 

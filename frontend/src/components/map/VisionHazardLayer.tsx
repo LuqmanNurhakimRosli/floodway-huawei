@@ -45,7 +45,7 @@ export function VisionHazardLayer() {
             <br />
             {LEVEL_META[h.level].label}: water at {Math.round(h.waterRatio * 100)}% of bank height.
             <br />
-            Routes avoid this zone.
+            Sample camera (simulated). The route is adjusted around this zone, approximately.
           </Popup>
         </Circle>
       ))}

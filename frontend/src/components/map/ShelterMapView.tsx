@@ -28,6 +28,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegramService';
 import { InPageActionDock } from './InPageActionDock';
 import { VisionHazardLayer } from './VisionHazardLayer';
+import { MapLegend } from './MapLegend';
 import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
 import { formatCapacity, formatKm, formatMin, formatPct, percentOf } from '../../lib/format';
 import { estimateEtaMin } from '../../lib/mappers';
@@ -737,7 +738,7 @@ export function ShelterMapView() {
 
             <div className="flex items-center justify-between text-[11px] text-slate-400">
               <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> Hazard Avoidance Corridor
+                <ShieldCheck className="w-3.5 h-3.5" /> Approximate detour, not road-aware
               </span>
               <button
                 onClick={handleResetNavigation}
@@ -822,21 +823,8 @@ export function ShelterMapView() {
           </div>
         )}
 
-        {/* Floating Map Legend (Bottom-Left) */}
-        <div className="absolute bottom-4 left-4 z-10 hidden sm:flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white text-xs font-semibold shadow-xl">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Safe Route</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: severityTokens.color }} />
-            <span>Demo flood basins ({severityTokens.label}, simulated)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-            <span>Roadblock Avoided</span>
-          </div>
-        </div>
+        {/* Legend: every layer names its source, and it is reachable on phones too */}
+        <MapLegend basinColor={severityTokens.color} basinLabel={severityTokens.label} />
 
         {/* Mobile floating quick drawer trigger */}
         <div className="absolute bottom-4 left-3 right-3 z-10 md:hidden flex items-center justify-between p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xl text-slate-800">
@@ -936,8 +924,8 @@ export function ShelterMapView() {
               <Route className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
               <span>
                 {floodSeverity === 'normal'
-                  ? 'Direct corridor active via Federal Highway'
-                  : 'Hazard avoidance active: Diverting via elevated bypass'}
+                  ? 'Approximate direct route (demo waypoints, not road-aware)'
+                  : 'Approximate detour around the flood zones shown (not road-aware)'}
               </span>
             </div>
             {floodSeverity !== 'normal' && (
@@ -946,14 +934,14 @@ export function ShelterMapView() {
                   ? 'bg-amber-100 text-amber-800 border border-amber-300'
                   : 'bg-red-100 text-red-800 border border-red-300'
               }`}>
-                {visionHazards.length} camera {visionHazards.length === 1 ? 'zone' : 'zones'}
+                {visionHazards.length} sample-camera {visionHazards.length === 1 ? 'zone' : 'zones'}
               </span>
             )}
           </div>
           {routeCalculation.visionAvoided.length > 0 && (
             <p className="mt-2 flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-800">
               <Route className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              Route bends around {routeCalculation.visionAvoided.length} Live Vision flood zone{routeCalculation.visionAvoided.length > 1 ? 's' : ''}.
+              Approximate: the route is bent around {routeCalculation.visionAvoided.length} sample-camera flood zone{routeCalculation.visionAvoided.length > 1 ? 's' : ''}. Not road-aware.
             </p>
           )}
         </div>

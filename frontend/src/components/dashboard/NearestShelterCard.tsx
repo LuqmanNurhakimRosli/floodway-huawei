@@ -49,7 +49,7 @@ export function NearestShelterCard() {
           </div>
           <div className="flex items-center gap-1 text-emerald-700 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Route Safe</span>
+            <span>Approximate route</span>
           </div>
         </div>
 
