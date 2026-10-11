@@ -155,7 +155,7 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
         <ol className="flex items-center gap-2 px-4 pt-4 sm:px-6" aria-label="Progress">
           {STEPS.map((label, i) => (
             <li key={label} className="flex flex-1 items-center gap-2" aria-current={i === step ? 'step' : undefined}>
-              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i < step ? 'bg-emerald-700 text-white' : i === step ? 'bg-[#1677FF] text-white' : 'bg-slate-200 text-slate-700'}`}>
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i < step ? 'bg-emerald-700 text-white' : i === step ? 'bg-[#0958D9] text-white' : 'bg-slate-200 text-slate-700'}`}>
                 {i < step ? <Check className="h-4 w-4" aria-hidden="true" /> : i + 1}
                 <span className="sr-only">{i < step ? ' (done)' : ''}</span>
               </span>

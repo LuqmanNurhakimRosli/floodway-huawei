@@ -34,9 +34,12 @@ export function AlertToast({ alert, onOpen, onDismiss }: Props) {
         <button type="button" onClick={() => onOpen(alert)} className={`group min-w-0 flex-1 rounded-lg text-left ${interactive}`}>
           <span className={`block text-sm/5 font-semibold ${meta.text}`}>{meta.label.toUpperCase()}</span>
           <span className="block truncate text-sm/5 font-semibold text-slate-900">{alert.camera_name}</span>
-          <span className="mt-0.5 flex items-center gap-1 text-sm/5 text-slate-600">
-            Reached <span className={num}>{Math.round(alert.water_ratio * 100)}%</span> of bank. Open routes
-            <ChevronRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
+          <span className="mt-0.5 block text-sm/5 text-slate-600">
+            Reached <span className={num}>{Math.round(alert.water_ratio * 100)}%</span> of bank.{' '}
+            <span className="inline-flex items-center whitespace-nowrap font-semibold text-[#0958D9]">
+              Open routes
+              <ChevronRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
+            </span>
           </span>
         </button>
         <button type="button" onClick={() => onDismiss(alert)} aria-label="Dismiss alert" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 ${interactive}`}>

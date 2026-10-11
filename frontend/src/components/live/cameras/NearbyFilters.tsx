@@ -42,7 +42,7 @@ export function NearbyFilters({ places, placeId, onPlace, radiusKm, onRadius, ta
         <span className="text-sm font-semibold text-slate-700">Radius</span>
         <div className="grid flex-1 grid-cols-3 rounded-full border border-slate-200 bg-slate-50 p-0.5" role="group" aria-label="Search radius">
           {RADII.map((km) => (
-            <button key={km} type="button" aria-pressed={radiusKm === km} onClick={() => onRadius(km)} className={`min-h-9 rounded-full text-sm font-bold ${focusRing} ${radiusKm === km ? 'bg-[#1677FF] text-white' : 'text-slate-700 hover:text-slate-900'}`}>
+            <button key={km} type="button" aria-pressed={radiusKm === km} onClick={() => onRadius(km)} className={`min-h-9 rounded-full text-sm font-bold ${focusRing} ${radiusKm === km ? 'bg-[#0958D9] text-white' : 'text-slate-700 hover:text-slate-900'}`}>
               {km} km
             </button>
           ))}

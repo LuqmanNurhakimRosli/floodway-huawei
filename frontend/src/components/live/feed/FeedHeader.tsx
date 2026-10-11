@@ -24,18 +24,18 @@ export function FeedHeader({ camera, distanceKm }: { camera: Camera; distanceKm:
             <span className="truncate">{sourceLabel(camera)}</span>
           </p>
         </div>
-        <div className="flex shrink-0 items-center justify-between gap-4 @min-[520px]/fh:justify-end">
+        <div className="flex shrink-0 items-center justify-between gap-3 @min-[520px]/fh:justify-end @min-[520px]/fh:gap-4">
           <div className="flex items-center gap-3">
             {reading ? <StatusChip level={reading.level} size="md" /> : <OfflineChip label={camera.online ? 'WAITING' : 'OFFLINE'} size="md" />}
             {reading && (
-              <p className="leading-none">
+              <p className="whitespace-nowrap leading-none">
                 <span className={`${num} block text-lg/6 font-semibold text-slate-900`}>{pct(reading.water_ratio)}</span>
                 <span className="block text-xs/4 text-slate-600">of bank</span>
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2 border-l border-slate-200 pl-4">
-            <span className="text-xs/4 text-slate-600">Next<br />capture</span>
+          <div className="flex items-center gap-2 border-l border-slate-200 pl-3 @min-[520px]/fh:pl-4">
+            <span className="hidden text-xs/4 text-slate-600 @min-[340px]/fh:inline">Next<br />capture</span>
             <CountdownRing cycle={cycle} size={44} />
           </div>
         </div>

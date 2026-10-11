@@ -52,7 +52,7 @@ export function CameraCard({ camera, distanceKm, history, selected, useScene, on
           <span className="block">{reading ? <StatusChip level={reading.level} /> : <OfflineChip label={camera.online ? 'WAITING' : 'OFFLINE'} />}</span>
           <span className="flex items-end justify-between gap-2">
             <span className="leading-none">
-              <span className={`${num} block text-sm/5 font-semibold ${reading ? 'text-slate-900' : 'text-slate-400'}`}>{reading ? pct(reading.water_ratio) : '--'}</span>
+              <span className={`${num} block text-sm/5 font-semibold ${reading ? 'text-slate-900' : 'text-slate-500'}`}>{reading ? pct(reading.water_ratio) : '--'}</span>
               <span className="block text-xs/4 text-slate-600">of bank</span>
             </span>
             <Sparkline values={reading ? history.slice(-20).map((r) => r.water_ratio) : []} color={meta?.hex ?? '#94A3B8'} width={56} height={24} className="shrink-0" />

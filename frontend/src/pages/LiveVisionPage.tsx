@@ -1,4 +1,4 @@
-import { ChevronDown, SlidersHorizontal, Video } from 'lucide-react';
+import { ChevronDown, Search, SlidersHorizontal, Video } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '../components/layout/DashboardSidebar';
@@ -81,7 +81,10 @@ export default function LiveVisionPage() {
   const onlineCount = state.cameras.filter((c) => c.online).length;
   const loading = state.status === 'idle' || state.status === 'loading';
   const filters = <NearbyFilters places={places} placeId={placeId} onPlace={setPlaceId} radiusKm={radiusKm} onRadius={setRadiusKm} tab={tab} onTab={setTab} query={query} onQuery={setQuery} />;
-  const emptyList = (
+  const searching = query.trim().length > 0;
+  const emptyList = searching ? (
+    <EmptyState icon={Search} title={`No cameras match "${query.trim()}"`} hint="Check the spelling or clear the search." action={{ label: 'Clear search', onClick: () => setQuery('') }} />
+  ) : (
     <EmptyState
       icon={Video}
       title={tab === 'mine' ? 'No cameras of your own yet' : 'No cameras in this radius'}
