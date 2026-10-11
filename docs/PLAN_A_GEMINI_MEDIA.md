@@ -372,3 +372,34 @@ Policy checks: no agency branding [yes/no], no readable plates or faces [yes/no]
 Anything you could not do, and why:
 Requests for code changes (not made by you):
 ```
+
+
+---
+
+## Defect found after the first run (2026-10-11): the water frames are pasted rectangles
+
+**What happened.** The first run produced a convincing NORMAL frame for each camera, but the WATCH, WARNING and DANGER
+frames are that NORMAL frame with a **flat tan rectangle drawn over the channel**. The changed pixels fill 81-94% of their own
+bounding box and have almost no colour variation (15 of 15 frames; see `check_realism.py`). `klang-rise.mp4` is a crossfade of
+them, so the loop shows the same rectangle. The README and the report called these "AI-generated"; only the NORMAL frames are.
+
+**Why `check_frames.py` did not catch it.** It asks whether the analyser classifies each frame at the intended level. The
+classical analyser detects smooth coloured pixels, which a flat rectangle is, so it scored 20/20. That result proves the
+pipeline runs; it says nothing about realism or accuracy. Do not quote it.
+
+**Acceptance for the redo (replaces "20/20" as the bar):**
+1. `python -m app.vision.sample_media.check_realism` exits 0 (no frame flagged as a pasted patch).
+2. A person looking at the NORMAL and DANGER frame of each camera, side by side, cannot point to a rectangular block.
+   Water must follow the channel and walls, rise against them, and have an irregular edge, texture and reflection.
+3. `check_frames.py` still reports at least 3 of 4 per camera. Report the real number; do not change thresholds.
+4. The README states which frames are AI-generated and how the others were made.
+
+**How to get real rising water.** Do not draw. Use an image-edit (image-to-image) call on the NORMAL frame, one level at a time,
+with an instruction like: *"Same photograph, same camera, same framing and lighting. Only change: the river water level is
+higher and now covers the lower concrete steps, reaching about {N}% of the wall height. Muddy brown water that follows the
+channel shape, wets the walls, with small ripples. Keep everything else pixel-identical."* Generate WATCH from NORMAL, then
+WARNING from WATCH, then DANGER from WARNING, so each step only raises the water. If the tool cannot edit an image while keeping
+the framing, say so in the report; do not substitute a drawn shape.
+
+**Until it is redone:** the app labels every sample camera SAMPLE and the loop PLAYBACK, and the About text says the imagery is
+sample imagery with synthetic water overlays (Plan B task P1-07). Do not present these frames as AI-generated flooding.

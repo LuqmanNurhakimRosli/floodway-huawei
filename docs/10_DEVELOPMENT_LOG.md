@@ -48,6 +48,19 @@
 - Replaced placeholder `.env` values with real Firebase config
 - Fixed authentication flow (login → redirect to /home)
 
+## 2026-10-11 (demo-polish)
+
+### Plan B executed: demo readiness pass
+- Home redesigned as a command centre; every number is computed from data or labelled simulated. Old Home components removed.
+- Honesty pass: removed fabricated verification and certification claims (JPS, NADMA, APM, Huawei ModelArts), the fake "live CCTV" modal,
+  invented AI verification fallbacks, and an auto-VERIFIED report endpoint. Forecast labelled as a formula.
+- Secrets: Telegram token and OpenRouter key moved server-side; the build no longer contains them. Write endpoints (cameras, alerts,
+  SOS, AI check) accept an operator token (`VISION_WRITE_TOKEN`). `/sos/*` was an open, unescaped Telegram relay and is fixed.
+- Backend: `POST /cameras` returned 500 (fixed earlier), shelters and reports mapped from snake_case, sample cameras backed by photos.
+- Tooling: `scripts/check.ps1`, `npm run check`, `npm run layout-check` (overlaps, horizontal scroll, text under 12 px), vitest.
+- Known defect: the Plan A water frames are a drawn rectangle (`sample_media/check_realism.py`). See `docs/DEMO_RUNBOOK.md`.
+- Docs: `docs/DEMO_AUDIT.md`, `docs/PLAN_A_GEMINI_MEDIA.md`, `docs/PLAN_B_SYSTEM_UPGRADE.md`, `docs/DEMO_RUNBOOK.md`.
+
 ## 2026-10-11
 
 ### Live Vision polish pass (branch `live-vision-polish`)

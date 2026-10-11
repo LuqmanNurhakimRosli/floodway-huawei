@@ -22,6 +22,52 @@ Plan A (`docs/PLAN_A_GEMINI_MEDIA.md`) has been fully executed by Gemini 3.8 Fla
 
 ---
 
+## Execution status (2026-10-11, branch `demo-polish`)
+
+Every task below was run and verified against the running app unless it says otherwise. `scripts/check.ps1` passes
+(frontend: tsc, 103 tests, build; backend: 102 passed, 1 deliberate xfail).
+
+| Task | Status | Notes |
+|---|---|---|
+| P1-01 shared keyless basemap | **Done** | `config/mapConfig.ts`; no Carto reference left. Check the OSM tile policy before a public launch. |
+| P1-02 mappers, formatters, no NaN | **Done** | Also fixed: backend report images pointed at `/assets/...` (404). 33 tests. |
+| P1-03 seed from sample media | **Done, with a media defect** | Photo-backed cameras, calibration, fallback, restart test. The Plan A water frames are a pasted rectangle (see below). |
+| P1-04 demo video | **Done** | Explicit, labelled "Demo loop" view, not silently replacing the live frame. |
+| P1-05 header at 360 px | **Done** | Found more with the new layout checker: map ghost controls, bottom-nav overlap, 768 px header. |
+| P1-06 /studio colour | **Done** | `THREE.Clock` warning remains: it comes from inside `@react-three/fiber`. |
+| P1-07 About / credits text | **Done** | Wording is accurate about the media (base photo AI-generated, water overlay synthetic). |
+| P1-08 hard-coded numbers | **Done** | Plus the Home redesign removed the fixed alert, 1.20 m, 95 mm/h and 87% numbers. |
+| P1-09 Telegram token out of the browser | **Done** | Verified by searching the build for the real values. **User action: rotate the token.** |
+| P1-10 reports, CCTV modal, counts | **Done** | Found and removed several false verification and certification claims (JPS, NADMA, APM, ModelArts). |
+| P1-12 crawl clean | **Done** | 21 of 21 loads: no console errors, no failed requests, no overflow. |
+| P2-01 to P2-09 Home redesign | **Done** | Screenshots at 1440, 1024, 390 in `docs/screenshots/demo-after/`. Backend-down state verified. |
+| P3-01 layer source tags | **Done** | `MapLegend`, also usable on phones. |
+| P3-02 route wording | **Done** | "Approximate, not road-aware" everywhere. |
+| P3-03 one risk colour scale | **Done** | WCAG contrast computed in a test. |
+| P3-04 layer legibility | **Done** | Dashed demo basins, solid camera zones, white route casing. |
+| P3-05 mobile sheet, performance | **Partial** | Legend and drawer height fixed on phones. No snap-height sheet and no frame-rate measurement. |
+| P4-01 shared tokens | **Done** | `styles/tokens.ts`. |
+| P4-02 /home fixes | **Done** | Superseded by the redesign. |
+| P4-03 /reports fixes | **Partial** | Text sizes and status model done. Touch targets under 44 px remain (informational column in `layout-check`). |
+| P4-04 /profile | **Partial** | Overflow, labels, prefilled channel removed. Not a full audit. |
+| P4-05 /studio and welcome | **Partial** | Colour and shadow warnings fixed; keyboard access to the 3D controls not done. |
+| P4-06 head metadata | **Done** | Clean share image from the real base photo. Also removed `user-scalable=no`. |
+| P5-01 vitest, `npm run check` | **Done** | `scripts/check.ps1` runs everything. |
+| P5-02 layout check | **Done** | `npm run layout-check`: overlaps, horizontal scroll, text under 12 px. |
+| P5-03 write protection | **Done** | Plus the previously open `/sos/*` Telegram senders. Verified with curl. |
+| P5-04 VITE keys | **Done** | **User action: rotate the Telegram and OpenRouter keys.** |
+| P5-05 "Analysing" dead state | **Done** | Measured against a killed server: 0.1 s (was up to 16 s). |
+| P5-06 restart behaviour | **Done** | Test plus handover note. |
+| P5-07 bundle size | **Not done** | The 3D chunk is lazy-loaded already; the main bundle is 627 kB. Left alone. |
+| P6 demo readiness | **Written, not rehearsed** | `docs/DEMO_RUNBOOK.md`. Nobody has run the click path with a timer. |
+
+**Things this plan did not anticipate (found while doing it):**
+- The Plan A water frames are a flat rectangle drawn over the NORMAL frame, so the "20/20" classification proves nothing about realism.
+  `sample_media/check_realism.py` flags 15 of 15. Regenerating them is the most visible remaining job.
+- The forecast is a hand-written formula labelled as a "pre-trained GRU" on "Huawei ModelArts". It is now labelled honestly.
+- `services/api.ts` ignored `VITE_API_BASE`, so a deployment could reach the wrong server for shelters, reports and the forecast.
+- `/telemetry/ingest` accepts unsigned readings and the default device secrets are in `config.py`. Not changed.
+
 ## 0. Ground rules for the implementation agent
 
 1. **Read `docs/DEMO_AUDIT.md` first.** Every task cites its finding IDs. If a task cannot be verified by reading the
