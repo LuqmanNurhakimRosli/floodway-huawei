@@ -148,3 +148,23 @@ def test_dispatcher_cooldown_and_escalation_rules():
     assert not d.should_send(ev(Level.WARNING), now=1100)      # inside cooldown
     assert d.should_send(ev(Level.DANGER), now=1100)           # escalation bypasses cooldown
     assert d.should_send(ev(Level.WARNING), now=1400)          # cooldown elapsed
+
+
+def test_added_camera_starts_its_capture_loop_and_can_be_removed(client):
+    """Regression: the sync create route runs in a worker thread, where asyncio.create_task fails. The camera was
+    saved but answered 500 and never got analysed."""
+    import time
+
+    r = client.post("/api/v1/vision/cameras", json=_draft("https://93.184.216.34/a.jpg"))
+    assert r.status_code == 201, r.text
+    rec = client.engine.cameras[r.json()["id"]]
+    deadline = time.time() + 2
+    while rec.task is None and time.time() < deadline:
+        time.sleep(0.02)
+    assert rec.task is not None, "capture loop was never started"
+
+    assert client.delete(f"/api/v1/vision/cameras/{rec.id}").status_code == 204
+    deadline = time.time() + 2
+    while not rec.task.done() and time.time() < deadline:
+        time.sleep(0.02)
+    assert rec.task.done(), "capture loop kept running after removal"

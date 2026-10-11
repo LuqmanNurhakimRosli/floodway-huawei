@@ -109,8 +109,23 @@ class VisionEngine:
                 rec.task.cancel()
         await asyncio.gather(*[r.task for r in self.cameras.values() if r.task], return_exceptions=True)
 
+    def _on_loop(self, fn, *args) -> None:
+        """Run `fn` on the engine's event loop. Sync routes (add/remove camera) run in a worker thread, where
+        asyncio.create_task / Task.cancel are not allowed; hop onto the loop in that case."""
+        try:
+            running = asyncio.get_running_loop()
+        except RuntimeError:
+            running = None
+        if running is self._loop:
+            fn(*args)
+        elif self._loop and self._loop.is_running():
+            self._loop.call_soon_threadsafe(fn, *args)
+
     def _spawn(self, rec: CameraRecord) -> None:
-        if rec.task is None or rec.task.done():
+        self._on_loop(self._spawn_now, rec)
+
+    def _spawn_now(self, rec: CameraRecord) -> None:
+        if rec.id in self.cameras and (rec.task is None or rec.task.done()):
             rec.task = asyncio.create_task(self._camera_loop(rec.id))
 
     # ───────────── registry ─────────────
@@ -154,7 +169,7 @@ class VisionEngine:
         if rec.seeded:
             raise PermissionError("sample cameras cannot be removed")
         if rec.task:
-            rec.task.cancel()
+            self._on_loop(rec.task.cancel)
         del self.cameras[camera_id]
         self._persist()
         self._publish_threadsafe({"type": "camera_removed", "camera_id": camera_id})
