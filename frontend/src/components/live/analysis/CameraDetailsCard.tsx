@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { sourceLabel } from '../../../lib/vision/describe';
 import { formatCoords, formatDistance } from '../../../lib/vision/geo';
 import type { Camera } from '../../../types/vision';
-import { card, focusRing, heading } from '../shared/ui';
+import { card, cardPad, cardTitle, interactive, num } from '../shared/ui';
 
 interface Props {
   camera: Camera;
@@ -16,38 +16,38 @@ export function CameraDetailsCard({ camera, distanceKm, onRemove }: Props) {
   const [busy, setBusy] = useState(false);
   const removable = camera.provider === 'mine' && camera.source_type !== 'synthetic' && onRemove;
 
-  const rows: [string, string][] = [
-    ['Name', camera.name],
-    ['Location', `${formatDistance(distanceKm)} from you`],
-    ['Source', camera.source_type === 'synthetic' ? 'Sample (self-running scene)' : sourceLabel(camera)],
-    ['Coordinates', formatCoords(camera.lat, camera.lon)],
+  const rows: { k: string; v: string; mono?: boolean }[] = [
+    { k: 'Source', v: camera.source_type === 'synthetic' ? 'Sample (self-running scene)' : sourceLabel(camera) },
+    { k: 'Distance', v: `${formatDistance(distanceKm)} from you`, mono: true },
+    { k: 'Coordinates', v: formatCoords(camera.lat, camera.lon), mono: true },
+    { k: 'Capture cycle', v: `every ${camera.interval_s}s`, mono: true },
   ];
 
   return (
-    <section className={`${card} p-4`}>
-      <div className="flex items-center justify-between">
-        <h3 className={`${heading} flex items-center gap-2 text-base`}>
+    <section className={`${card} ${cardPad}`} aria-labelledby="cd-title">
+      <div className="flex min-h-10 items-center justify-between gap-3">
+        <h3 id="cd-title" className={`${cardTitle} flex items-center gap-2`}>
           <CameraIcon className="h-5 w-5 text-slate-600" aria-hidden="true" /> Camera details
         </h3>
         {removable && !confirming && (
-          <button type="button" onClick={() => setConfirming(true)} aria-label="Remove this camera" className={`flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-red-600 ${focusRing}`}>
+          <button type="button" onClick={() => setConfirming(true)} aria-label="Remove this camera" className={`flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-700 ${interactive}`}>
             <Trash2 className="h-4 w-4" aria-hidden="true" />
           </button>
         )}
       </div>
-      <dl className="mt-3 divide-y divide-slate-100 text-sm">
-        {rows.map(([k, v]) => (
-          <div key={k} className="flex items-baseline justify-between gap-3 py-2">
-            <dt className="text-slate-600">{k}</dt>
-            <dd className="text-right font-semibold text-slate-900">{v}</dd>
+      <dl className="mt-2 divide-y divide-slate-100 text-sm/5">
+        {rows.map(({ k, v, mono }) => (
+          <div key={k} className="flex min-h-10 items-center justify-between gap-3 py-2">
+            <dt className="shrink-0 text-slate-600">{k}</dt>
+            <dd className={`truncate text-right font-medium text-slate-900 ${mono ? num : ''}`}>{v}</dd>
           </div>
         ))}
       </dl>
       {removable && confirming && (
-        <div className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-red-200 bg-red-50 p-3">
-          <p className="text-sm font-semibold text-red-800">Remove this camera?</p>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-red-200 bg-red-50 p-3" role="alertdialog" aria-label="Confirm removal">
+          <p className="text-sm/5 font-semibold text-red-800">Remove this camera?</p>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setConfirming(false)} className={`min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-800 ${focusRing}`}>
+            <button type="button" onClick={() => setConfirming(false)} className={`min-h-11 rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800 ${interactive}`}>
               Cancel
             </button>
             <button
@@ -62,7 +62,7 @@ export function CameraDetailsCard({ camera, distanceKm, onRemove }: Props) {
                   setConfirming(false);
                 }
               }}
-              className={`min-h-10 rounded-lg bg-red-600 px-3 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-60 ${focusRing}`}
+              className={`min-h-11 rounded-xl bg-red-600 px-3 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60 ${interactive}`}
             >
               {busy ? 'Removing…' : 'Remove'}
             </button>

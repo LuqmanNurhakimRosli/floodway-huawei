@@ -1,7 +1,7 @@
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import type { Reading } from '../../../types/vision';
-import { focusRing } from '../shared/ui';
+import { focusRing, num } from '../shared/ui';
 
 export function JsonOutputCard({ reading }: { reading: Reading }) {
   const [copied, setCopied] = useState(false);
@@ -40,7 +40,7 @@ export function JsonOutputCard({ reading }: { reading: Reading }) {
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
-      <pre className="max-h-64 overflow-auto rounded-xl bg-slate-900 p-3 font-mono text-xs leading-relaxed text-sky-200">{text}</pre>
+      <pre className={`${num} max-h-64 overflow-auto rounded-xl bg-slate-900 p-3 text-xs/5 text-sky-100`} tabIndex={0} aria-label="Latest result as JSON">{text}</pre>
     </div>
   );
 }

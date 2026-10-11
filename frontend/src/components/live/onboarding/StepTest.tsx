@@ -45,7 +45,7 @@ export function StepTest({ loading, error, reading, offlineSample, onRetry }: Pr
           <p className="font-heading text-3xl font-extrabold text-slate-900">{pct(reading.water_ratio)} <span className="text-base font-semibold text-slate-600">of bank</span></p>
         </div>
         <div className="text-right">
-          <StatusChip level={reading.level} className="px-3 py-1.5 text-sm" />
+          <StatusChip level={reading.level} size="md" />
           <p className="mt-1 font-mono text-xs text-slate-600">confidence {Math.round(reading.confidence * 100)}%</p>
         </div>
       </div>

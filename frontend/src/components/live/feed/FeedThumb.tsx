@@ -1,3 +1,4 @@
+import { WifiOff } from 'lucide-react';
 import { frameUrl } from '../../../services/vision/visionApi';
 import type { Camera } from '../../../types/vision';
 import { RiverScene } from './RiverScene';
@@ -8,20 +9,22 @@ interface Props {
   className?: string;
 }
 
-/** Small thumbnail for cards and the camera strip. */
-export function FeedThumb({ camera, useScene, className = '' }: Props) {
-  const ratio = camera.reading?.water_ratio ?? 0;
+/** Small 16:9 thumbnail for cards and the camera strip. Size comes from `className`. */
+export function FeedThumb({ camera, useScene, className = 'aspect-video w-full' }: Props) {
   return (
-    <div className={`relative aspect-video overflow-hidden rounded-lg bg-slate-200 ${className}`}>
+    <span className={`relative block overflow-hidden rounded-lg bg-slate-200 ${className}`}>
       {!camera.online ? (
-        <div className="flex h-full w-full items-center justify-center bg-slate-300 text-xs font-semibold text-slate-600">No signal</div>
+        <span className="flex h-full w-full flex-col items-center justify-center gap-0.5 bg-slate-200 text-xs/4 font-medium text-slate-600">
+          <WifiOff className="h-4 w-4" aria-hidden="true" />
+          No signal
+        </span>
       ) : useScene ? (
-        <RiverScene ratio={ratio} />
+        <RiverScene ratio={camera.reading?.water_ratio ?? 0} />
       ) : !camera.reading ? (
-        <div className="flex h-full w-full items-center justify-center bg-slate-200 text-xs font-semibold text-slate-600">Waiting…</div>
+        <span className="flex h-full w-full items-center justify-center text-xs/4 font-medium text-slate-600">Waiting…</span>
       ) : (
-        <img src={frameUrl(camera.id, camera.reading?.timestamp ?? 0)} alt="" loading="lazy" className="h-full w-full object-cover" />
+        <img src={frameUrl(camera.id, camera.reading.timestamp)} alt="" loading="lazy" className="h-full w-full object-cover" />
       )}
-    </div>
+    </span>
   );
 }

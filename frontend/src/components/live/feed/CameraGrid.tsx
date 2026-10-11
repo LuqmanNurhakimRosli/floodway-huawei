@@ -2,7 +2,7 @@ import { camTag } from '../../../lib/vision/camTag';
 import { pct } from '../../../lib/vision/format';
 import type { Camera } from '../../../types/vision';
 import { OfflineChip, StatusChip } from '../shared/StatusChip';
-import { card, focusRing } from '../shared/ui';
+import { card, interactive, num } from '../shared/ui';
 import { FeedViewer } from './FeedViewer';
 import type { OverlayState } from './OverlayToggles';
 
@@ -15,34 +15,40 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-/** Several cameras at once: 2 x 2 on desktop, one column on phones. */
+/** Every visible camera at once: 1 column on phones, 2 on desktop, 3 when the centre column is very wide. */
 export function CameraGrid({ cameras, allCameras, useScene, overlays, selectedId, onSelect }: Props) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {cameras.slice(0, 4).map((camera) => (
-        <button
-          key={camera.id}
-          type="button"
-          onClick={() => onSelect(camera.id)}
-          aria-label={`Open ${camera.name}`}
-          className={`${card} p-2 text-left ${focusRing} ${selectedId === camera.id ? 'border-[#1677FF] ring-2 ring-[#1677FF]/40' : 'hover:border-slate-300'}`}
-        >
-          <FeedViewer camera={camera} tag={camTag(allCameras, camera.id)} useScene={useScene} overlays={overlays} compact />
-          <div className="mt-2 space-y-1 px-1">
-            <p className="truncate text-sm font-bold text-slate-900">{camera.name}</p>
-            <div className="flex items-center gap-2">
-              {camera.online && camera.reading ? (
-                <>
-                  <StatusChip level={camera.reading.level} />
-                  <span className="font-mono text-xs font-semibold text-slate-700">{pct(camera.reading.water_ratio)} of bank</span>
-                </>
-              ) : (
-                <OfflineChip />
-              )}
-            </div>
-          </div>
-        </button>
-      ))}
+    <div className="@container/grid">
+      <ul className="grid grid-cols-1 gap-4 @min-[520px]/grid:grid-cols-2 @min-[840px]/grid:grid-cols-3" aria-label="All cameras">
+        {cameras.map((camera) => {
+          const reading = camera.online ? camera.reading : null;
+          return (
+            <li key={camera.id} className="flex">
+              <button
+                type="button"
+                onClick={() => onSelect(camera.id)}
+                aria-label={`Open ${camera.name}`}
+                className={`${card} flex w-full flex-col p-2 text-left ${interactive} ${selectedId === camera.id ? 'border-[#1677FF] ring-1 ring-[#1677FF]' : 'hover:border-slate-300'}`}
+              >
+                <FeedViewer camera={camera} tag={camTag(allCameras, camera.id)} useScene={useScene} overlays={overlays} compact />
+                <span className="flex flex-1 flex-col gap-2 px-2 pb-1 pt-3">
+                  <span className="truncate text-sm/5 font-semibold text-slate-900" title={camera.name}>{camera.name}</span>
+                  <span className="flex items-center gap-2">
+                    {reading ? (
+                      <>
+                        <StatusChip level={reading.level} />
+                        <span className={`${num} text-xs/4 font-medium text-slate-700`}>{pct(reading.water_ratio)} of bank</span>
+                      </>
+                    ) : (
+                      <OfflineChip label={camera.online ? 'WAITING' : 'OFFLINE'} />
+                    )}
+                  </span>
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

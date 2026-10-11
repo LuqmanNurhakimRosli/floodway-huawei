@@ -1,5 +1,6 @@
 import { LayoutGrid, Maximize } from 'lucide-react';
-import { focusRing } from '../shared/ui';
+import type { LucideIcon } from 'lucide-react';
+import { interactive } from '../shared/ui';
 
 export type ViewMode = 'focus' | 'grid';
 
@@ -8,23 +9,26 @@ interface Props {
   onChange: (v: ViewMode) => void;
 }
 
+const MODES: { mode: ViewMode; label: string; icon: LucideIcon }[] = [
+  { mode: 'focus', label: 'Focus', icon: Maximize },
+  { mode: 'grid', label: 'Grid', icon: LayoutGrid },
+];
+
 export function ViewToggle({ value, onChange }: Props) {
-  const btn = (mode: ViewMode, label: string, Icon: typeof Maximize) => (
-    <button
-      key={mode}
-      type="button"
-      aria-pressed={value === mode}
-      onClick={() => onChange(mode)}
-      className={`inline-flex min-h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold ${focusRing} ${value === mode ? 'bg-[#1677FF] text-white' : 'text-slate-700 hover:bg-slate-100'}`}
-    >
-      <Icon className="h-4 w-4" aria-hidden="true" />
-      {label}
-    </button>
-  );
   return (
-    <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1" role="group" aria-label="View mode">
-      {btn('focus', 'Focus', Maximize)}
-      {btn('grid', 'Grid', LayoutGrid)}
+    <div className="inline-flex shrink-0 rounded-xl border border-slate-200 bg-white p-1" role="group" aria-label="View mode">
+      {MODES.map(({ mode, label, icon: Icon }) => (
+        <button
+          key={mode}
+          type="button"
+          aria-pressed={value === mode}
+          onClick={() => onChange(mode)}
+          className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-sm/5 font-semibold ${interactive} ${value === mode ? 'bg-[#1677FF] text-white' : 'text-slate-700 hover:bg-slate-100'}`}
+        >
+          <Icon className="h-4 w-4" aria-hidden="true" />
+          {label}
+        </button>
+      ))}
     </div>
   );
 }

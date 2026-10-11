@@ -1,8 +1,8 @@
-import { X } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import type { AlertEvent } from '../../../types/vision';
-import { focusRing } from '../shared/ui';
+import { interactive, num } from '../shared/ui';
 
 interface Props {
   alert: AlertEvent | undefined;
@@ -12,7 +12,8 @@ interface Props {
 
 const AUTO_DISMISS_MS = 12000;
 
-/** Slides in for each new WARNING/DANGER. Top-right on desktop, full width under the header on phones. */
+/** One per new WARNING/DANGER. Top-right on desktop; full width just under the app header on phones,
+ *  so it never covers the sticky action bar at the bottom. */
 export function AlertToast({ alert, onOpen, onDismiss }: Props) {
   useEffect(() => {
     if (!alert) return;
@@ -25,17 +26,20 @@ export function AlertToast({ alert, onOpen, onDismiss }: Props) {
   const Icon = meta.icon;
 
   return (
-    <div role="alert" className="fixed inset-x-3 top-20 z-50 sm:left-auto sm:right-4 sm:w-96">
-      <div className={`flex items-start gap-3 rounded-2xl border-2 bg-white p-3 shadow-xl ${meta.border}`}>
+    <div role="alert" className="fixed inset-x-3 top-[4.5rem] z-50 motion-safe:animate-[live-toast-in_200ms_ease-out] sm:left-auto sm:right-6 sm:top-20 sm:w-[400px]">
+      <div className={`flex items-start gap-3 rounded-2xl border bg-white p-3 shadow-lg shadow-slate-900/10 ${meta.border}`}>
         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${meta.solid}`}>
           <Icon className="h-5 w-5" aria-hidden="true" />
         </span>
-        <button type="button" onClick={() => onOpen(alert)} className={`min-w-0 flex-1 rounded-lg text-left ${focusRing}`}>
-          <p className={`text-sm font-extrabold ${meta.text}`}>{meta.label.toUpperCase()}</p>
-          <p className="text-sm font-semibold text-slate-900">{alert.camera_name}</p>
-          <p className="text-sm text-slate-600">Reached {Math.round(alert.water_ratio * 100)}% of bank. Tap to view evacuation routes.</p>
+        <button type="button" onClick={() => onOpen(alert)} className={`group min-w-0 flex-1 rounded-lg text-left ${interactive}`}>
+          <span className={`block text-sm/5 font-semibold ${meta.text}`}>{meta.label.toUpperCase()}</span>
+          <span className="block truncate text-sm/5 font-semibold text-slate-900">{alert.camera_name}</span>
+          <span className="mt-0.5 flex items-center gap-1 text-sm/5 text-slate-600">
+            Reached <span className={num}>{Math.round(alert.water_ratio * 100)}%</span> of bank. Open routes
+            <ChevronRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
+          </span>
         </button>
-        <button type="button" onClick={() => onDismiss(alert)} aria-label="Dismiss alert" className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 ${focusRing}`}>
+        <button type="button" onClick={() => onDismiss(alert)} aria-label="Dismiss alert" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 ${interactive}`}>
           <X className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>

@@ -1,12 +1,12 @@
-import { Droplet, MapPin } from 'lucide-react';
 import { useCaptureCycle } from '../../../hooks/vision/useCaptureCycle';
+import { sourceLabel } from '../../../lib/vision/describe';
 import { formatDistance } from '../../../lib/vision/geo';
 import { pct, timeAgo } from '../../../lib/vision/format';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import { FeedThumb } from '../feed/FeedThumb';
 import { OfflineChip, StatusChip } from '../shared/StatusChip';
 import { Sparkline } from '../shared/Sparkline';
-import { focusRing } from '../shared/ui';
+import { interactive, num } from '../shared/ui';
 import type { Camera, Reading } from '../../../types/vision';
 
 interface Props {
@@ -18,49 +18,51 @@ interface Props {
   onSelect: () => void;
 }
 
+export function cycleStatus(camera: Camera, phase: string, secondsLeft: number): string {
+  if (!camera.online) return camera.last_frame_at ? `Offline for ${timeAgo(camera.last_frame_at).replace(' ago', '')}` : 'Offline · no frames yet';
+  if (phase === 'stale') return 'Stale feed';
+  if (phase === 'analysing') return 'Analysing…';
+  if (camera.feed_refresh_s > 0) return `Updated ${timeAgo(camera.last_frame_at)}`;
+  return `Next capture in ${secondsLeft}s`;
+}
+
+/** Fixed structure so every card has the same height: name row, thumbnail + reading row, status row. */
 export function CameraCard({ camera, distanceKm, history, selected, useScene, onSelect }: Props) {
   const cycle = useCaptureCycle(camera);
-  const reading = camera.reading;
+  const reading = camera.online ? camera.reading : null;
   const meta = reading ? LEVEL_META[reading.level] : null;
-
-  let status = `Next capture in ${cycle.secondsLeft}s`;
-  if (!camera.online) status = `Offline for ${timeAgo(camera.last_frame_at).replace(' ago', '')}`;
-  else if (cycle.phase === 'stale') status = 'Stale feed';
-  else if (cycle.phase === 'analysing') status = 'Analysing…';
-  else if (camera.feed_refresh_s > 0) status = `Updated ${timeAgo(camera.last_frame_at)}`;
+  const status = cycleStatus(camera, cycle.phase, cycle.secondsLeft);
 
   return (
     <button
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      className={`flex w-full gap-3 rounded-2xl border-2 bg-white p-2.5 text-left transition-colors ${focusRing} ${
-        selected ? 'border-[#1677FF] shadow-md shadow-blue-500/10' : 'border-slate-200 hover:border-slate-300'
-      } ${!camera.online ? 'opacity-80' : ''}`}
+      className={`block w-full rounded-2xl border p-3 text-left ${interactive} ${
+        selected ? 'border-[#1677FF] bg-blue-50/50 ring-1 ring-[#1677FF]' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
+      }`}
     >
-      <FeedThumb camera={camera} useScene={useScene} className="w-24 shrink-0 self-start" />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-slate-900">{camera.name}</p>
-        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-            <MapPin className="h-3 w-3" aria-hidden="true" />
-            {formatDistance(distanceKm)}
+      <span className="flex items-baseline justify-between gap-2">
+        <span className="truncate text-base/6 font-semibold text-slate-900" title={camera.name}>{camera.name}</span>
+        <span className={`${num} shrink-0 text-xs/4 text-slate-600`}>{formatDistance(distanceKm)}</span>
+      </span>
+      <span className="mt-2 flex gap-3">
+        <FeedThumb camera={camera} useScene={useScene} className="h-16 w-28 shrink-0" />
+        <span className="flex min-w-0 flex-1 flex-col justify-between">
+          <span className="block">{reading ? <StatusChip level={reading.level} /> : <OfflineChip label={camera.online ? 'WAITING' : 'OFFLINE'} />}</span>
+          <span className="flex items-end justify-between gap-2">
+            <span className="leading-none">
+              <span className={`${num} block text-sm/5 font-semibold ${reading ? 'text-slate-900' : 'text-slate-400'}`}>{reading ? pct(reading.water_ratio) : '--'}</span>
+              <span className="block text-xs/4 text-slate-600">of bank</span>
+            </span>
+            <Sparkline values={reading ? history.slice(-20).map((r) => r.water_ratio) : []} color={meta?.hex ?? '#94A3B8'} width={56} height={24} className="shrink-0" />
           </span>
-          {camera.online && reading ? <StatusChip level={reading.level} /> : <OfflineChip />}
-        </div>
-        <div className="mt-1.5 flex items-center justify-between gap-2">
-          {camera.online && reading ? (
-            <p className="flex items-center gap-1 font-mono text-base font-bold text-slate-900">
-              <Droplet className="h-3.5 w-3.5 text-[#1677FF]" aria-hidden="true" />
-              {pct(reading.water_ratio)}
-            </p>
-          ) : (
-            <p className="font-mono text-base font-bold text-slate-400">–</p>
-          )}
-          {camera.online && history.length > 1 && <Sparkline values={history.slice(-20).map((r) => r.water_ratio)} color={meta?.hex ?? '#0EA5E9'} width={72} height={26} />}
-        </div>
-        <p className={`mt-0.5 text-xs ${cycle.phase === 'stale' ? 'font-semibold text-amber-700' : 'text-slate-600'}`}>{status}</p>
-      </div>
+        </span>
+      </span>
+      <span className="mt-2 flex items-center justify-between gap-2 border-t border-slate-100 pt-2 text-xs/4">
+        <span className={`truncate ${cycle.phase === 'stale' ? 'font-semibold text-amber-800' : 'text-slate-600'}`}>{status}</span>
+        <span className="shrink-0 text-slate-600">{sourceLabel(camera)}</span>
+      </span>
     </button>
   );
 }

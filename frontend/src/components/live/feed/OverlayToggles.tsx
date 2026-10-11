@@ -1,5 +1,6 @@
-import { Eye, EyeOff } from 'lucide-react';
-import { focusRing } from '../shared/ui';
+import { Droplets, Rows3, SquareDashed, Waves } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { interactive } from '../shared/ui';
 
 export interface OverlayState {
   roi: boolean;
@@ -9,30 +10,39 @@ export interface OverlayState {
 }
 
 export const DEFAULT_OVERLAYS: OverlayState = { roi: true, lines: true, mask: true, waterline: true };
-const LABELS: Record<keyof OverlayState, string> = { roi: 'Zone', lines: 'Lines', mask: 'Water', waterline: 'Waterline' };
+const ITEMS: { key: keyof OverlayState; label: string; hint: string; icon: LucideIcon }[] = [
+  { key: 'roi', label: 'Zone', hint: 'Water zone outline', icon: SquareDashed },
+  { key: 'lines', label: 'Lines', hint: 'Normal, warning and danger lines', icon: Rows3 },
+  { key: 'mask', label: 'Water', hint: 'Detected water tint', icon: Droplets },
+  { key: 'waterline', label: 'Waterline', hint: 'Detected waterline', icon: Waves },
+];
 
 interface Props {
   value: OverlayState;
   onChange: (next: OverlayState) => void;
 }
 
+/** One segmented row that never wraps. Labels show when the toolbar has room; icons with tooltips otherwise.
+ *  Must sit inside an `@container/toolbar`. */
 export function OverlayToggles({ value, onChange }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Feed overlays">
-      {(Object.keys(LABELS) as (keyof OverlayState)[]).map((key) => {
+    <div className="inline-flex shrink-0 rounded-xl border border-slate-200 bg-white p-1" role="group" aria-label="Feed overlays">
+      {ITEMS.map(({ key, label, hint, icon: Icon }) => {
         const on = value[key];
         return (
           <button
             key={key}
             type="button"
             aria-pressed={on}
+            aria-label={label}
+            title={`${on ? 'Hide' : 'Show'}: ${hint}`}
             onClick={() => onChange({ ...value, [key]: !on })}
-            className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold ${focusRing} ${
-              on ? 'border-[#1677FF]/40 bg-blue-50 text-[#0958D9]' : 'border-slate-300 bg-white text-slate-600 hover:text-slate-900'
+            className={`inline-flex min-h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2 text-sm/5 font-medium ${interactive} ${
+              on ? 'bg-blue-50 text-[#0958D9]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
-            {on ? <Eye className="h-3.5 w-3.5" aria-hidden="true" /> : <EyeOff className="h-3.5 w-3.5" aria-hidden="true" />}
-            {LABELS[key]}
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden @min-[540px]/toolbar:inline">{label}</span>
           </button>
         );
       })}

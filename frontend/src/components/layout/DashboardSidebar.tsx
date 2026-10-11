@@ -13,8 +13,9 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-export function DashboardSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+/** `defaultCollapsed` starts in the icon rail (used by dense pages on laptop widths); the user can still expand it. */
+export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapsed?: boolean }) {
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
 
   const navItems = [
     { label: 'Home', icon: LayoutDashboard, path: '/home' },
@@ -50,6 +51,7 @@ export function DashboardSidebar() {
             onClick={() => setIsCollapsed(true)}
             className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
             title="Collapse Sidebar"
+            aria-label="Collapse sidebar"
           >
             <PanelLeftClose className="w-4 h-4" />
           </button>
@@ -62,6 +64,7 @@ export function DashboardSidebar() {
             onClick={() => setIsCollapsed(false)}
             className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
             title="Expand Sidebar"
+            aria-label="Expand sidebar"
           >
             <PanelLeftOpen className="w-4 h-4" />
           </button>

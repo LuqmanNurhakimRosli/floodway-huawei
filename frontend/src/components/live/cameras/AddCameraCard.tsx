@@ -1,9 +1,9 @@
 import { Plus } from 'lucide-react';
-import { focusRing } from '../shared/ui';
+import { interactive } from '../shared/ui';
 
 export function AddCameraCard({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#1677FF]/50 bg-blue-50/40 p-3 text-sm font-bold text-[#0958D9] hover:bg-blue-50 ${focusRing}`}>
+    <button type="button" onClick={onClick} className={`flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#1677FF]/50 bg-blue-50/40 px-3 text-sm font-semibold text-[#0958D9] hover:bg-blue-50 ${interactive}`}>
       <Plus className="h-4 w-4" aria-hidden="true" />
       Add my camera
     </button>
