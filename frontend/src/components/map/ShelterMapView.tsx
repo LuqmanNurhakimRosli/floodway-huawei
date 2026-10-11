@@ -27,6 +27,7 @@ import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegramService';
 import { InPageActionDock } from './InPageActionDock';
+import { VisionHazardLayer } from './VisionHazardLayer';
 import { Shelter } from '../../types';
 
 // Custom Animated Leaflet DivIcons
@@ -547,6 +548,9 @@ export function ShelterMapView() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             maxZoom={19}
           />
+
+          {/* Live Vision CCTV Hazard Zones (<Circle> per WARNING/DANGER camera & ?focus= auto-fly) */}
+          <VisionHazardLayer />
 
           {/* Camera follower during GPS turn-by-turn simulation */}
           <NavigationMapController isNavigating={isNavigating} gpsPos={currentGpsPosition} />

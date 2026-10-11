@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Map,
   FileText,
-  Box,
+  Video,
   User,
   PanelLeftClose,
   PanelLeftOpen,
@@ -20,7 +20,7 @@ export function DashboardSidebar() {
     { label: 'Home', icon: LayoutDashboard, path: '/home' },
     { label: 'Map', icon: Map, path: '/map' },
     { label: 'Reports', icon: FileText, path: '/reports' },
-    { label: '3D Twin', icon: Box, path: '/simulation' },
+    { label: 'Live Vision', icon: Video, path: '/live' },
     { label: 'Profile', icon: User, path: '/profile' },
   ];
 

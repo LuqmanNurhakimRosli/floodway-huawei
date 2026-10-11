@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, AlertTriangle, Box } from 'lucide-react';
+import { Home, AlertTriangle, Video } from 'lucide-react';
 
 export function InPageActionDock() {
   const navigate = useNavigate();
@@ -26,12 +26,12 @@ export function InPageActionDock() {
       </button>
 
       <button
-        onClick={() => navigate('/simulation')}
+        onClick={() => navigate('/live')}
         className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
-        title="Open 3D Digital Twin"
+        title="Open Live Vision CCTV"
       >
-        <Box className="w-3.5 h-3.5 text-blue-600" />
-        <span>3D Twin</span>
+        <Video className="w-3.5 h-3.5 text-blue-600" />
+        <span>Live Vision</span>
       </button>
     </div>
   );

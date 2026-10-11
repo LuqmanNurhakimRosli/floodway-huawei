@@ -5,6 +5,7 @@ import { AppProvider } from './contexts/AppContext';
 import { WelcomePage } from './pages/WelcomePage';
 import { HomePage } from './pages/HomePage';
 import { MapPage } from './pages/MapPage';
+import LiveVisionPage from './pages/LiveVisionPage';
 import { SimulationPage } from './pages/SimulationPage';
 import { ReportPage } from './pages/ReportPage';
 import { NavigationPage } from './pages/NavigationPage';
@@ -27,7 +28,8 @@ export function App() {
           <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
           <Route path="/shelters" element={<Navigate to="/map" replace />} />
-          <Route path="/simulation" element={<ProtectedRoute><SimulationPage /></ProtectedRoute>} />
+          <Route path="/live" element={<ProtectedRoute><LiveVisionPage /></ProtectedRoute>} />
+          <Route path="/simulation" element={<Navigate to="/live" replace />} />
           <Route path="/studio" element={<ProtectedRoute><HouseStudio360 /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
           <Route path="/navigation/:shelterId" element={<ProtectedRoute><NavigationPage /></ProtectedRoute>} />

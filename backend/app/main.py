@@ -1,11 +1,19 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import telemetry, twin, sos, shelters, predict, reports
+from app.vision import router as vision_router, vision_lifespan
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with vision_lifespan(app):
+        yield
 
 app = FastAPI(
     title="FloodWay 2.0 Backend - Huawei ICT Competition",
     description="Enterprise life-safety intelligence platform powered by Huawei Cloud ModelArts, IoTDA & Ascend AI.",
-    version="2.0.0"
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 app.add_middleware(
@@ -23,6 +31,7 @@ app.include_router(sos.router)
 app.include_router(shelters.router)
 app.include_router(predict.router)
 app.include_router(reports.router)
+app.include_router(vision_router)
 
 @app.get("/healthz")
 def health_check():

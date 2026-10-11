@@ -1,0 +1,175 @@
+import { Check, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { visionActions } from '../../../hooks/vision/useVisionStore';
+import { linesAreValid } from '../../../lib/vision/thresholds';
+import { ApiError, previewFrame, testCamera } from '../../../services/vision/visionApi';
+import type { Calibration, CameraDraft, Reading } from '../../../types/vision';
+import { btnPrimary, btnSecondary, focusRing, heading } from '../shared/ui';
+import { DEFAULT_LINES, StepCalibrate } from './StepCalibrate';
+import { StepSource } from './StepSource';
+import type { SourceForm } from './StepSource';
+import { StepTest } from './StepTest';
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  onSaved: (cameraId: string) => void;
+  origin: { lat: number; lon: number };
+  offlineDemo: boolean; // backend unreachable: use the vector scene + a sample result
+  gpsAvailable: boolean;
+}
+
+const STEPS = ['Source', 'Calibrate', 'Test & save'] as const;
+
+function validateSource(f: SourceForm): string | null {
+  if (f.name.trim().length < 2) return 'Give the camera a name.';
+  if (!/^(https?|rtsps?):\/\/.+/i.test(f.source_url.trim())) return 'Enter a full URL starting with http://, https:// or rtsp://.';
+  if (/^[^:]+:\/\/[^/]*@/.test(f.source_url.trim())) return 'Put the username and password in their own fields, not in the URL.';
+  if (Boolean(f.username) !== Boolean(f.password)) return 'Enter both a username and a password, or neither.';
+  const lat = Number(f.lat);
+  const lon = Number(f.lon);
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90) return 'Latitude must be a number between -90 and 90.';
+  if (!Number.isFinite(lon) || lon < -180 || lon > 180) return 'Longitude must be a number between -180 and 180.';
+  return null;
+}
+
+export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, gpsAvailable }: Props) {
+  const [step, setStep] = useState(0);
+  const [form, setForm] = useState<SourceForm>({ name: '', source_type: 'snapshot', source_url: '', username: '', password: '', lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4), feed_refresh_s: 0 });
+  const [calibration, setCalibration] = useState<Calibration>({ roi: [], lines: DEFAULT_LINES });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [testError, setTestError] = useState<string | null>(null);
+  const [reading, setReading] = useState<Reading | null>(null);
+  const dialog = useRef<HTMLDivElement>(null);
+
+  const buildDraft = useCallback((): CameraDraft => ({
+    name: form.name.trim(), provider: 'mine', lat: Number(form.lat), lon: Number(form.lon),
+    source_type: form.source_type, source_url: form.source_url.trim(),
+    username: form.username || undefined, password: form.password || undefined,
+    interval_s: 8, feed_refresh_s: form.feed_refresh_s, calibration,
+  }), [form, calibration]);
+
+  const reset = useCallback(() => {
+    setStep(0); setError(null); setTestError(null); setReading(null); setBusy(false); setTesting(false);
+    setCalibration({ roi: [], lines: DEFAULT_LINES });
+    setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return null; });
+    setForm((f) => ({ ...f, name: '', source_url: '', username: '', password: '', lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4) }));
+  }, [origin.lat, origin.lon]);
+
+  const close = useCallback(() => { reset(); onClose(); }, [reset, onClose]);
+
+  // Escape closes, focus moves into the dialog, page scroll is locked while open.
+  useEffect(() => {
+    if (!open) return;
+    dialog.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = previous; };
+  }, [open, close]);
+
+  const runTest = useCallback(async () => {
+    setTesting(true); setTestError(null); setReading(null);
+    try {
+      if (offlineDemo) {
+        await new Promise((r) => setTimeout(r, 900));
+        setReading({ camera_id: 'draft', timestamp: new Date().toISOString(), window_seconds: 2.4, frames_analyzed: 5, water_ratio: 0.31, waterline_y: 0.6, level: 'ADVISORY', observed_level: 'ADVISORY', confidence: 0.9, low_confidence: false, lines_crossed: ['normal'], trend: 'steady', model: 'sample-data', latency_ms: 900, action: 'show_on_map' });
+      } else {
+        setReading(await testCamera(buildDraft()));
+      }
+    } catch (err) {
+      setTestError(err instanceof ApiError || err instanceof Error ? err.message : 'The test failed.');
+    } finally {
+      setTesting(false);
+    }
+  }, [offlineDemo, buildDraft]);
+
+  const next = async () => {
+    setError(null);
+    if (step === 0) {
+      const problem = validateSource(form);
+      if (problem) return setError(problem);
+      if (offlineDemo) { setPreviewUrl(null); return setStep(1); }
+      setBusy(true);
+      try {
+        const url = await previewFrame({ source_type: form.source_type, source_url: form.source_url.trim(), username: form.username || undefined, password: form.password || undefined });
+        setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url; });
+        setStep(1);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Could not reach that camera.');
+      } finally {
+        setBusy(false);
+      }
+    } else if (step === 1) {
+      setStep(2);
+      void runTest();
+    }
+  };
+
+  const save = async () => {
+    setBusy(true); setTestError(null);
+    try {
+      const cam = await visionActions.addCamera(buildDraft());
+      onSaved(cam.id);
+      close();
+    } catch (err) {
+      setTestError(err instanceof Error ? err.message : 'Could not save the camera.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!open) return null;
+  const canNext = step === 1 ? linesAreValid(calibration) : true;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="presentation">
+      <div className="absolute inset-0 bg-slate-900/60" onClick={close} aria-hidden="true" />
+      <div ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="wiz-title" className="relative flex max-h-[92vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl focus:outline-none sm:max-w-3xl sm:rounded-3xl">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+          <h2 id="wiz-title" className={`${heading} text-lg`}>Add my camera</h2>
+          <button type="button" onClick={close} aria-label="Close" className={`flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 ${focusRing}`}>
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <ol className="flex items-center gap-2 px-5 pt-4" aria-label="Progress">
+          {STEPS.map((label, i) => (
+            <li key={label} className="flex flex-1 items-center gap-2" aria-current={i === step ? 'step' : undefined}>
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i < step ? 'bg-emerald-700 text-white' : i === step ? 'bg-[#1677FF] text-white' : 'bg-slate-200 text-slate-600'}`}>
+                {i < step ? <Check className="h-4 w-4" aria-hidden="true" /> : i + 1}
+              </span>
+              <span className={`hidden text-sm font-semibold sm:inline ${i === step ? 'text-slate-900' : 'text-slate-600'}`}>{label}</span>
+              {i < STEPS.length - 1 && <span className="h-px flex-1 bg-slate-200" aria-hidden="true" />}
+            </li>
+          ))}
+        </ol>
+
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+          {step === 0 && <StepSource form={form} onChange={setForm} error={error} onUseMyLocation={gpsAvailable ? () => setForm({ ...form, lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4) }) : null} />}
+          {step === 1 && <StepCalibrate imageUrl={previewUrl} value={calibration} onChange={setCalibration} />}
+          {step === 2 && <StepTest loading={testing} error={testError} reading={reading} offlineSample={offlineDemo} onRetry={runTest} />}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-5 py-4">
+          <button type="button" onClick={() => (step === 0 ? close() : setStep(step - 1))} className={btnSecondary}>
+            {step === 0 ? 'Cancel' : 'Back'}
+          </button>
+          {step < 2 ? (
+            <button type="button" onClick={next} disabled={busy || !canNext} className={btnPrimary}>
+              {busy ? 'Checking camera…' : 'Next'}
+            </button>
+          ) : (
+            <button type="button" onClick={save} disabled={busy || testing || !reading} className={btnPrimary}>
+              {busy ? 'Saving…' : 'Save camera'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,150 @@
+import asyncio
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.vision.alerts import AlertDispatcher
+from app.vision.analysis import get_analyzer
+from app.vision.bootstrap import build_default_engine
+from app.vision.config import VisionSettings
+from app.vision.engine import VisionEngine
+from app.vision.schemas import AlertEvent
+from app.vision.seed import sample_calibration
+from app.vision.standalone import create_app
+
+
+class FakeChannel:
+    name = "fake"
+
+    def __init__(self):
+        self.sent: list[AlertEvent] = []
+
+    async def send(self, event):
+        self.sent.append(event)
+
+
+@pytest.fixture()
+def settings(tmp_path):
+    return VisionSettings(data_dir=tmp_path, seed_samples=True)
+
+
+@pytest.fixture()
+def client(settings, monkeypatch):
+    # Disable the background loops: the tests drive analysis explicitly.
+    async def no_loops(self, run_loops=True):
+        self._loop = asyncio.get_running_loop()
+        self._running = True
+
+    monkeypatch.setattr(VisionEngine, "start", no_loops)
+    engine = build_default_engine(settings)
+    with TestClient(create_app(engine)) as c:
+        c.engine = engine
+        yield c
+
+
+def test_lists_seeded_cameras(client):
+    cams = client.get("/api/v1/vision/cameras").json()
+    ids = {c["id"] for c in cams}
+    assert {"sample-klang-jamek", "sample-backyard-stream"} <= ids
+    sample = next(c for c in cams if c["id"] == "sample-klang-jamek")
+    assert sample["is_playback"] is True and sample["source_type"] == "synthetic"
+
+
+def test_analyze_returns_reading_and_frame(client):
+    r = client.post("/api/v1/vision/cameras/sample-klang-jamek/analyze")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["frames_analyzed"] >= 1 and 0 <= body["confidence"] <= 1
+    assert body["level"] in {"NORMAL", "ADVISORY", "WARNING", "DANGER"}
+    assert body["model"] == "classical-v1"
+    frame = client.get("/api/v1/vision/cameras/sample-klang-jamek/frame.jpg")
+    assert frame.status_code == 200 and frame.headers["content-type"] == "image/jpeg"
+    assert frame.content[:2] == b"\xff\xd8"
+    assert client.get("/api/v1/vision/cameras/sample-klang-jamek/readings").json()[-1]["timestamp"] == body["timestamp"]
+
+
+def test_unknown_camera_is_404(client):
+    assert client.post("/api/v1/vision/cameras/nope/analyze").status_code == 404
+    assert client.get("/api/v1/vision/cameras/nope/readings").status_code == 404
+
+
+def test_offline_camera_fails_and_goes_offline_after_three(client):
+    for _ in range(3):
+        assert client.post("/api/v1/vision/cameras/sample-backyard-stream/analyze").status_code == 502
+    cam = next(c for c in client.get("/api/v1/vision/cameras").json() if c["id"] == "sample-backyard-stream")
+    assert cam["online"] is False
+
+
+def _draft(url):
+    cal = sample_calibration().model_dump(mode="json")
+    return {"name": "Test drain", "lat": 3.15, "lon": 101.7, "source_type": "snapshot", "source_url": url, "calibration": cal}
+
+
+@pytest.mark.parametrize("url", ["http://127.0.0.1/x.jpg", "http://169.254.169.254/latest", "file:///etc/passwd"])
+def test_create_camera_blocks_ssrf(client, url):
+    assert client.post("/api/v1/vision/cameras", json=_draft(url)).status_code == 422
+
+
+def test_preview_blocks_ssrf(client):
+    r = client.post("/api/v1/vision/cameras/preview", json={"source_type": "snapshot", "source_url": "http://10.0.0.1/a.jpg"})
+    assert r.status_code == 422
+
+
+def test_user_cameras_can_be_disabled(tmp_path):
+    engine = build_default_engine(VisionSettings(data_dir=tmp_path, allow_user_cameras=False))
+    with TestClient(create_app(engine)) as c:
+        assert c.post("/api/v1/vision/cameras", json=_draft("https://93.184.216.34/a.jpg")).status_code == 403
+
+
+def test_seeded_cameras_cannot_be_deleted(client):
+    assert client.delete("/api/v1/vision/cameras/sample-klang-jamek").status_code == 403
+
+
+def test_invalid_calibration_is_422(client):
+    bad = _draft("https://93.184.216.34/a.jpg")
+    bad["calibration"]["lines"] = {"normal": 0.4, "warning": 0.6, "danger": 0.8}
+    assert client.post("/api/v1/vision/cameras", json=bad).status_code == 422
+
+
+def test_websocket_streams_snapshot_then_reading(client):
+    with client.websocket_connect("/api/v1/vision/ws") as ws:
+        first = ws.receive_json()
+        assert first["type"] == "snapshot" and len(first["cameras"]) >= 5
+        client.post("/api/v1/vision/cameras/sample-klang-jamek/analyze")
+        msg = ws.receive_json()
+        assert msg["type"] == "reading" and msg["reading"]["camera_id"] == "sample-klang-jamek"
+
+
+def test_escalation_creates_alert_and_dispatches(settings, monkeypatch):
+    """Drive a camera into DANGER and check the alert is stored, published and dispatched once."""
+    from app.vision.sources.synthetic import SyntheticRiverSource
+
+    channel = FakeChannel()
+    engine = VisionEngine(settings, get_analyzer(settings), AlertDispatcher([channel], cooldown_s=300))
+    engine.register_synthetic("flood", "Flood test", "mine", 3.1, 101.7, sample_calibration(),
+                              SyntheticRiverSource(1.05, 1.05, 100, seed=3), 8)
+
+    async def run():
+        await engine.start(run_loops=False)
+        r1 = await engine.analyze_once_async("flood")
+        r2 = await engine.analyze_once_async("flood")
+        await engine.stop()
+        return r1, r2
+
+    r1, r2 = asyncio.run(run())
+    assert r1.level.value == "DANGER"  # confident danger escalates immediately
+    assert len(engine.alerts) == 1 and engine.alerts[0].level.value == "DANGER"
+    assert len(channel.sent) == 1  # second reading does not re-alert (cooldown / no change)
+    assert r2.action == "show_on_map"
+
+
+def test_dispatcher_cooldown_and_escalation_rules():
+    d = AlertDispatcher([], cooldown_s=300)
+    ev = lambda lvl: AlertEvent(id="1", camera_id="c", camera_name="C", level=lvl, water_ratio=0.8, timestamp="t", message="m")
+    from app.vision.schemas import Level
+
+    assert d.should_send(ev(Level.WARNING), now=1000)
+    d._last["c"] = (Level.WARNING, 1000)
+    assert not d.should_send(ev(Level.WARNING), now=1100)      # inside cooldown
+    assert d.should_send(ev(Level.DANGER), now=1100)           # escalation bypasses cooldown
+    assert d.should_send(ev(Level.WARNING), now=1400)          # cooldown elapsed
