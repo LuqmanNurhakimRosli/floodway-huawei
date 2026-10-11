@@ -43,7 +43,7 @@ export function ProfileSettings() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+    <div className="w-full min-w-0 max-w-4xl mx-auto p-4 md:p-6 space-y-6">
       {/* Profile Overview */}
       <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-xs flex items-center gap-4">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] text-white font-heading font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -132,20 +132,22 @@ export function ProfileSettings() {
           <input
             type="text"
             placeholder="Name & Relationship (e.g. Uncle Hadi)"
+            aria-label="Contact name and relationship"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#1677FF]"
+            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#1677FF]"
           />
           <input
             type="text"
             placeholder="Phone (e.g. +60 17-555 1234)"
+            aria-label="Contact phone number"
             value={newPhone}
             onChange={(e) => setNewPhone(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#1677FF]"
+            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#1677FF]"
           />
           <button
             type="submit"
-            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-1"
+            className="min-h-11 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-1"
           >
             <Plus className="w-4 h-4" />
             <span>Add</span>

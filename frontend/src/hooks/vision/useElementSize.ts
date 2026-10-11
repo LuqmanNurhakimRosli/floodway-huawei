@@ -13,3 +13,16 @@ export function useElementHeight(ref: RefObject<HTMLElement | null>): number {
   }, [ref]);
   return height;
 }
+
+/** Rendered width of an element, kept current with a ResizeObserver. `fallback` until measured. */
+export function useElementWidth(ref: RefObject<HTMLElement | null>, fallback = 640): number {
+  const [width, setWidth] = useState(fallback);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([entry]) => setWidth(Math.round(entry.contentRect.width) || fallback));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref, fallback]);
+  return width;
+}

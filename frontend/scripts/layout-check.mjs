@@ -47,6 +47,15 @@ for (const route of ROUTES) {
         }
         return null;
       };
+      const shownAt = (el, x, y) => {
+        for (let n = el.parentElement; n && n !== document.body; n = n.parentElement) {
+          const cs = getComputedStyle(n);
+          if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+          const r = n.getBoundingClientRect();
+          if (x < r.left || x > r.right || y < r.top || y > r.bottom) return false;
+        }
+        return true;
+      };
       const overlaps = [];
       for (let i = 0; i < items.length; i++) {
         for (let j = i + 1; j < items.length; j++) {
@@ -56,7 +65,10 @@ for (const route of ROUTES) {
           const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
           const ox = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
           const oy = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
-          if (ox > 4 && oy > 4) overlaps.push(`${label(a)} x ${label(b)} (${Math.round(ox)}x${Math.round(oy)}px)`);
+          // An element scrolled out of its scroll container is clipped: it has a box but is not visible there.
+          const cx = Math.max(ra.left, rb.left) + ox / 2;
+          const cy = Math.max(ra.top, rb.top) + oy / 2;
+          if (ox > 4 && oy > 4 && shownAt(a, cx, cy) && shownAt(b, cx, cy)) overlaps.push(`${label(a)} x ${label(b)} (${Math.round(ox)}x${Math.round(oy)}px)`);
         }
       }
       let small = 0;

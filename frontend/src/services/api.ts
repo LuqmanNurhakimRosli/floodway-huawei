@@ -170,3 +170,34 @@ export async function fetchReports(): Promise<CitizenReport[]> {
     demo({ id: 'rep-04', title: 'Monsoon Drain Overflowing into Residential Road', location: 'Seksyen 13, Shah Alam', lat: 3.0845, lon: 101.5321, waterDepthCm: 38, status: 'UNDER_REVIEW', timestampStr: 'Just now', author: 'Farhan M.', upvotes: 9, imageUrl: '/banjir_drain.jpg', description: 'Example report: a drain is overflowing onto a street, about 38 cm.' }),
   ];
 }
+
+export interface ForecastResponse {
+  station_name: string;
+  water_level_m: number;
+  forecast: {
+    source: string;
+    method?: string;
+    horizons_min: number[];
+    p10: number[];
+    p50: number[];
+    p90: number[];
+    peak_level_m: number;
+    time_to_peak_min: number;
+    time_to_danger_min: number | null;
+  };
+}
+
+/**
+ * The backend's forecast, or null when it cannot be had. Unlike fetchTwinState there is deliberately no built-in
+ * fallback: the Home screen shows an error state instead of numbers the server never produced.
+ */
+export async function fetchForecast(): Promise<ForecastResponse | null> {
+  try {
+    const res = await fetch(`${BACKEND_URL}/twin/state`, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body?.forecast?.p50 ? (body as ForecastResponse) : null;
+  } catch {
+    return null;
+  }
+}

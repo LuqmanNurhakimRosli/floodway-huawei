@@ -1,0 +1,108 @@
+// Pure logic behind the Home screen, kept out of the components so it can be tested.
+import type { Camera, Level } from '../types/vision';
+import { haversineKm, PLACES } from './vision/geo';
+import type { Place } from './vision/geo';
+import { levelRank } from './vision/levels';
+
+/** The online camera with the highest level, ties broken by the higher water ratio. null when nothing is reporting. */
+export function highestRisk(cameras: Camera[]): Camera | null {
+  let best: Camera | null = null;
+  for (const c of cameras) {
+    if (!c.online || !c.reading) continue;
+    if (!best || !best.reading) { best = c; continue; }
+    const a = levelRank(c.reading.level);
+    const b = levelRank(best.reading.level);
+    if (a > b || (a === b && c.reading.water_ratio > best.reading.water_ratio)) best = c;
+  }
+  return best;
+}
+
+/** The overall level shown in the hero: the highest level among reporting cameras. */
+export function overallLevel(cameras: Camera[]): Level | null {
+  return highestRisk(cameras)?.reading?.level ?? null;
+}
+
+/** Newest reading time across cameras (ms since epoch), or null. */
+export function newestReadingAt(cameras: Camera[]): number | null {
+  let newest: number | null = null;
+  for (const c of cameras) {
+    const t = c.reading ? Date.parse(c.reading.timestamp) : NaN;
+    if (Number.isFinite(t) && (newest === null || t > newest)) newest = t;
+  }
+  return newest;
+}
+
+export type Freshness = 'fresh' | 'aging' | 'stale' | 'unknown';
+
+/** fresh under 60 s, aging under 5 min, stale beyond; unknown when there is no reading at all. */
+export function freshness(at: number | null, now = Date.now()): { state: Freshness; seconds: number | null } {
+  if (at === null) return { state: 'unknown', seconds: null };
+  const seconds = Math.max(0, Math.round((now - at) / 1000));
+  return { state: seconds < 60 ? 'fresh' : seconds < 300 ? 'aging' : 'stale', seconds };
+}
+
+export interface DistrictRow {
+  district: string;
+  level: Level;
+  /** Highest water ratio among its cameras (1.0 = bank full). */
+  ratio: number;
+  cameras: number;
+}
+
+/**
+ * Group cameras by the nearest named place. The backend has no district field, so this is a stated approximation:
+ * the UI says "grouped by nearest place". Ranked by level, then by water ratio. Offline cameras are skipped.
+ */
+export function districtRisk(cameras: Camera[], places: Place[] = PLACES): DistrictRow[] {
+  const rows = new Map<string, DistrictRow>();
+  for (const c of cameras) {
+    if (!c.online || !c.reading) continue;
+    const nearest = places.reduce((best, p) => (haversineKm(p.lat, p.lon, c.lat, c.lon) < haversineKm(best.lat, best.lon, c.lat, c.lon) ? p : best), places[0]);
+    const name = nearest.label.split(',')[0];
+    const cur = rows.get(name);
+    const level = c.reading.level;
+    if (!cur) rows.set(name, { district: name, level, ratio: c.reading.water_ratio, cameras: 1 });
+    else {
+      cur.cameras += 1;
+      cur.ratio = Math.max(cur.ratio, c.reading.water_ratio);
+      if (levelRank(level) > levelRank(cur.level)) cur.level = level;
+    }
+  }
+  return [...rows.values()].sort((a, b) => levelRank(b.level) - levelRank(a.level) || b.ratio - a.ratio);
+}
+
+export interface CameraCounts {
+  total: number;
+  online: number;
+  alerting: number;
+}
+
+export function cameraCounts(cameras: Camera[]): CameraCounts {
+  const online = cameras.filter((c) => c.online);
+  return {
+    total: cameras.length,
+    online: online.length,
+    alerting: online.filter((c) => c.reading && levelRank(c.reading.level) >= levelRank('WARNING')).length,
+  };
+}
+
+/** Plain-words sentence for the hero, never stronger than the data. */
+export function heroSentence(level: Level | null, source: 'live' | 'sample', camera: Camera | null): string {
+  if (level === null || !camera) return 'No camera is reporting right now.';
+  const where = camera.name;
+  const base = level === 'DANGER' ? `Water is at the danger line at ${where}.` : level === 'WARNING' ? `Water is above the warning line at ${where}.` : level === 'ADVISORY' ? `Water is above normal at ${where}. Keep watching.` : 'Water is within its normal range at every reporting camera.';
+  return source === 'sample' ? `${base} (Sample cameras: this is a demo.)` : base;
+}
+
+/** Nearest shelter that is open; if none is open, the nearest of all; undefined for an empty list. */
+export function nearestOpenShelter<T extends { status: string; distanceKm: number }>(shelters: T[]): T | undefined {
+  const byDistance = (a: T, b: T) => a.distanceKm - b.distanceKm;
+  const open = shelters.filter((s) => s.status === 'OPEN').sort(byDistance);
+  return open[0] ?? [...shelters].sort(byDistance)[0];
+}
+
+/** A seeded demo camera: a self-running scene, or the seeded offline placeholder (ids start with "sample-"). */
+export const isSampleCamera = (c: Pick<Camera, 'id' | 'source_type'>): boolean => c.source_type === 'synthetic' || c.id.startsWith('sample-');
+
+/** True when every camera is a sample, or there are none to say otherwise. */
+export const allSampleCameras = (cameras: Pick<Camera, 'id' | 'source_type'>[]): boolean => cameras.every(isSampleCamera);

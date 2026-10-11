@@ -22,9 +22,9 @@ export function IoTHeaderPopover() {
       >
         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
         {/* Full label — hidden on very small phones */}
-        <span className="hidden sm:inline">IoT demo · {DEMO_SCENARIO.sensors.online}/{DEMO_SCENARIO.sensors.active} (simulated)</span>
+        <span className="hidden xl:inline">IoT demo · {DEMO_SCENARIO.sensors.online}/{DEMO_SCENARIO.sensors.active} (simulated)</span>
         {/* Icon-only on xs */}
-        <Radio className="w-3.5 h-3.5 sm:hidden" />
+        <Radio className="w-3.5 h-3.5 xl:hidden" aria-hidden="true" /><span className="sr-only">IoT demo sensors (simulated)</span>
         <ChevronDown className="w-3 h-3 text-slate-400" />
       </button>
 

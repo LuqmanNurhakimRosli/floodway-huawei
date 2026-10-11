@@ -7,6 +7,8 @@ interface AppContextType {
   setWaterLevelM: (level: number) => void;
   floodPhase: FloodPhase;
   shelters: Shelter[];
+  /** true once the shelter fetch has finished (successfully or not), so screens can tell loading from empty. */
+  sheltersReady: boolean;
   reports: CitizenReport[];
   activeSos: SosEvent | null;
   setActiveSos: (sos: SosEvent | null) => void;
@@ -27,6 +29,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [waterLevelM, setWaterLevelM] = useState(1.20);
   const [selectedLocation, setSelectedLocation] = useState('Kampung Baru, Kuala Lumpur');
   const [shelters, setShelters] = useState<Shelter[]>([]);
+  const [sheltersReady, setSheltersReady] = useState(false);
   const [reports, setReports] = useState<CitizenReport[]>([]);
   const [activeSos, setActiveSos] = useState<SosEvent | null>(null);
   const [familySafetyStatus, setFamilySafetyStatus] = useState<'IDLE' | 'SOS_ACTIVE' | 'ARRIVED_SAFE'>('IDLE');
@@ -45,7 +48,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    fetchShelters().then(setShelters);
+    fetchShelters().then(setShelters).finally(() => setSheltersReady(true));
     fetchReports().then(setReports);
   }, []);
 
@@ -108,6 +111,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setWaterLevelM,
         floodPhase,
         shelters,
+        sheltersReady,
         reports,
         activeSos,
         setActiveSos,
