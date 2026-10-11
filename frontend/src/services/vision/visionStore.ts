@@ -19,6 +19,7 @@ export interface VisionState {
 
 const HISTORY_MAX = 60;
 const POLL_MS = 5000;
+const PROBE_MS = 8000; // while on sample data, keep checking whether the server came up
 
 let state: VisionState = { cameras: [], history: {}, alerts: [], unseen: [], status: 'idle', usingMock: false, connected: false, error: null };
 const listeners = new Set<() => void>();
@@ -27,6 +28,7 @@ let refs = 0;
 let closeSocket: (() => void) | null = null;
 let stopMock: (() => void) | null = null;
 let pollTimer: ReturnType<typeof setInterval> | null = null;
+let probeTimer: ReturnType<typeof setInterval> | null = null;
 let releaseTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const getState = (): VisionState => state;
@@ -114,26 +116,38 @@ function startMockMode(reason: string | null): void {
   cameras.forEach((c) => {
     if (c.reading) history = pushHistory(history, c.reading);
   });
-  setState({ cameras, history, usingMock: true, status: 'ready', connected: false, error: reason });
+  setState({ cameras, history, alerts: [], unseen: [], usingMock: true, status: 'ready', connected: false, error: reason });
   stopMock = startMockFeed(applyMessage, (id) => state.cameras.find((c) => c.id === id)?.reading?.level);
+  // Sample data is a fallback, not a mode to get stuck in: switch to the real server as soon as it answers.
+  if (!FORCE_MOCK && !probeTimer) probeTimer = setInterval(() => void connectLive().catch(() => undefined), PROBE_MS);
+}
+
+/** Load from the server and open the push channel. Throws when the server cannot be reached. */
+async function connectLive(): Promise<void> {
+  const [cameras, alerts] = await Promise.all([api.listCameras(), api.listAlerts().catch(() => [] as AlertEvent[])]);
+  if (probeTimer) clearInterval(probeTimer);
+  probeTimer = null;
+  stopMock?.();
+  stopMock = null;
+  let history: Record<string, Reading[]> = {};
+  cameras.forEach((c) => {
+    if (c.reading) history = pushHistory(history, c.reading);
+  });
+  setState({ cameras, alerts, unseen: [], history, status: 'ready', usingMock: false, error: null });
+  closeSocket?.();
+  closeSocket = openVisionSocket({
+    onMessage: applyMessage,
+    onOpen: () => setState({ connected: true }),
+    onClose: () => setState({ connected: false }),
+  });
+  startPolling();
 }
 
 async function start(): Promise<void> {
   setState({ status: 'loading' });
   if (FORCE_MOCK) return startMockMode(null);
   try {
-    const [cameras, alerts] = await Promise.all([api.listCameras(), api.listAlerts().catch(() => [] as AlertEvent[])]);
-    let history: Record<string, Reading[]> = {};
-    cameras.forEach((c) => {
-      if (c.reading) history = pushHistory(history, c.reading);
-    });
-    setState({ cameras, alerts, history, status: 'ready', usingMock: false, error: null });
-    closeSocket = openVisionSocket({
-      onMessage: applyMessage,
-      onOpen: () => setState({ connected: true }),
-      onClose: () => setState({ connected: false }),
-    });
-    startPolling();
+    await connectLive();
   } catch (err) {
     startMockMode(err instanceof Error ? err.message : 'Cannot reach the server');
   }
@@ -146,6 +160,8 @@ function stop(): void {
   stopMock = null;
   if (pollTimer) clearInterval(pollTimer);
   pollTimer = null;
+  if (probeTimer) clearInterval(probeTimer);
+  probeTimer = null;
   setState({ status: 'idle', connected: false });
 }
 
