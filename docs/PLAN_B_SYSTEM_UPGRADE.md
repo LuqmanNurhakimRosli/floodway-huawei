@@ -45,7 +45,8 @@ Every task below was run and verified against the running app unless it says oth
 | P3-02 route wording | **Done** | "Approximate, not road-aware" everywhere. |
 | P3-03 one risk colour scale | **Done** | WCAG contrast computed in a test. |
 | P3-04 layer legibility | **Done** | Dashed demo basins, solid camera zones, white route casing. |
-| P3-05 mobile sheet, performance | **Partial** | Legend and drawer height fixed on phones. No snap-height sheet and no frame-rate measurement. |
+| P3-05 mobile sheet, performance | **Done** | Bottom sheet with three snap heights (drag, tap or arrow keys). Starting turn-by-turn drops it to the peek height so the map shows. Frame rate measured with `npm run map-fps`: desktop about 59 fps, phone with 4x slower CPU about 31 fps (headless Chrome, software rendering: a relative check, not a device number). |
+| P3 map overhaul (user request, 2026-10-11) | **Done** | Kuala Lumpur only: 8 demo relief centres, 7 fixed start points (also the header picker), 16 illustrative flood-prone areas that grow with the scenario, real road routes with up to 3 alternatives and turn steps from OpenStreetMap (OSRM, precomputed into `src/data/klRoutes.json`), chooser that prefers the route crossing the fewest flooded areas, compact collapsed legend, honest arrival dialog. Not done: live routing (the routes are stored, so a new start point or centre needs `node scripts/build_kl_routes.mjs`), traffic. |
 | P4-01 shared tokens | **Done** | `styles/tokens.ts`. |
 | P4-02 /home fixes | **Done** | Superseded by the redesign. |
 | P4-03 /reports fixes | **Partial** | Text sizes and status model done. Touch targets under 44 px remain (informational column in `layout-check`). |

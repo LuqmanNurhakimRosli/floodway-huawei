@@ -48,6 +48,15 @@
 - Replaced placeholder `.env` values with real Firebase config
 - Fixed authentication flow (login → redirect to /home)
 
+## 2026-10-11 (demo-polish, map overhaul)
+
+- `/map` rebuilt for Kuala Lumpur only. New: `frontend/src/data/{klDemo.ts,kl_shelters.json,klRoutes.json}`, `lib/routing.ts`, `components/map/{FloodProneLayer,BottomSheet,MapPanel,NavigationHud,ArrivalDialog,mapIcons}.tsx`, `hooks/{useDriveSim,useMediaQuery}.ts`.
+- Shelters: backend `app/data/kl_shelters.json` is the single source (`shelters_data.py` loads it); the frontend keeps an identical copy for its offline fallback and `tests/test_shelters.py` fails if they differ. Invented phone numbers removed.
+- Routes: `node scripts/build_kl_routes.mjs` asks the public OSRM server for 7 origins x 8 centres (about a minute) and writes `klRoutes.json` (172 kB, lazy-loaded). Re-run it if the start points or centres change.
+- Fixed: starting turn-by-turn on a phone did not show the map (the old layout needed the Interactive Map tab). The sheet now drops to its peek height.
+- Fixed: the arrival dialog said a Telegram message was dispatched whatever happened; it now shows the real result.
+- The old hard-coded Shah Alam route, waypoints, roadblocks, "1.2 km" and step text are gone.
+
 ## 2026-10-11 (demo-polish)
 
 ### Plan B executed: demo readiness pass

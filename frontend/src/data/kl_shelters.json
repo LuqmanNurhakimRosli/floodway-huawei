@@ -1,0 +1,146 @@
+[
+  {
+    "id": "shelter-01",
+    "name": "Dewan Serbaguna Kampung Baru",
+    "category": "Community Center",
+    "lat": 3.165,
+    "lon": 101.705,
+    "address": "Kampung Baru, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 180,
+    "max_capacity": 220,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water",
+      "First aid"
+    ],
+    "elevation_m": null,
+    "route_status": "ADVISORY"
+  },
+  {
+    "id": "shelter-02",
+    "name": "Kompleks Sukan Titiwangsa",
+    "category": "Sports Complex",
+    "lat": 3.1782,
+    "lon": 101.7088,
+    "address": "Titiwangsa, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 120,
+    "max_capacity": 600,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water",
+      "First aid",
+      "Generator"
+    ],
+    "elevation_m": null,
+    "route_status": "CLEAR"
+  },
+  {
+    "id": "shelter-03",
+    "name": "Dewan Komuniti Sentul Perdana",
+    "category": "Community Hall",
+    "lat": 3.1818,
+    "lon": 101.6912,
+    "address": "Sentul, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 64,
+    "max_capacity": 180,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water",
+      "Toilets"
+    ],
+    "elevation_m": null,
+    "route_status": "CLEAR"
+  },
+  {
+    "id": "shelter-04",
+    "name": "Kompleks Sukan Bangsar",
+    "category": "Sports Complex",
+    "lat": 3.1298,
+    "lon": 101.678,
+    "address": "Bangsar, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 45,
+    "max_capacity": 400,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water",
+      "First aid",
+      "Generator"
+    ],
+    "elevation_m": null,
+    "route_status": "CLEAR"
+  },
+  {
+    "id": "shelter-05",
+    "name": "Demo relief centre: Segambut hall",
+    "category": "Community Hall",
+    "lat": 3.188,
+    "lon": 101.665,
+    "address": "Segambut, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 30,
+    "max_capacity": 150,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water"
+    ],
+    "elevation_m": null,
+    "route_status": "CLEAR"
+  },
+  {
+    "id": "shelter-06",
+    "name": "Demo relief centre: TTDI hall",
+    "category": "Community Hall",
+    "lat": 3.14,
+    "lon": 101.63,
+    "address": "Taman Tun Dr Ismail, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 88,
+    "max_capacity": 200,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water",
+      "Toilets"
+    ],
+    "elevation_m": null,
+    "route_status": "CLEAR"
+  },
+  {
+    "id": "shelter-07",
+    "name": "Demo relief centre: Pantai Dalam hall",
+    "category": "Community Hall",
+    "lat": 3.113,
+    "lon": 101.662,
+    "address": "Pantai Dalam, Kuala Lumpur (demo location)",
+    "status": "FULL",
+    "current_capacity": 160,
+    "max_capacity": 160,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water"
+    ],
+    "elevation_m": null,
+    "route_status": "ADVISORY"
+  },
+  {
+    "id": "shelter-08",
+    "name": "Demo relief centre: Cheras hall",
+    "category": "Community Hall",
+    "lat": 3.099,
+    "lon": 101.729,
+    "address": "Cheras, Kuala Lumpur (demo location)",
+    "status": "OPEN",
+    "current_capacity": 22,
+    "max_capacity": 260,
+    "contact": "Not available (demo)",
+    "facilities": [
+      "Water",
+      "First aid"
+    ],
+    "elevation_m": null,
+    "route_status": "CLEAR"
+  }
+]

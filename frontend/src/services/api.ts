@@ -1,6 +1,7 @@
 import { Shelter, CitizenReport, ForecastData } from '../types';
 import { mapReport, mapShelter } from '../lib/mappers';
 import { API_BASE } from './vision/config';
+import klShelters from '../data/kl_shelters.json';
 
 // One backend address for everything: VITE_API_BASE, or http://localhost:8080 in development. (This used to be a
 // hard-coded localhost:8080, so a deployment that set VITE_API_BASE reached the wrong server for shelters and reports.)
@@ -45,110 +46,8 @@ export async function fetchShelters(): Promise<Shelter[]> {
     }
   } catch (e) {}
 
-  return [
-    {
-      id: 'shelter-01',
-      name: 'Dewan Sultan Sulaiman, Kampung Baru',
-      category: 'Heritage Civic Hall',
-      lat: 3.1635,
-      lon: 101.7025,
-      address: 'Jalan Dewan Sultan Sulaiman, Kampung Baru, 50300 Kuala Lumpur',
-      status: 'OPEN',
-      currentCapacity: 145,
-      maxCapacity: 250,
-      contact: '+603-2692 1445',
-      facilities: ['Medical Station', 'Emergency Kitchen', 'First Aid', 'Generator Backup'],
-      elevationM: 38.0,
-      routeStatus: 'CLEAR',
-      distanceKm: 0.4,
-      travelTimeMin: 3
-    },
-    {
-      id: 'shelter-02',
-      name: 'Kompleks Sukan Titiwangsa',
-      category: 'Sports Arena Relief Center',
-      lat: 3.1782,
-      lon: 101.7088,
-      address: 'Jalan Kuantan, Titiwangsa, 53200 Kuala Lumpur',
-      status: 'OPEN',
-      currentCapacity: 210,
-      maxCapacity: 500,
-      contact: '+603-4021 3455',
-      facilities: ['Indoor Stadium Floor', 'Helipad Access', 'Medical Tents', 'Clean Water Filtration'],
-      elevationM: 42.0,
-      routeStatus: 'CLEAR',
-      distanceKm: 2.1,
-      travelTimeMin: 6
-    },
-    {
-      id: 'shelter-03',
-      name: 'Dewan Komuniti Sentul Perdana (DBKL)',
-      category: 'Community Center',
-      lat: 3.1818,
-      lon: 101.6912,
-      address: 'Bandar Baru Sentul, 51000 Kuala Lumpur',
-      status: 'OPEN',
-      currentCapacity: 120,
-      maxCapacity: 300,
-      contact: '+603-4043 8920',
-      facilities: ['Relief Supplies Storage', 'Baby Care Room', 'Hot Meals Supply'],
-      elevationM: 36.5,
-      routeStatus: 'CLEAR',
-      distanceKm: 2.8,
-      travelTimeMin: 8
-    },
-    {
-      id: 'shelter-04',
-      name: 'Dewan Tunku Canselor Universiti Malaya',
-      category: 'University Relief Campus',
-      lat: 3.1205,
-      lon: 101.6575,
-      address: 'Universiti Malaya, Lembah Pantai, 50603 Kuala Lumpur',
-      status: 'OPEN',
-      currentCapacity: 180,
-      maxCapacity: 600,
-      contact: '+603-7967 7022',
-      facilities: ['Mass Capacity Auditorium', 'Medical Faculty Clinic', 'Emergency WiFi', 'Generator Power'],
-      elevationM: 48.0,
-      routeStatus: 'CLEAR',
-      distanceKm: 6.8,
-      travelTimeMin: 14
-    },
-    {
-      id: 'shelter-05',
-      name: 'Dewan Sivik MBPJ Petaling Jaya',
-      category: 'Civic Hall',
-      lat: 3.0982,
-      lon: 101.6455,
-      address: 'Jalan Yong Shook Lin, 46675 Petaling Jaya, Selangor',
-      status: 'OPEN',
-      currentCapacity: 88,
-      maxCapacity: 350,
-      contact: '+603-7956 3544',
-      facilities: ['Full Kitchen', 'Ambulance Station', 'Pet Safe Zone', 'Power Hub'],
-      elevationM: 22.0,
-      routeStatus: 'CLEAR',
-      distanceKm: 9.5,
-      travelTimeMin: 18
-    },
-    {
-      id: 'shelter-06',
-      name: 'Stadium Melawati Shah Alam',
-      category: 'Mega Indoor Stadium',
-      lat: 3.0738,
-      lon: 101.5183,
-      address: 'Persiaran Sukan, Seksyen 13, 40100 Shah Alam, Selangor',
-      status: 'FULL',
-      currentCapacity: 850,
-      maxCapacity: 850,
-      contact: '+603-5510 4432',
-      facilities: ['Regional Operations Hub', 'Mass Relief Depot - Currently Full Capacity'],
-      elevationM: 18.0,
-      routeStatus: 'ADVISORY',
-      distanceKm: 18.5,
-      travelTimeMin: 26
-    }
-  ];
+  // Offline fallback: the same Kuala Lumpur demo list the backend serves (a test keeps the two identical).
+  return (klShelters as Record<string, unknown>[]).map((r) => mapShelter(r));
 }
 
 export async function fetchReports(): Promise<CitizenReport[]> {

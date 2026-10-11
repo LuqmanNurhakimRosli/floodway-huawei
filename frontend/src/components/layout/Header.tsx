@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon, Waves } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { ORIGINS } from '../../data/klDemo';
 import { IoTHeaderPopover } from '../dashboard/IoTHeaderPopover';
 
 export function Header() {
@@ -9,12 +10,7 @@ export function Header() {
   const { user } = useAuth();
   const [showLocationMenu, setShowLocationMenu] = useState(false);
 
-  const locations = [
-    'Kampung Baru, Kuala Lumpur',
-    'Taman Sri Muda, Shah Alam',
-    'Jalan Kuching, Segambut',
-    'Pantai Dalam, Kuala Lumpur'
-  ];
+  const locations = ORIGINS.map((o) => o.location);
 
   const shortLocation = selectedLocation.split(',')[0].trim();
 

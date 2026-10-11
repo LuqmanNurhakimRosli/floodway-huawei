@@ -1,1174 +1,308 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Polyline, Polygon, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {
-  Navigation,
-  CheckCircle2,
-  AlertTriangle,
-  Phone,
-  Car,
-  Bike,
-  Footprints,
-  Waves,
-  Cpu,
-  Check,
-  AlertOctagon,
-  ArrowRight,
-  ShieldCheck,
-  Shield,
-  Route,
-  MessageSquare,
-  ExternalLink,
-  Compass
-} from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegramService';
+import { dispatchArrivalCheckin, type TelegramResult } from '../../services/telegramService';
 import { InPageActionDock } from './InPageActionDock';
 import { VisionHazardLayer } from './VisionHazardLayer';
 import { MapLegend } from './MapLegend';
+import { FloodProneLayer, SCENARIO_COLOR, floodedZones, type Scenario } from './FloodProneLayer';
+import { BottomSheet, type Snap } from './BottomSheet';
+import { MapPanel, type ShelterFilter } from './MapPanel';
+import { NavigationHud } from './NavigationHud';
+import { ArrivalDialog } from './ArrivalDialog';
+import { createShelterIcon, gpsNavIcon, userIcon } from './mapIcons';
 import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
-import { formatCapacity, formatKm, formatMin, formatPct, percentOf } from '../../lib/format';
-import { estimateEtaMin } from '../../lib/mappers';
+import { ORIGINS, originForLocation } from '../../data/klDemo';
+import { formatCapacity, formatMin } from '../../lib/format';
+import type { TravelMode } from '../../lib/mappers';
+import { etaMin, lineLengthM, pointAtDistance, rankRoutes, stepAt, toRoadRoute, type LatLon, type RoadRoute, type ScoredRoute, type Zone } from '../../lib/routing';
 import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
-import { detourAroundHazards, hazardsKey } from '../../lib/vision/hazards';
-import { Shelter } from '../../types';
+import { useDriveSim } from '../../hooks/useDriveSim';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
-// Custom Animated Leaflet DivIcons
-const userIcon = new L.DivIcon({
-  className: 'user-icon',
-  html: `
-    <div class="user-marker-container">
-      <div class="user-marker-pulse"></div>
-      <div class="user-marker-dot"></div>
-    </div>
-  `,
-  iconSize: [24, 24],
-  iconAnchor: [12, 12],
-});
+type RoutesDb = Record<string, Parameters<typeof toRoadRoute>[0][]>;
 
-const gpsNavIcon = new L.DivIcon({
-  className: 'gps-nav-icon',
-  html: `
-    <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-      <div style="position: absolute; inset: -4px; border-radius: 50%; background: #1677FF; opacity: 0.4; animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-      <div style="width: 28px; height: 28px; border-radius: 50%; background: #1677FF; border: 3px solid white; box-shadow: 0 4px 14px rgba(22,119,255,0.7); display: flex; align-items: center; justify-content: center; color: white;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
-        </svg>
-      </div>
-    </div>
-  `,
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-});
+/** Length of the simulated drive on screen, whatever the real route length. */
+const DRIVE_MS = 30000;
+const KL_CENTER: LatLon = [3.155, 101.69];
 
-const createShelterIcon = (isSelected: boolean, status: string) => {
-  const isFull = status === 'FULL';
-  const isClosed = status === 'CLOSED';
-
-  let bgColor = '#10B981'; // Green for open
-  let symbol = `
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-    </svg>
-  `;
-
-  if (isClosed) {
-    bgColor = '#EF4444'; // Red
-    symbol = `<span style="font-size: 15px; font-weight: 900; line-height: 1;">✕</span>`;
-  } else if (isFull) {
-    bgColor = '#F59E0B'; // Amber
-    symbol = `<span style="font-size: 16px; font-weight: 900; line-height: 1;">!</span>`;
-  } else if (isSelected) {
-    bgColor = '#1677FF'; // Blue
-  }
-
-  return new L.DivIcon({
-    className: 'shelter-icon',
-    html: `
-      <div class="shelter-marker ${isSelected ? 'selected' : ''}">
-        <div style="width: ${isSelected ? '38px' : '32px'}; height: ${isSelected ? '38px' : '32px'}; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 2px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
-          ${symbol}
-        </div>
-        ${isSelected ? '<div class="shelter-marker-ring"></div>' : ''}
-      </div>
-    `,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
-  });
-};
-
-const roadblockIcon = (name: string) =>
-  new L.DivIcon({
-    className: 'roadblock-icon',
-    html: `
-      <div style="background: #DC2626; color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 10px rgba(220,38,38,0.7); cursor: pointer;">
-        <span style="font-size: 14px; font-weight: 900; line-height: 1;">✕</span>
-      </div>
-    `,
-    iconSize: [26, 26],
-    iconAnchor: [13, 13],
-  });
-
-// 5 MULTIPLE HISTORICAL / REALISTIC FLOOD-PRONE BASINS IN KLANG VALLEY
-const FLOOD_BASINS = [
-  {
-    id: 'basin-01',
-    name: 'Kampung Baru / Klang River Confluence',
-    normal: [
-      [3.1670, 101.7000],
-      [3.1640, 101.7040],
-      [3.1600, 101.7030],
-      [3.1610, 101.6970],
-    ] as [number, number][],
-    warning: [
-      [3.1700, 101.6980],
-      [3.1660, 101.7080],
-      [3.1570, 101.7060],
-      [3.1590, 101.6950],
-    ] as [number, number][],
-    danger: [
-      [3.1740, 101.6950],
-      [3.1690, 101.7120],
-      [3.1540, 101.7100],
-      [3.1560, 101.6910],
-    ] as [number, number][],
-  },
-  {
-    id: 'basin-02',
-    name: 'Taman Sri Muda Seksyen 25 Retention Basin',
-    normal: [
-      [3.0420, 101.5300],
-      [3.0400, 101.5370],
-      [3.0340, 101.5350],
-      [3.0360, 101.5280],
-    ] as [number, number][],
-    warning: [
-      [3.0450, 101.5270],
-      [3.0430, 101.5410],
-      [3.0310, 101.5390],
-      [3.0330, 101.5250],
-    ] as [number, number][],
-    danger: [
-      [3.0480, 101.5240],
-      [3.0460, 101.5450],
-      [3.0280, 101.5420],
-      [3.0300, 101.5210],
-    ] as [number, number][],
-  },
-  {
-    id: 'basin-03',
-    name: 'Sungai Rasau Flood Spillway (Klang Gateway)',
-    normal: [
-      [3.0580, 101.4870],
-      [3.0560, 101.5000],
-      [3.0490, 101.4980],
-      [3.0510, 101.4850],
-    ] as [number, number][],
-    warning: [
-      [3.0610, 101.4840],
-      [3.0590, 101.5040],
-      [3.0460, 101.5010],
-      [3.0480, 101.4820],
-    ] as [number, number][],
-    danger: [
-      [3.0640, 101.4810],
-      [3.0620, 101.5080],
-      [3.0430, 101.5040],
-      [3.0450, 101.4790],
-    ] as [number, number][],
-  },
-  {
-    id: 'basin-04',
-    name: 'Batu Tiga Low-Lying Industrial Catchment',
-    normal: [
-      [3.0800, 101.5580],
-      [3.0780, 101.5700],
-      [3.0710, 101.5670],
-      [3.0730, 101.5550],
-    ] as [number, number][],
-    warning: [
-      [3.0830, 101.5550],
-      [3.0810, 101.5740],
-      [3.0680, 101.5700],
-      [3.0700, 101.5520],
-    ] as [number, number][],
-    danger: [
-      [3.0860, 101.5520],
-      [3.0840, 101.5780],
-      [3.0650, 101.5730],
-      [3.0670, 101.5490],
-    ] as [number, number][],
-  },
-  {
-    id: 'basin-05',
-    name: 'Seksyen 13 Stadium Inundation Depression',
-    normal: [
-      [3.0870, 101.5340],
-      [3.0850, 101.5430],
-      [3.0790, 101.5410],
-      [3.0810, 101.5310],
-    ] as [number, number][],
-    warning: [
-      [3.0900, 101.5310],
-      [3.0880, 101.5460],
-      [3.0760, 101.5440],
-      [3.0780, 101.5280],
-    ] as [number, number][],
-    danger: [
-      [3.0930, 101.5280],
-      [3.0910, 101.5490],
-      [3.0730, 101.5470],
-      [3.0750, 101.5250],
-    ] as [number, number][],
-  },
-];
-
-// Dynamic GPS Route Generator connecting user to ANY selected shelter
-const calculateRouteForShelter = (
-  destLat: number,
-  destLon: number,
-  severity: 'normal' | 'warning' | 'danger'
-): { route: [number, number][]; roadblocks: [number, number][]; isDetour: boolean } => {
-  const startLat = 3.1610;
-  const startLon = 101.7005;
-
-  const dLat = destLat - startLat;
-  const dLon = destLon - startLon;
-  const dist = Math.hypot(dLat, dLon);
-
-  // Immediate shelter (< 1km, e.g. Dewan Sultan Sulaiman)
-  if (dist < 0.015) {
-    return {
-      route: [
-        [startLat, startLon],
-        [startLat + 0.0015, startLon + 0.0010],
-        [destLat, destLon],
-      ],
-      roadblocks: severity === 'danger' ? [[startLat + 0.003, startLon - 0.002]] : [],
-      isDetour: severity !== 'normal',
-    };
-  }
-
-  // Northern shelters (Titiwangsa, Sentul)
-  if (destLat > startLat) {
-    if (severity === 'danger' || severity === 'warning') {
-      return {
-        route: [
-          [startLat, startLon],
-          [3.1660, 101.7045],
-          [3.1720, 101.7090], // Elevated Tun Razak / Jalan Kuantan Bypass
-          [3.1765, 101.7050],
-          [destLat, destLon],
-        ],
-        roadblocks: [[3.1670, 101.6980]],
-        isDetour: true,
-      };
-    }
-    return {
-      route: [
-        [startLat, startLon],
-        [3.1680, 101.7015],
-        [3.1740, 101.7040],
-        [destLat, destLon],
-      ],
-      roadblocks: [],
-      isDetour: false,
-    };
-  }
-
-  // Southern / Western shelters (UM, MBPJ, Shah Alam)
-  if (severity === 'normal') {
-    return {
-      route: [
-        [startLat, startLon],
-        [3.1520, 101.6930],
-        [3.1360, 101.6780],
-        [3.1180, 101.6560],
-        [destLat + 0.01, destLon + 0.01],
-        [destLat, destLon],
-      ],
-      roadblocks: [],
-      isDetour: false,
-    };
-  }
-
-  // Warning / Danger: Skirt basins via elevated highway corridor
-  return {
-    route: [
-      [startLat, startLon],
-      [3.1500, 101.6880], // Divert south-west away from river basin
-      [3.1350, 101.6720], // Elevated Kerinchi Link Bypass
-      [3.1150, 101.6480], // Elevated Federal Highway Viaduct
-      [3.0900, 101.6150], // Subang High-Ridge Crossing
-      [destLat + 0.005, destLon + 0.005],
-      [destLat, destLon],
-    ],
-    roadblocks: [
-      [3.1640, 101.6970], // Riverbank inundation
-      [3.0800, 101.5400], // Low-lying drainage roadblock
-    ],
-    isDetour: true,
-  };
-};
-
-// Map Camera Controller for GPS Follower
-function NavigationMapController({
-  isNavigating,
-  gpsPos,
-}: {
-  isNavigating: boolean;
-  gpsPos: [number, number];
-}) {
+/** Fits the chosen route in the visible part of the map (the phone sheet covers the bottom). */
+function FitRoute({ line, bottomPad, enabled }: { line: LatLon[] | null; bottomPad: number; enabled: boolean }) {
   const map = useMap();
-
+  const key = line ? `${line[0]}|${line[line.length - 1]}|${line.length}` : '';
   useEffect(() => {
-    if (isNavigating && gpsPos) {
-      map.panTo(gpsPos, {
-        animate: true,
-        duration: 0.25,
-        easeLinearity: 0.5,
-      });
-    }
-  }, [gpsPos, isNavigating, map]);
+    if (!line || !enabled) return;
+    map.fitBounds(L.latLngBounds(line), { paddingTopLeft: [32, 72], paddingBottomRight: [32, bottomPad + 24], maxZoom: 16, animate: true });
+    // refit when the route changes or the sheet height settles, not on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, bottomPad, enabled, map]);
+  return null;
+}
 
+/** Follows the simulated car. */
+function FollowCar({ pos, active }: { pos: LatLon | null; active: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    if (active && pos) map.setView(pos, 16, { animate: true, duration: 0.25 });
+  }, [pos, active, map]);
   return null;
 }
 
 export function ShelterMapView() {
   const navigate = useNavigate();
-  const { shelters, setFamilySafetyStatus } = useApp();
-
-  const [selectedShelterId, setSelectedShelterId] = useState<string>('shelter-01');
-  const [filter, setFilter] = useState<'all' | 'open' | 'recommended'>('all');
-  const [transportMode, setTransportMode] = useState<'car' | 'bike' | 'walk'>('car');
-  const [mobileTab, setMobileTab] = useState<'map' | 'shelters'>('map');
-
-  // Interactive Flood Severity state (Normal, Warning, Danger)
-  const [floodSeverity, setFloodSeverity] = useState<'normal' | 'warning' | 'danger'>('warning');
-
-  // GPS Navigator 6-Second Simulation State
+  const { shelters, selectedLocation, setSelectedLocation, setFamilySafetyStatus } = useApp();
   const { user } = useAuth();
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [navProgress, setNavProgress] = useState(0); // 0 to 1
-  const [navElapsedSec, setNavElapsedSec] = useState(0);
-  const [hasArrived, setHasArrived] = useState(false);
-  const [arrivalTimestamp, setArrivalTimestamp] = useState<{ date: string; time: string } | null>(null);
 
-  // Fallback coords if shelters array is still loading
-  const FALLBACK_LAT = 3.1642;
-  const FALLBACK_LON = 101.7118;
+  const desktop = useMediaQuery('(min-width: 768px)');
+  const origin = originForLocation(selectedLocation);
+  const [selectedId, setSelectedId] = useState('shelter-01');
+  const [scenario, setScenario] = useState<Scenario>('warning');
+  const [filter, setFilter] = useState<ShelterFilter>('all');
+  const [mode, setMode] = useState<TravelMode>('car');
+  const [chosen, setChosen] = useState(0);
+  const [snap, setSnap] = useState<Snap>('peek');
+  const [sheetH, setSheetH] = useState(0);
+  const [routesDb, setRoutesDb] = useState<RoutesDb | null>(null);
+  const [arrival, setArrival] = useState<{ when: string; telegram: TelegramResult | null } | null>(null);
 
-  // Selected shelter object with fallback
-  const selectedShelter = (shelters && shelters.length > 0)
-    ? (shelters.find((s) => s.id === selectedShelterId) || shelters[0])
-    : undefined;
-
-  const currentDestLat = selectedShelter?.lat ?? FALLBACK_LAT;
-  const currentDestLon = selectedShelter?.lon ?? FALLBACK_LON;
-
-  const filteredShelters = useMemo(() => {
-    if (!shelters || shelters.length === 0) return [];
-    return shelters.filter((s) => {
-      if (filter === 'open') return s.status === 'OPEN';
-      if (filter === 'recommended') return s.routeStatus === 'CLEAR' && s.status === 'OPEN';
-      return true;
-    });
-  }, [shelters, filter]);
-
-  // Straight-line distance over an assumed speed: an estimate, shown with "~".
-  const etaFor = (km: number) => formatMin(estimateEtaMin(km, transportMode));
-
-  // Dynamic route calculation: Automatically recalculates to whichever shelter is selected!
-  // Live Vision flood zones (cameras at WARNING/DANGER) bend the route around them. Keyed on zone identity so the
-  // route only changes when a zone appears, disappears or changes level, not on every reading.
-  const visionHazards = useVisionHazards();
-  const visionKey = hazardsKey(visionHazards);
-  const routeCalculation = useMemo(() => {
-    const base = calculateRouteForShelter(
-      currentDestLat,
-      currentDestLon,
-      floodSeverity
-    );
-    const detour = detourAroundHazards(base.route, visionHazards);
-    return { ...base, route: detour.route, isDetour: base.isDetour || detour.avoided.length > 0, visionAvoided: detour.avoided };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDestLat, currentDestLon, floodSeverity, visionKey]);
-
-  const activeRoute = routeCalculation.route;
-  const activeRoadblocks = routeCalculation.roadblocks;
-
-  // Interpolate GPS coordinates along the activeRoute
-  const currentGpsPosition = useMemo((): [number, number] => {
-    if (!isNavigating || navProgress === 0) {
-      return activeRoute[0];
-    }
-    if (navProgress >= 1) {
-      return activeRoute[activeRoute.length - 1];
-    }
-
-    const totalSegments = activeRoute.length - 1;
-    const globalProgress = navProgress * totalSegments;
-    const segmentIndex = Math.min(Math.floor(globalProgress), totalSegments - 1);
-    const segmentRatio = globalProgress - segmentIndex;
-
-    const p1 = activeRoute[segmentIndex];
-    const p2 = activeRoute[segmentIndex + 1];
-
-    const lat = p1[0] + (p2[0] - p1[0]) * segmentRatio;
-    const lon = p1[1] + (p2[1] - p1[1]) * segmentRatio;
-
-    return [lat, lon];
-  }, [isNavigating, navProgress, activeRoute]);
-
-  // 6-Second Turn-by-Turn GPS Navigation Loop
+  // The road routes are a 170 kB data file: load it after the first paint.
   useEffect(() => {
-    if (!isNavigating) return;
+    let live = true;
+    import('../../data/klRoutes.json').then((m) => live && setRoutesDb((m.default as unknown as { routes: RoutesDb }).routes));
+    return () => {
+      live = false;
+    };
+  }, []);
 
-    const DURATION_MS = 6000;
-    const startTime = performance.now();
+  const selected = shelters.find((s) => s.id === selectedId) ?? shelters[0];
 
-    const interval = setInterval(() => {
-      const now = performance.now();
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / DURATION_MS, 1);
+  // Zones routes must avoid: the flooded demo areas for this scenario plus any sample-camera zones at WARNING/DANGER.
+  const cameraHazards = useVisionHazards();
+  const zones = useMemo<Zone[]>(
+    () => [...floodedZones(scenario), ...cameraHazards.map((h) => ({ id: `cam-${h.cameraId}`, lat: h.lat, lon: h.lon, radiusM: h.radiusM }))],
+    [scenario, cameraHazards],
+  );
 
-      setNavProgress(progress);
-      setNavElapsedSec(Number((progress * 6).toFixed(1)));
+  const rankedFor = useCallback(
+    (shelterId: string): ScoredRoute[] => {
+      const raw = routesDb?.[`${origin.id}|${shelterId}`];
+      return raw ? rankRoutes(raw.map(toRoadRoute), zones) : [];
+    },
+    [routesDb, origin.id, zones],
+  );
+  const alternatives = useMemo(() => (selected ? rankedFor(selected.id) : []), [rankedFor, selected]);
+  const best = useMemo(() => Object.fromEntries(shelters.map((s) => [s.id, rankedFor(s.id)[0] ?? null])), [shelters, rankedFor]);
 
-      if (progress >= 1) {
-        clearInterval(interval);
-        const dateText = new Date().toLocaleDateString('en-MY', {
-          weekday: 'short',
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        });
-        const timeText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // A different centre, start point or scenario starts again from the suggested route.
+  useEffect(() => setChosen(0), [selectedId, origin.id, scenario]);
+  const route: ScoredRoute | null = alternatives[Math.min(chosen, alternatives.length - 1)] ?? null;
 
-        setArrivalTimestamp({ date: dateText, time: timeText });
-        setHasArrived(true);
-        setFamilySafetyStatus('ARRIVED_SAFE');
+  // Simulated drive along the chosen road route.
+  const lineLen = useMemo(() => (route ? lineLengthM(route.line) : 0), [route]);
+  const speedup = route ? route.durationS / (DRIVE_MS / 1000) : 1;
+  const onArrive = useCallback(() => {
+    if (!route || !selected) return;
+    const now = new Date();
+    const date = now.toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setFamilySafetyStatus('ARRIVED_SAFE');
+    setArrival({ when: `${date} · ${time}`, telegram: null });
+    dispatchArrivalCheckin({ userName: user?.name || 'Demo user', shelterName: selected.name, dateStr: date, timeStr: time })
+      .then((telegram) => setArrival((a) => (a ? { ...a, telegram } : a)))
+      .catch(() => setArrival((a) => (a ? { ...a, telegram: { success: false } } : a)));
+  }, [route, selected, setFamilySafetyStatus, user?.name]);
+  const sim = useDriveSim(DRIVE_MS, onArrive);
 
-        // Automatically dispatch shelter arrival check-in via Telegram Bot
-        dispatchArrivalCheckin({
-          userName: user?.name || 'Luqman Nurhakim',
-          shelterName: selectedShelter?.name || 'Dewan Sultan Sulaiman, Kampung Baru',
-          dateStr: dateText,
-          timeStr: timeText,
-        });
-      }
-    }, 50);
+  const travelled = route ? sim.progress * route.distanceM : 0;
+  const car = useMemo(() => (route && sim.active ? pointAtDistance(route.line, sim.progress * lineLen).pos : null), [route, sim.active, sim.progress, lineLen]);
+  const step = route && sim.active ? stepAt(route, travelled) : null;
+  const nextText = step ? (step.next ? `${step.next.text}` : 'Arrive at the relief centre') : '';
 
-    return () => clearInterval(interval);
-  }, [isNavigating, setFamilySafetyStatus, selectedShelter?.name, user?.name]);
-
-  const handleStartNavigation = (shelter: Shelter) => {
-    if (shelter.status === 'FULL' || shelter.status === 'CLOSED') {
-      return;
-    }
-    setNavProgress(0);
-    setNavElapsedSec(0);
-    setHasArrived(false);
-    setIsNavigating(true);
+  const start = () => {
+    if (!route || !selected || selected.status === 'FULL' || selected.status === 'CLOSED') return;
+    setSnap('peek'); // on a phone the sheet must get out of the way, so the map with the route is what you see
+    setArrival(null);
+    sim.start();
   };
+  const cancel = () => sim.stop();
 
-  const handleResetNavigation = () => {
-    setIsNavigating(false);
-    setNavProgress(0);
-    setNavElapsedSec(0);
-    setHasArrived(false);
-  };
+  const panel = (
+    <MapPanel
+      originId={origin.id}
+      onOrigin={(id) => {
+        sim.stop();
+        const o = ORIGINS.find((x) => x.id === id);
+        if (o) setSelectedLocation(o.location);
+      }}
+      scenario={scenario}
+      onScenario={(s) => {
+        sim.stop();
+        setScenario(s);
+      }}
+      floodedCount={floodedZones(scenario).length}
+      cameraZoneCount={cameraHazards.length}
+      shelters={shelters}
+      best={best}
+      selectedId={selected?.id ?? ''}
+      onSelect={(id) => {
+        sim.stop();
+        setSelectedId(id);
+      }}
+      filter={filter}
+      onFilter={setFilter}
+      mode={mode}
+      onMode={setMode}
+      alternatives={alternatives}
+      chosen={Math.min(chosen, Math.max(0, alternatives.length - 1))}
+      onChoose={(i) => {
+        sim.stop();
+        setChosen(i);
+      }}
+      navigating={sim.active}
+      onStart={start}
+      routesReady={routesDb !== null}
+    />
+  );
 
-  // Severity visual tokens
-  const severityTokens = {
-    normal: {
-      color: '#0284C7',
-      fillColor: '#38BDF8',
-      fillOpacity: 0.22,
-      label: 'Normal (Safe)',
-      depth: '0.45 m',
-      desc: 'All river basins within capacity. Standard direct route clear.',
-    },
-    warning: {
-      color: '#D97706',
-      fillColor: '#F59E0B',
-      fillOpacity: 0.38,
-      label: 'Warning (Yellow)',
-      depth: '1.20 m',
-      desc: 'River levels rising +0.8m. Avoidance routing active via elevated bypass.',
-    },
-    danger: {
-      color: '#DC2626',
-      fillColor: '#EF4444',
-      fillOpacity: 0.55,
-      label: 'Danger (Red)',
-      depth: '1.85 m',
-      desc: 'Severe flash breach in 5 basins. Low ground cut off. Rerouting around hazards.',
-    },
-  }[floodSeverity];
+  const peekHeader = selected && (
+    <div className="flex items-center gap-2">
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-heading text-sm font-extrabold text-slate-900">{selected.name.replace('Demo relief centre: ', '')}</p>
+        <p className="truncate text-xs text-slate-700">
+          {route ? (
+            <>
+              {(route.distanceM / 1000).toFixed(1)} km · ~{formatMin(etaMin(route, mode))} ·{' '}
+              <span className={route.crossings === 0 ? 'font-bold text-emerald-700' : 'font-bold text-red-700'}>
+                {route.crossings === 0 ? 'avoids flood' : `crosses ${route.crossings} flooded`}
+              </span>
+            </>
+          ) : routesDb ? (
+            'No stored road route'
+          ) : (
+            'Loading routes…'
+          )}
+        </p>
+      </div>
+      {sim.active ? (
+        <button type="button" onClick={cancel} className="min-h-11 shrink-0 rounded-xl bg-red-600 px-3.5 text-xs font-bold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700">
+          Stop
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={start}
+          disabled={!route || selected.status === 'FULL' || selected.status === 'CLOSED'}
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[#1677FF] px-3.5 text-xs font-bold text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2 disabled:opacity-50"
+        >
+          <Navigation className="h-4 w-4" aria-hidden="true" /> Start
+        </button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="relative w-full h-[calc(100dvh-8rem)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-slate-100">
-      {/* Floating In-Page Action Switcher Dock */}
-      <InPageActionDock />
-
-      {/* Mobile Top View Switcher */}
-      <div className="md:hidden flex items-center bg-white border-b border-slate-200 p-2 gap-2 z-20 shrink-0">
-        <button
-          onClick={() => setMobileTab('map')}
-          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-            mobileTab === 'map'
-              ? 'bg-[#1677FF] text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <Compass className="w-3.5 h-3.5" />
-          <span>Interactive Map</span>
-        </button>
-        <button
-          onClick={() => setMobileTab('shelters')}
-          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-            mobileTab === 'shelters'
-              ? 'bg-[#1677FF] text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <Shield className="w-3.5 h-3.5" />
-          <span>Relief Centers & Simulator ({filteredShelters.length})</span>
-        </button>
-      </div>
-
-      {/* Real OpenStreetMap Leaflet Canvas (Clean HD Tiles - Zero Watermarks - Zero Floating Overlays) */}
-      <div className={`relative flex-1 h-full min-h-[350px] ${mobileTab === 'shelters' ? 'hidden md:block' : 'block'}`}>
-        <MapContainer
-          center={[3.1050, 101.6200]}
-          zoom={12}
-          scrollWheelZoom={true}
-          className="w-full h-full z-0"
-        >
+    <div className="relative flex h-[calc(100dvh-8rem)] w-full flex-col overflow-hidden bg-slate-100 md:h-[calc(100vh-64px)] md:flex-row">
+      <div className="relative min-h-[350px] flex-1">
+        <InPageActionDock />
+        <MapContainer center={KL_CENTER} zoom={12} scrollWheelZoom preferCanvas className="z-0 h-full w-full">
           <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
-
-          {/* Live Vision CCTV Hazard Zones (<Circle> per WARNING/DANGER camera & ?focus= auto-fly) */}
           <VisionHazardLayer />
+          <FloodProneLayer scenario={scenario} />
+          <FitRoute line={route?.line ?? null} bottomPad={desktop ? 0 : sheetH} enabled={!sim.active} />
+          <FollowCar pos={car} active={sim.active} />
 
-          {/* Camera follower during GPS turn-by-turn simulation */}
-          <NavigationMapController isNavigating={isNavigating} gpsPos={currentGpsPosition} />
-
-          {/* 5 Distinct Historical & Flood-Prone Basins across Klang Valley */}
-          {FLOOD_BASINS.map((basin) => (
-            <Polygon
-              key={basin.id}
-              positions={basin[floodSeverity]}
-              pathOptions={{
-                color: severityTokens.color,
-                fillColor: severityTokens.fillColor,
-                fillOpacity: Math.min(0.14, severityTokens.fillOpacity),
-                weight: 1.5,
-                dashArray: '6 6', // dashed = demo scenario layer; camera zones are solid
-              }}
-            >
-              <Popup>
-                <div className="text-xs p-1">
-                  <b className="block" style={{ color: severityTokens.color }}>
-                    {basin.name}
-                  </b>
-                  <span className="font-semibold text-slate-700 block mt-0.5">
-                    Scenario surge: {severityTokens.depth} ({severityTokens.label})
-                  </span>
-                  <span className="text-xs text-slate-600 font-semibold block mt-1">
-                    Demo basin, simulated. Not from a hydrodynamic model.
-                  </span>
-                </div>
-              </Popup>
-            </Polygon>
-          ))}
-
-          {/* Approximate route. White casing first, so the line reads over tiles and coloured zones. */}
-          <Polyline positions={activeRoute} pathOptions={{ color: '#FFFFFF', weight: isNavigating ? 10 : 9, opacity: 0.85 }} />
-          <Polyline
-            positions={activeRoute}
-            pathOptions={{
-              color: isNavigating ? '#1677FF' : '#0284C7',
-              weight: isNavigating ? 6 : 5,
-              opacity: 0.9,
-              dashArray: isNavigating ? undefined : '8, 8',
-            }}
-          />
-
-          {/* Active Roadblocks Inundating Arteries (Shown when Warning or Danger) */}
-          {floodSeverity !== 'normal' && (
+          {/* Other routes first (dashed, tap to choose), then the chosen one on top with a white casing */}
+          {alternatives.map((r, i) =>
+            i === chosen ? null : (
+              <Polyline
+                key={`alt-${r.index}`}
+                positions={r.line}
+                pathOptions={{ color: '#64748B', weight: 5, opacity: 0.8, dashArray: '8 8' }}
+                eventHandlers={{ click: () => !sim.active && setChosen(i) }}
+              />
+            ),
+          )}
+          {route && (
             <>
-              {/* Roadblock 1: Batu Tiga Underpass */}
-              <Marker position={[3.0760, 101.5640]} icon={roadblockIcon('Batu Tiga Underpass')}>
-                <Popup>
-                  <div className="text-xs p-1">
-                    <b className="text-red-700 block">Demo roadblock: Batu Tiga Underpass</b>
-                    <span>Simulated scenario marker. Not a real report or closure.</span>
-                  </div>
-                </Popup>
-              </Marker>
-
-              {/* Roadblock 2: Jalan Raja Muda Musa */}
-              <Marker position={[3.1635, 101.7040]} icon={roadblockIcon('Jalan Raja Muda')}>
-                <Popup>
-                  <div className="text-xs p-1">
-                    <b className="text-red-700 block">Demo roadblock: Jalan Raja Muda Musa</b>
-                    <span>Simulated scenario marker. Not a real report or closure.</span>
-                  </div>
-                </Popup>
-              </Marker>
-
-              {/* Roadblock 3: Sri Muda Seksyen 25 Ingress */}
-              <Marker position={[3.0370, 101.5330]} icon={roadblockIcon('Sri Muda Ingress')}>
-                <Popup>
-                  <div className="text-xs p-1">
-                    <b className="text-red-700 block">Demo roadblock: Jalan Khidmat 25</b>
-                    <span>Simulated scenario marker. Not a real report or closure.</span>
-                  </div>
-                </Popup>
-              </Marker>
+              <Polyline positions={route.line} pathOptions={{ color: '#FFFFFF', weight: 10, opacity: 0.9 }} />
+              <Polyline positions={route.line} pathOptions={{ color: '#1677FF', weight: 6, opacity: 0.95 }} />
             </>
           )}
 
-          {/* User Starting Live Marker / GPS Navigation Marker */}
-          {isNavigating ? (
-            <Marker position={currentGpsPosition} icon={gpsNavIcon}>
-              <Popup>
-                <div className="text-xs p-1 font-semibold">
-                  <span className="text-blue-600 font-bold block">🚗 Turn-by-Turn GPS Active</span>
-                  <span>Progress: {Math.round(navProgress * 100)}% ({navElapsedSec}s / 6s)</span>
-                </div>
-              </Popup>
-            </Marker>
+          {car ? (
+            <Marker position={car} icon={gpsNavIcon} />
           ) : (
-            <Marker position={activeRoute[0]} icon={userIcon}>
+            <Marker position={[origin.lat, origin.lon]} icon={userIcon}>
               <Popup>
-                <div className="text-xs p-1 font-semibold">
-                  <span>📍 Your Residence (Kampung Baru)</span>
-                </div>
+                <span className="text-xs font-semibold">Your position (demo): {origin.label}</span>
               </Popup>
             </Marker>
           )}
 
-          {/* Evacuation Shelter Markers (Max 6 Shelters) */}
           {shelters.map((s) => (
             <Marker
               key={s.id}
               position={[s.lat, s.lon]}
-              icon={createShelterIcon(s.id === selectedShelter?.id, s.status)}
-              eventHandlers={{
-                click: () => setSelectedShelterId(s.id),
-              }}
+              icon={createShelterIcon(s.id === selected?.id, s.status)}
+              eventHandlers={{ click: () => !sim.active && setSelectedId(s.id) }}
             >
               <Popup>
-                <div className="text-xs p-1">
+                <div className="p-1 text-xs">
                   <b className="block text-slate-900">{s.name}</b>
-                  <div className="flex items-center gap-1.5 mt-0.5 mb-1">
-                    <span
-                      className={`px-1.5 py-0.2 rounded text-xs font-extrabold ${
-                        s.status === 'CLOSED'
-                          ? 'bg-red-100 text-red-800'
-                          : s.status === 'FULL'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-emerald-100 text-emerald-800'
-                      }`}
-                    >
-                      {s.status}
-                    </span>
-                    <span className="text-slate-600 font-bold">
-                      {formatCapacity(s.currentCapacity, s.maxCapacity)} ({formatPct(s.currentCapacity, s.maxCapacity)})
-                    </span>
-                  </div>
-                  <span className="text-slate-500 block text-xs">{s.address}</span>
-                  {s.status !== 'OPEN' && (
-                    <span className="text-red-600 font-bold block mt-1 text-xs">
-                      ⚠️ Capacity Limit Reached · Seek alternate shelter
-                    </span>
-                  )}
+                  <span className="block font-semibold text-slate-700">
+                    {s.status} · {formatCapacity(s.currentCapacity, s.maxCapacity)}
+                  </span>
+                  <span className="block text-slate-600">{s.address}</span>
+                  <span className="mt-1 block font-semibold text-slate-600">Demo relief centre, not an official register.</span>
                 </div>
               </Popup>
             </Marker>
           ))}
         </MapContainer>
 
-        {/* GPS NAVIGATION TURN-BY-TURN HUD (Top-Center when active) */}
-        {isNavigating && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 w-[92%] max-w-md bg-slate-950/95 backdrop-blur-xl border-2 border-[#1677FF] text-white p-3.5 rounded-2xl shadow-2xl animate-fade-in">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#1677FF]"></span>
-                </span>
-                <span className="text-xs font-black uppercase tracking-wider text-blue-400 font-heading">
-                  GPS Turn-by-Turn Navigator
-                </span>
-              </div>
-              <span className="font-mono text-xs font-bold text-slate-300">
-                {navElapsedSec}s / 6.0s
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between text-xs mb-2">
-              <div className="flex items-center gap-1.5">
-                <Navigation className="w-4 h-4 text-[#1677FF] shrink-0" />
-                <span className="font-bold truncate max-w-[200px]">
-                  {navProgress < 0.4
-                    ? 'Kerinchi Link → Federal Viaduct'
-                    : navProgress < 0.8
-                    ? 'KESAS Elevated Bypass (Avoiding Flooded Batu Tiga)'
-                    : 'Arrival: SK Seksyen 24 Shah Alam'}
-                </span>
-              </div>
-              <span className="font-extrabold text-emerald-400 text-sm">
-                {Math.max(0, 1.2 * (1 - navProgress)).toFixed(1)} km
-              </span>
-            </div>
-
-            {/* Navigation Progress Bar */}
-            <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-2">
-              <div
-                className="h-full bg-gradient-to-r from-blue-500 via-sky-400 to-emerald-400 transition-all duration-75 ease-linear rounded-full"
-                style={{ width: `${Math.round(navProgress * 100)}%` }}
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-slate-400">
-              <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> Approximate detour, not road-aware
-              </span>
-              <button
-                onClick={handleResetNavigation}
-                className="text-xs text-red-400 hover:text-red-300 font-bold underline cursor-pointer"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
+        {sim.active && step && route && (
+          <NavigationHud
+            instruction={nextText}
+            toNextM={step.toNextM}
+            remainingM={Math.max(0, route.distanceM - travelled)}
+            remainingMin={Math.max(0, etaMin(route, mode) * (1 - sim.progress))}
+            progress={sim.progress}
+            speedup={speedup}
+            onCancel={cancel}
+          />
         )}
 
-        {/* ARRIVAL CONFIRMATION DIALOG */}
-        {hasArrived && (
-          <div className="absolute inset-0 z-30 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/80 rounded-3xl p-6 text-white shadow-2xl text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center mx-auto text-emerald-400">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-
-              <div>
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-1">
-                  GPS Route Complete (6s Simulation)
-                </span>
-                <h3 className="font-heading font-extrabold text-xl text-white">
-                  Safely Arrived at {selectedShelter?.name || 'Shelter'}
-                </h3>
-                <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                  Geofence check-in successful. Your designated emergency contacts have been automatically notified via <b>Telegram Bot (@{TELEGRAM_CONFIG.BOT_USERNAME})</b> with your arrival confirmation.
-                </p>
-              </div>
-
-              <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700 text-left text-xs space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Arrival Date & Time:</span>
-                  <span className="font-bold text-white">
-                    {arrivalTimestamp ? `${arrivalTimestamp.date} · ${arrivalTimestamp.time}` : 'Just now'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-emerald-400">
-                  <span className="text-slate-400">Telegram Notification:</span>
-                  <a
-                    href={TELEGRAM_CONFIG.BOT_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-bold flex items-center gap-1 underline underline-offset-2 hover:text-emerald-300"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Dispatched (@{TELEGRAM_CONFIG.BOT_USERNAME})</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Family Safety Status:</span>
-                  <span className="font-bold text-emerald-400 flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5" /> ARRIVED SAFE
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Shelter Capacity:</span>
-                  <span className="font-bold text-white">
-                    {formatCapacity(selectedShelter?.currentCapacity, selectedShelter?.maxCapacity)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={handleResetNavigation}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors cursor-pointer"
-                >
-                  Return to Map
-                </button>
-                <button
-                  onClick={() => navigate('/reports')}
-                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/25 cursor-pointer"
-                >
-                  <span>Live Flood Reports</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
+        {arrival && selected && (
+          <ArrivalDialog
+            shelterName={selected.name.replace('Demo relief centre: ', '')}
+            capacity={formatCapacity(selected.currentCapacity, selected.maxCapacity)}
+            when={arrival.when}
+            telegram={arrival.telegram}
+            onClose={() => setArrival(null)}
+            onReports={() => navigate('/reports')}
+          />
         )}
 
-        {/* Legend: every layer names its source, and it is reachable on phones too */}
-        <MapLegend basinColor={severityTokens.color} basinLabel={severityTokens.label} />
+        {(desktop || snap !== 'full') && <MapLegend floodColor={SCENARIO_COLOR[scenario]} bottomOffset={desktop ? 0 : sheetH} />}
 
-        {/* Mobile floating quick drawer trigger */}
-        <div className="absolute bottom-4 left-3 right-3 z-10 md:hidden flex items-center justify-between p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xl text-slate-800">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-              <Shield className="w-4 h-4 text-[#1677FF]" />
-            </div>
-            <div className="min-w-0">
-              <div className="font-heading font-extrabold text-xs text-slate-900 truncate">
-                {selectedShelter?.name || 'Selected Shelter'}
-              </div>
-              <div className="text-xs text-slate-500 flex items-center gap-2">
-                <span>{formatKm(selectedShelter?.distanceKm)} away</span>
-                <span>·</span>
-                <span className="text-emerald-600 font-bold">{selectedShelter?.status ?? 'OPEN'}</span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => setMobileTab('shelters')}
-            className="px-3 py-1.5 rounded-xl bg-[#1677FF] text-white text-xs font-bold shrink-0 shadow-sm cursor-pointer"
-          >
-            All Shelters & Sim ↗
-          </button>
-        </div>
+        {/* Phones: three-height bottom sheet over the map. Desktop uses the side panel below. */}
+        {!desktop && (
+          <BottomSheet snap={snap} onSnapChange={setSnap} header={peekHeader} onHeight={setSheetH}>
+            {panel}
+          </BottomSheet>
+        )}
       </div>
 
-      {/* SHELTER & SIMULATOR UNIFIED RIGHT SIDEBAR DRAWER */}
-      <div className={`w-full md:w-[410px] lg:w-[450px] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col z-20 shadow-2xl shrink-0 h-full overflow-hidden ${mobileTab === 'map' ? 'hidden md:flex' : 'flex'}`}>
-        {/* SECTION 1: FLOOD HAZARD SIMULATOR — light white/blue card matching sidebar */}
-        <div className="p-4 bg-white border-b border-slate-200 space-y-3 shrink-0">
-          {/* Header row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center shadow-sm">
-                <Waves className="w-4 h-4 text-[#1677FF]" />
-              </div>
-              <div>
-                <h3 className="font-heading font-extrabold text-xs tracking-wider uppercase text-slate-800">
-                  Flood Hazard Simulator
-                </h3>
-                <span className="text-xs text-slate-500">5 Klang Valley Basins · Live Detour</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#1677FF] border border-blue-200 text-xs font-semibold">
-              <Shield className="w-3 h-3" />
-              <span>Predictive Engine</span>
-            </div>
-          </div>
-
-          {/* 3 Severity Switcher Buttons — light segmented control */}
-          <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs font-bold">
-            <button
-              onClick={() => setFloodSeverity('normal')}
-              className={`py-2 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
-                floodSeverity === 'normal'
-                  ? 'bg-[#1677FF] text-white shadow-md'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-white'
-              }`}
-            >
-              <span>Normal</span>
-              <span className="text-xs opacity-80">Safe (0.45m)</span>
-            </button>
-            <button
-              onClick={() => setFloodSeverity('warning')}
-              className={`py-2 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
-                floodSeverity === 'warning'
-                  ? 'bg-amber-500 text-white shadow-md font-extrabold'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-white'
-              }`}
-            >
-              <span>Warning</span>
-              <span className="text-xs opacity-80">+0.8m Rise</span>
-            </button>
-            <button
-              onClick={() => setFloodSeverity('danger')}
-              className={`py-2 px-2 rounded-lg transition-all flex flex-col items-center gap-0.5 cursor-pointer ${
-                floodSeverity === 'danger'
-                  ? 'bg-red-500 text-white shadow-md font-extrabold'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-white'
-              }`}
-            >
-              <span>Danger</span>
-              <span className="text-xs opacity-80">Peak (1.85m)</span>
-            </button>
-          </div>
-
-          {/* Dynamic Avoidance Status Banner — light version */}
-          <div className={`p-2.5 rounded-xl text-xs flex items-center justify-between border ${
-            floodSeverity === 'normal'
-              ? 'bg-blue-50 border-blue-200'
-              : floodSeverity === 'warning'
-              ? 'bg-amber-50 border-amber-200'
-              : 'bg-red-50 border-red-200'
-          }`}>
-            <div className="flex items-center gap-1.5 text-slate-700">
-              <Route className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
-              <span>
-                {floodSeverity === 'normal'
-                  ? 'Approximate direct route (demo waypoints, not road-aware)'
-                  : 'Approximate detour around the flood zones shown (not road-aware)'}
-              </span>
-            </div>
-            {floodSeverity !== 'normal' && (
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ml-2 shrink-0 ${
-                floodSeverity === 'warning'
-                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                  : 'bg-red-100 text-red-800 border border-red-300'
-              }`}>
-                {visionHazards.length} sample-camera {visionHazards.length === 1 ? 'zone' : 'zones'}
-              </span>
-            )}
-          </div>
-          {routeCalculation.visionAvoided.length > 0 && (
-            <p className="mt-2 flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-800">
-              <Route className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-              Approximate: the route is bent around {routeCalculation.visionAvoided.length} sample-camera flood zone{routeCalculation.visionAvoided.length > 1 ? 's' : ''}. Not road-aware.
-            </p>
-          )}
-        </div>
-
-        {/* SECTION 2: TRANSPORT MODE SWITCHER */}
-        <div className="p-4 pb-2 border-b border-slate-100 bg-white shrink-0">
-          <div className="flex items-center justify-between mb-2.5">
-            <div>
-              <h2 className="font-heading font-extrabold text-base text-slate-900">
-                Evacuation Relief Centers
-              </h2>
-              <span className="text-xs text-slate-500">{shelters.length} safe {shelters.length === 1 ? 'haven' : 'havens'} registered (demo list)</span>
-            </div>
-            <span className="text-xs font-extrabold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">
-              {filteredShelters.length} / {shelters.length} shown
-            </span>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl mb-2.5">
-            {(['all', 'open', 'recommended'] as const).map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setFilter(mode)}
-                className={`flex-1 py-1 text-xs font-bold rounded-lg capitalize transition-colors cursor-pointer ${
-                  filter === mode
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {mode === 'all' ? `All (${shelters.length})` : mode === 'open' ? 'Open Only' : 'Recommended'}
-              </button>
-            ))}
-          </div>
-
-          {/* Transport Mode Switcher */}
-          <div className="flex items-center justify-between bg-white p-1 rounded-xl border border-slate-200 text-xs">
-            <button
-              onClick={() => setTransportMode('car')}
-              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors cursor-pointer ${
-                transportMode === 'car' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <Car className="w-3.5 h-3.5" />
-              <span>Drive</span>
-            </button>
-            <button
-              onClick={() => setTransportMode('bike')}
-              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors cursor-pointer ${
-                transportMode === 'bike' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <Bike className="w-3.5 h-3.5" />
-              <span>Motorcycle</span>
-            </button>
-            <button
-              onClick={() => setTransportMode('walk')}
-              className={`flex-1 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-colors cursor-pointer ${
-                transportMode === 'walk' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <Footprints className="w-3.5 h-3.5" />
-              <span>Walk</span>
-            </button>
-          </div>
-        </div>
-
-        {/* SECTION 3: SHELTER CARDS LIST */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 overscroll-contain pb-28 md:pb-6">
-          {filteredShelters.map((s) => {
-            const isSelected = s.id === selectedShelter?.id;
-            const capPct = percentOf(s.currentCapacity, s.maxCapacity);
-            const isFull = s.status === 'FULL';
-            const isClosed = s.status === 'CLOSED';
-            const isBlocked = s.routeStatus === 'BLOCKED';
-
-            return (
-              <div
-                key={s.id}
-                onClick={() => setSelectedShelterId(s.id)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                  isSelected
-                    ? isClosed
-                      ? 'border-red-400 bg-red-50/40 ring-1 ring-red-300'
-                      : isFull
-                      ? 'border-amber-400 bg-amber-50/40 ring-1 ring-amber-300'
-                      : 'border-[#1677FF] bg-blue-50/40 shadow-sm ring-1 ring-[#1677FF]/30'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      {s.category}
-                    </span>
-                    <h3 className="font-heading font-bold text-sm text-slate-900">{s.name}</h3>
-                  </div>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-extrabold flex items-center gap-1 shrink-0 ${
-                      isClosed
-                        ? 'bg-red-100 text-red-800'
-                        : isFull
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-emerald-100 text-emerald-800'
-                    }`}
-                  >
-                    {isClosed ? (
-                      <>
-                        <AlertOctagon className="w-3 h-3" />
-                        <span>CLOSED</span>
-                      </>
-                    ) : isFull ? (
-                      <>
-                        <AlertTriangle className="w-3 h-3" />
-                        <span>CAPACITY FULL</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>{s.status}</span>
-                      </>
-                    )}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2.5 my-2 text-xs text-slate-600">
-                  <span className="font-bold text-slate-800">{formatKm(s.distanceKm)}</span>
-                  <span>·</span>
-                  <span className="font-semibold text-[#1677FF]">
-                    ~{etaFor(s.distanceKm)} ({transportMode})
-                  </span>
-                  <span>·</span>
-                  <span
-                    className={`font-semibold ${
-                      isBlocked ? 'text-red-600' : s.routeStatus === 'ADVISORY' ? 'text-amber-600' : 'text-emerald-600'
-                    }`}
-                  >
-                    {s.routeStatus}
-                  </span>
-                </div>
-
-                {/* Capacity Bar */}
-                <div className="space-y-1 mt-2">
-                  <div className="flex justify-between text-xs text-slate-500 font-medium">
-                    <span>Capacity ({capPct === null ? '–' : `${capPct}%`})</span>
-                    <span className={`font-bold ${(capPct ?? 0) >= 100 ? 'text-red-600' : 'text-slate-700'}`}>
-                      {formatCapacity(s.currentCapacity, s.maxCapacity)}
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        (capPct ?? 0) >= 100
-                          ? 'bg-red-600'
-                          : (capPct ?? 0) > 80
-                          ? 'bg-amber-500'
-                          : 'bg-emerald-500'
-                      }`}
-                      style={{ width: `${capPct ?? 0}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Special Closed / Full Capacity Advisory Alert */}
-                {isClosed && (
-                  <div className="mt-2.5 p-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-1.5">
-                    <AlertOctagon className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold block">Access Route Inundated</span>
-                      <span>This shelter is closed. Please redirect to SK Seksyen 24 (1.2 km).</span>
-                    </div>
-                  </div>
-                )}
-
-                {isFull && (
-                  <div className="mt-2.5 p-2 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold block">100% Maximum Capacity Reached</span>
-                      <span>No more beds available. Redirecting new evacuees to secondary hall.</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Selected Action Buttons */}
-                {isSelected && (
-                  <div className="mt-4 pt-3 border-t border-slate-200/70 flex items-center gap-2">
-                    {isClosed || isFull ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedShelterId('shelter-01');
-                        }}
-                        className="flex-1 py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
-                      >
-                        <Compass className="w-3.5 h-3.5" />
-                        <span>Reroute to Open Shelter</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStartNavigation(s);
-                        }}
-                        disabled={isNavigating}
-                        className="flex-1 py-2.5 px-3 rounded-xl bg-[#1677FF] hover:bg-[#0958D9] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 disabled:opacity-50 cursor-pointer"
-                      >
-                        <Navigation className="w-3.5 h-3.5" />
-                        <span>{isNavigating ? 'Navigating...' : 'Start Turn-by-Turn'}</span>
-                      </button>
-                    )}
-                    <a
-                      href={`tel:${s.contact}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700"
-                      title="Call Shelter Warden"
-                    >
-                      <Phone className="w-4 h-4" />
-                    </a>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {desktop && (
+        <aside aria-label="Route planner" className="z-20 h-full w-[410px] shrink-0 overflow-y-auto border-l border-slate-200 bg-white shadow-2xl lg:w-[450px]">
+          {panel}
+        </aside>
+      )}
     </div>
   );
 }

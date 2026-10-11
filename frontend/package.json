@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "check": "tsc -b && npm run test && npm run build",
-    "layout-check": "node scripts/layout-check.mjs"
+    "layout-check": "node scripts/layout-check.mjs",
+    "map-fps": "node scripts/map-fps.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

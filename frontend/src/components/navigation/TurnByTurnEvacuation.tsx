@@ -18,9 +18,9 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
   const [hasArrived, setHasArrived] = useState(false);
 
   const shelter = shelters.find((s) => s.id === shelterId) || shelters[0] || {
-    name: 'SK Seksyen 24 Shah Alam',
-    address: 'Jalan Seksyen 24/2, Shah Alam',
-    contact: '+603-5541 2345'
+    name: 'Dewan Serbaguna Kampung Baru',
+    address: 'Kampung Baru, Kuala Lumpur (demo location)',
+    contact: 'Not available (demo)'
   };
 
   useEffect(() => {

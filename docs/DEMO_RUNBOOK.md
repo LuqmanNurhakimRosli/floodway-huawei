@@ -18,8 +18,9 @@ Say this plainly. A judge who asks "is that real?" must get a straight answer.
 | **Simulated** | The five sample cameras and their pictures | AI-generated base photos with a **drawn water overlay**. They move on a timer. They are labelled SAMPLE. They are not real footage and not from any agency. |
 | **Simulated** | River level, rainfall, sensor counts | Demo scenario numbers (`frontend/src/config/demoScenario.ts`). The header says "simulated". |
 | **Simulated** | The forecast | A hand-written formula on a simulated starting level. **Not a trained model, not validated.** The page says so permanently. |
-| **Simulated** | Shelters, flood basins, roadblocks, citizen reports | Demo data. The two starter reports and their photos are examples, not incidents at the places named. |
-| **Approximate** | Evacuation route | On the Map, fixed demo waypoints; on Home, a straight line. Both are bent around camera flood zones. Not road-aware. The UI says "approximate". |
+| **Simulated** | Shelters, flood-prone areas, citizen reports | Demo data (the 16 flood-prone areas are hand-placed around known low spots, not a DBKL/JPS map; the 8 relief centres are not an official register). The two starter reports and their photos are examples, not incidents at the places named. |
+| **Real data, simulated drive** | Evacuation route (Map) | Road geometry and turn steps come from OpenStreetMap through the public OSRM server, computed in advance and stored. The route chosen avoids the flood areas it can; the car on screen is a sped-up simulation, not a tracked position. No live traffic. |
+| **Approximate** | Evacuation route (Home) | A straight line bent around camera flood zones. Not road-aware. The UI says "approximate". |
 | **Not built / not claimed** | Any public JPS or DBKL camera feed | No confirmed public API. Never say the cameras are government feeds. |
 | **Not built / not claimed** | Verification by an agency, certification, a Huawei Cloud call | Nothing verifies reports. No Huawei Cloud service is called by this demo. It is designed for Huawei Cloud. |
 | **Not built / not claimed** | Real IoT sensors in the demo | The code can read a USB sensor, but the demo shows simulated values. |
@@ -59,7 +60,7 @@ Open the app. The demo user is signed in already; "Explore Demo as Citizen" on t
    browser notification and the alert entry appear on their own. (90 s)
 4. **Demo loop** (Klang camera). Press "Demo loop" to show the 15 s rise. Say the loop is a labelled sample, not tied to the readings. (20 s)
 5. **Show evacuation routes.** The map opens focused on that camera. Point at the flood zone, the approximate route, and read
-   the legend: every layer says where its data comes from. Say "approximate, not road-aware". (60 s)
+   the legend (collapsed, tap to open). Pick a start point, switch the scenario to Danger, show that Route A crosses the fewest flooded areas, press Start turn-by-turn and say the drive is simulated. (60 s)
 6. **Reports.** The demo-data note is at the top. Say reports are unverified unless marked, and that no agency uses the demo review desk. (30 s)
 7. **Close** with the table in section 1: real, simulated, not built. (15 s)
 
@@ -99,7 +100,7 @@ notifications allowed for the site; a screen recording of the full five-minute p
 4. **IoT ingest** (`/api/v1/telemetry/ingest`) accepts readings without a signature when none is sent, and the default device
    secrets are in `backend/app/config.py`. Not changed here. Do not expose it publicly.
 5. **Report photos** are example photographs that do not show the places named. Replace them before any public showing.
-6. **Route logic is approximate** and the demo shelters are a fixed list.
+6. **Routes are stored, not live.** Only the 7 start points and 8 relief centres have road routes; there is no traffic. Alternatives come from OSRM and some pairs have only one.
 
 ## 7. Before any public deployment
 
