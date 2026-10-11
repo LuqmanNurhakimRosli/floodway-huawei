@@ -100,7 +100,7 @@ never restarted; that backend used `VISION_SAMPLE_CLOCK_OFFSET_S` to reach state
 | long-name | 70+ character name truncates with a title tooltip |
 | map-route-avoids-zone | route bends around a WARNING camera zone; panel says so |
 
-Wizard (`wizard-*` in the session scratch, summarised): focus trapped (25 Tabs stayed inside), validation error,
+Wizard (`wizard-<W>x<H>-<step>.png`): focus trapped (25 Tabs stayed inside), validation error,
 SSRF rejection ("This URL can't be used: that address is on a private or reserved network."), real preview frame,
 lines moved by keyboard, pills never overlap, test result, Escape closes. Checked at 1366x768 and 390x844.
 
