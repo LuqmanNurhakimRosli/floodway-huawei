@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import asyncio
 
-from fastapi import APIRouter, HTTPException, Query, Request, Response, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, WebSocket, WebSocketDisconnect
+
+from app.security import require_write_token
 
 from .engine import VisionEngine
 from .schemas import AlertEvent, CameraCreate, CameraPublic, Reading, SourceDraft
@@ -51,31 +53,31 @@ def list_cameras(request: Request):
     return _engine(request).list_public()
 
 
-@router.post("/cameras", response_model=CameraPublic, status_code=201)
+@router.post("/cameras", response_model=CameraPublic, status_code=201, dependencies=[Depends(require_write_token)])
 def create_camera(draft: CameraCreate, request: Request):
     return _guard(lambda: _engine(request).add_camera(draft))
 
 
-@router.post("/cameras/preview")
+@router.post("/cameras/preview", dependencies=[Depends(require_write_token)])
 async def preview_frame(draft: SourceDraft, request: Request):
     engine = _engine(request)
     jpeg = await asyncio.to_thread(_guard, lambda: engine.preview_draft(draft))
     return Response(jpeg, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
 
 
-@router.post("/cameras/test", response_model=Reading)
+@router.post("/cameras/test", response_model=Reading, dependencies=[Depends(require_write_token)])
 async def test_camera(draft: CameraCreate, request: Request):
     engine = _engine(request)
     return await asyncio.to_thread(_guard, lambda: engine.test_draft(draft))
 
 
-@router.delete("/cameras/{camera_id}", status_code=204)
+@router.delete("/cameras/{camera_id}", status_code=204, dependencies=[Depends(require_write_token)])
 def delete_camera(camera_id: str, request: Request):
     _guard(lambda: _engine(request).remove_camera(camera_id))
     return Response(status_code=204)
 
 
-@router.post("/cameras/{camera_id}/analyze", response_model=Reading)
+@router.post("/cameras/{camera_id}/analyze", response_model=Reading, dependencies=[Depends(require_write_token)])
 async def analyze_now(camera_id: str, request: Request):
     engine = _engine(request)
     _guard(lambda: engine.get(camera_id))

@@ -5,6 +5,7 @@
 // (no key on the server, server unreachable, quota, bad output) the result says `ran: false`. There is no fallback
 // that invents a result.
 import { API_BASE } from './vision/config';
+import { authHeaders } from './auth';
 import { AiVerificationResult } from '../types';
 
 export interface VisionAnalysisParams {
@@ -53,7 +54,7 @@ export async function analyzeFloodImage(params: VisionAnalysisParams): Promise<A
     const dataUrl = await toDataUrl(params.imageUrl);
     const res = await fetch(`${API_BASE}/api/v1/ai/flood-image-check`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({
         image_data_url: dataUrl,
         description: (params.userDescription ?? '').slice(0, 300),
@@ -62,7 +63,7 @@ export async function analyzeFloodImage(params: VisionAnalysisParams): Promise<A
       signal: AbortSignal.timeout(45000),
     });
     if (res.status === 429) return NOT_RUN('Too many AI checks in a short time. Try again in a minute.', params.reportedDepthCm);
-    if (res.status === 401) return NOT_RUN('The AI check is protected on this server.', params.reportedDepthCm);
+    if (res.status === 401) return NOT_RUN('The AI check is protected on this server. Enter the operator token under Profile.', params.reportedDepthCm);
     if (!res.ok) return NOT_RUN(`The AI check could not be completed (server answered ${res.status}).`, params.reportedDepthCm);
     const r = (await res.json()) as BackendResult;
     if (!r.available) return NOT_RUN(r.notes, params.reportedDepthCm);

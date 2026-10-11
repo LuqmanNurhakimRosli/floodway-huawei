@@ -1,4 +1,5 @@
 import type { AlertEvent, Camera, CameraDraft, Reading } from '../../types/vision';
+import { authHeaders, NEEDS_TOKEN_MESSAGE } from '../auth';
 import { VISION_API } from './config';
 
 export class ApiError extends Error {
@@ -13,7 +14,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${VISION_API}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    headers: { 'Content-Type': 'application/json', ...authHeaders(), ...(init?.headers ?? {}) },
   });
   if (!res.ok) {
     let detail = res.statusText;
@@ -23,7 +24,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       /* keep statusText */
     }
-    throw new ApiError(res.status, detail);
+    throw new ApiError(res.status, res.status === 401 ? NEEDS_TOKEN_MESSAGE : detail);
   }
   return res.status === 204 ? (undefined as T) : ((await res.json()) as T);
 }
@@ -40,7 +41,7 @@ export const testCamera = (draft: CameraDraft) => request<Reading>('/cameras/tes
 export async function previewFrame(draft: Pick<CameraDraft, 'source_type' | 'source_url' | 'username' | 'password'>): Promise<string> {
   const res = await fetch(`${VISION_API}/cameras/preview`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(draft),
   });
   if (!res.ok) {
@@ -50,7 +51,7 @@ export async function previewFrame(draft: Pick<CameraDraft, 'source_type' | 'sou
     } catch {
       /* keep statusText */
     }
-    throw new ApiError(res.status, String(detail));
+    throw new ApiError(res.status, res.status === 401 ? NEEDS_TOKEN_MESSAGE : String(detail));
   }
   return URL.createObjectURL(await res.blob());
 }

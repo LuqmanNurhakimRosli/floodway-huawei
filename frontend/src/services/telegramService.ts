@@ -1,6 +1,7 @@
 // Telegram alerts. The browser NEVER holds a bot token: every message goes to the FloodWay backend
 // (POST /api/v1/alerts/telegram), which sends it with a server-side token. Do not add VITE_ secrets here.
 import { API_BASE } from './vision/config';
+import { authHeaders } from './auth';
 
 export const TELEGRAM_CONFIG = {
   BOT_USERNAME: (import.meta as any).env?.VITE_TELEGRAM_BOT_USERNAME || 'floodway_bot',
@@ -19,12 +20,12 @@ export async function sendTelegramMessage(text: string, customChatId?: string): 
   try {
     const res = await fetch(`${API_BASE}/api/v1/alerts/telegram`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(chatId ? { text, chat_id: chatId } : { text }),
       signal: AbortSignal.timeout(10000),
     });
     if (res.status === 429) return { success: false, error: 'Too many alerts in a short time. Try again in a minute.' };
-    if (res.status === 401) return { success: false, error: 'Alerts are protected on this server.' };
+    if (res.status === 401) return { success: false, error: 'Alerts are protected on this server. Enter the operator token under Profile.' };
     if (res.status === 422) return { success: false, error: 'The chat ID is not valid. Use @channelname or a numeric chat ID.' };
     if (!res.ok) return { success: false, error: `The server answered ${res.status}.` };
     const body = (await res.json()) as { sent: boolean; simulated: boolean; detail: string };

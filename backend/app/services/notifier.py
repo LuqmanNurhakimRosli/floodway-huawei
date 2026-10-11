@@ -1,3 +1,4 @@
+import html
 import httpx
 import logging
 from app.config import TELEGRAM_BOT_TOKEN, TELEGRAM_DEFAULT_CHAT_ID, HUAWEI_SMN_TOPIC_URN
@@ -35,11 +36,12 @@ class Notifier:
         """
         Formats and broadcasts official emergency SOS alert.
         """
-        name = payload.get("userName", "Citizen")
-        phone = payload.get("phone", "N/A")
+        esc = lambda v: html.escape(str(v), quote=False)  # the message is sent as HTML: never trust a field
+        name = esc(payload.get("userName", "Citizen"))
+        phone = esc(payload.get("phone", "N/A"))
         lat = payload.get("lat", 3.1610)
         lon = payload.get("lon", 101.7010)
-        shelter = payload.get("shelterName", "Nearby Relief Center")
+        shelter = esc(payload.get("shelterName", "Nearby Relief Center"))
         depth_cm = payload.get("waterDepthCm", 18)
         maps_link = f"https://maps.google.com/?q={lat:.5f},{lon:.5f}"
 
@@ -55,17 +57,18 @@ class Notifier:
         tg_sent = await self.send_telegram(msg)
         return {
             "telegram_sent": tg_sent,
-            "channel": "Telegram Bot API" if tg_sent else "Simulation Mode",
-            "status": "DELIVERED"
+            "channel": "Telegram Bot API" if tg_sent else "Not sent (Telegram not configured)",
+            "status": "DELIVERED" if tg_sent else "NOT_SENT"
         }
 
     async def broadcast_checkin(self, payload: dict) -> dict:
         """
         Formats and broadcasts shelter arrival geofence check-in.
         """
-        name = payload.get("userName", "Citizen")
-        shelter = payload.get("shelterName", "Relief Center")
-        time_str = payload.get("time", "Just now")
+        esc = lambda v: html.escape(str(v), quote=False)
+        name = esc(payload.get("userName", "Citizen"))
+        shelter = esc(payload.get("shelterName", "Relief Center"))
+        time_str = esc(payload.get("time", "Just now"))
 
         msg = (
             f"✅ <b>FAMILY SAFETY CONFIRMATION</b>\n\n"
@@ -75,6 +78,6 @@ class Notifier:
             f"<i>You can rest easy. Family loop completed via FloodWay 2.0.</i>"
         )
         tg_sent = await self.send_telegram(msg)
-        return {"telegram_sent": tg_sent, "status": "CONFIRMED"}
+        return {"telegram_sent": tg_sent, "status": "CONFIRMED" if tg_sent else "NOT_SENT"}
 
 notifier = Notifier()

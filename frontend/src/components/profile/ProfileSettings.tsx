@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { User, Phone, Users, Send, ShieldCheck, CheckCircle2, Save, Trash2, Plus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { sendTelegramMessage } from '../../services/telegramService';
+import { hasWriteToken, setWriteToken } from '../../services/auth';
 
 export function ProfileSettings() {
   const { user } = useAuth();
   const [tgChatId, setTgChatId] = useState(() => localStorage.getItem('floodway_tg_chat_id') || '');
   const [testSent, setTestSent] = useState(false);
+  const [operatorToken, setOperatorToken] = useState('');
+  const [operatorSet, setOperatorSet] = useState(hasWriteToken());
 
   const [contacts, setContacts] = useState([
     { id: 'c1', name: 'Nurul Huda (Mother)', phone: '+60 12-987 6543' },
@@ -102,6 +105,42 @@ export function ProfileSettings() {
             </span>
           )}
         </div>
+      </div>
+
+      {/* Operator access: only needed when the server sets VISION_WRITE_TOKEN */}
+      <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-xs space-y-3" aria-labelledby="operator-title">
+        <h3 id="operator-title" className="font-heading font-bold text-lg text-slate-900">Operator access</h3>
+        <p className="text-sm/5 text-slate-700">
+          Needed only if this server protects changes (adding or removing cameras, Telegram alerts, the AI photo check). The token is kept in this
+          browser tab's memory only and is cleared when you reload. It is never saved or sent anywhere except to this server.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <label className="sr-only" htmlFor="operator-token">Operator token</label>
+          <input
+            id="operator-token"
+            type="password"
+            autoComplete="off"
+            placeholder="Operator token"
+            value={operatorToken}
+            onChange={(e) => setOperatorToken(e.target.value)}
+            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:border-[#1677FF]"
+          />
+          <button
+            type="button"
+            onClick={() => { setWriteToken(operatorToken); setOperatorSet(hasWriteToken()); setOperatorToken(''); }}
+            className="min-h-11 px-4 rounded-xl bg-[#0958D9] text-white text-sm font-semibold"
+          >
+            Use token
+          </button>
+          <button
+            type="button"
+            onClick={() => { setWriteToken(''); setOperatorSet(false); setOperatorToken(''); }}
+            className="min-h-11 px-4 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-semibold"
+          >
+            Clear
+          </button>
+        </div>
+        <p role="status" className="text-sm/5 font-semibold text-slate-800">{operatorSet ? 'A token is set for this tab.' : 'No token set.'}</p>
       </div>
 
       {/* Emergency Contacts Circle */}

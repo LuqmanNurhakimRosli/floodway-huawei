@@ -192,3 +192,36 @@ def test_user_cameras_survive_a_cold_restart(settings, monkeypatch):
         assert cams[cam_id]["calibration"]["lines"] == draft["calibration"]["lines"]
         assert cams[cam_id]["provider"] == "mine"
         assert {"sample-klang-jamek", "sample-backyard-stream"} <= set(cams), "sample cameras should be seeded on a cold start"
+
+
+# ---- P5-03: write protection ----------------------------------------------------------------------------------
+
+def test_writes_are_open_in_development_but_log_a_warning(client, monkeypatch):
+    monkeypatch.delenv("VISION_WRITE_TOKEN", raising=False)
+    assert client.post("/api/v1/vision/cameras", json=_draft("https://93.184.216.34/a.jpg")).status_code == 201
+
+
+def test_writes_require_the_token_once_one_is_set(client, monkeypatch):
+    monkeypatch.setenv("VISION_WRITE_TOKEN", "operator-secret")
+    url, good = "/api/v1/vision/cameras", {"Authorization": "Bearer operator-secret"}
+    draft = _draft("https://93.184.216.34/a.jpg")
+
+    for call in (
+        lambda h: client.post(url, json=draft, headers=h),
+        lambda h: client.post(url + "/preview", json={"source_type": "snapshot", "source_url": "https://93.184.216.34/a.jpg"}, headers=h),
+        lambda h: client.post(url + "/test", json=draft, headers=h),
+        lambda h: client.post(url + "/sample-klang-jamek/analyze", headers=h),
+        lambda h: client.delete(url + "/sample-klang-jamek", headers=h),
+    ):
+        assert call({}).status_code == 401
+        assert call({"Authorization": "Bearer wrong"}).status_code == 401
+        assert call({"Authorization": "Basic operator-secret"}).status_code == 401
+        assert call(good).status_code != 401  # authorised: may still fail for other reasons (403 sample, 502 source...)
+
+
+def test_reads_and_the_socket_stay_open_when_a_token_is_set(client, monkeypatch):
+    monkeypatch.setenv("VISION_WRITE_TOKEN", "operator-secret")
+    assert client.get("/api/v1/vision/cameras").status_code == 200
+    assert client.get("/api/v1/vision/alerts").status_code == 200
+    with client.websocket_connect("/api/v1/vision/ws") as ws:
+        assert ws.receive_json()["type"] == "snapshot"
