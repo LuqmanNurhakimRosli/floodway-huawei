@@ -27,6 +27,9 @@ class VisionSettings:
     allow_user_cameras: bool = _bool("VISION_ALLOW_USER_CAMERAS", True)
     allow_private_urls: bool = _bool("VISION_ALLOW_PRIVATE_URLS", False)
     seed_samples: bool = _bool("VISION_SEED_SAMPLES", True)
+    # Testing aid: shift the sample scenes' clock by N seconds to reach a given water level on demand.
+    # Backend only, so the page itself never gains manual controls.
+    sample_clock_offset_s: float = float(os.getenv("VISION_SAMPLE_CLOCK_OFFSET_S", "0"))
     # Alerting.
     alert_cooldown_s: int = int(os.getenv("VISION_ALERT_COOLDOWN_S", "300"))
     telegram_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "")

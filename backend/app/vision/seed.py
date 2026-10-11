@@ -1,7 +1,9 @@
 """Sample cameras so the page is alive on first run. These are SYNTHETIC (self-running) scenes,
 clearly flagged as playback in the API/UI. They are placeholders, not real agency feeds.
-Replace or extend them with real sources (see docs/LIVE_VISION_IMPLEMENTATION_PLAN.md)."""
+Replace or extend them with real sources (see backend/app/vision/sources/)."""
 from __future__ import annotations
+
+import time
 
 from .engine import VisionEngine
 from .schemas import Calibration, Lines
@@ -36,9 +38,11 @@ SAMPLES = [
 
 def seed_samples(engine: VisionEngine) -> None:
     interval = engine.settings.default_interval_s
+    offset = engine.settings.sample_clock_offset_s
+    clock = (lambda: time.time() + offset) if offset else time.time
     for i, (cid, name, provider, lat, lon, lo, hi, period, phase) in enumerate(SAMPLES):
         engine.register_synthetic(cid, name, provider, lat, lon, sample_calibration(),
-                                  SyntheticRiverSource(lo, hi, period, phase, seed=i), interval)
+                                  SyntheticRiverSource(lo, hi, period, phase, seed=i, clock=clock), interval)
     # Genuinely unreachable URL (.invalid never resolves) so the offline state is real.
     engine.register_offline_placeholder("sample-backyard-stream", "Backyard Stream", 3.1700, 101.7100,
                                         sample_calibration(), "https://backyard-camera.invalid/frame.jpg", interval)

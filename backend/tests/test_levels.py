@@ -92,3 +92,24 @@ class TestTracker:
         t.update(Level.DANGER, 0.95)  # back up: counter resets
         t.update(Level.NORMAL, 0.9)
         assert t.update(Level.NORMAL, 0.9)[0] == Level.DANGER
+
+
+def test_sample_clock_offset_shifts_the_scene(monkeypatch):
+    """VISION_SAMPLE_CLOCK_OFFSET_S moves the sample scenes in time (testing aid, backend only)."""
+    from app.vision import seed
+    from app.vision.config import VisionSettings
+
+    captured = []
+
+    class FakeEngine:
+        settings = VisionSettings(sample_clock_offset_s=1000.0)
+
+        def register_synthetic(self, *args):
+            captured.append(args[6])
+
+        def register_offline_placeholder(self, *args):
+            pass
+
+    monkeypatch.setattr(seed.time, "time", lambda: 50.0)
+    seed.seed_samples(FakeEngine())
+    assert captured and all(src.clock() == 1050.0 for src in captured)
