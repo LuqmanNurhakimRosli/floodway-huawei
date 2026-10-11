@@ -511,7 +511,7 @@ export function ShelterMapView() {
   }[floodSeverity];
 
   return (
-    <div className="relative w-full h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-slate-100">
+    <div className="relative w-full h-[calc(100dvh-8rem)] md:h-[calc(100vh-64px)] flex flex-col md:flex-row overflow-hidden bg-slate-100">
       {/* Floating In-Page Action Switcher Dock */}
       <InPageActionDock />
 

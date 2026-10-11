@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "check": "tsc -b && npm run test && npm run build"
+    "check": "tsc -b && npm run test && npm run build",
+    "layout-check": "node scripts/layout-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -32,6 +33,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "playwright-core": "^1.48.2",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
     "vitest": "^5.0.3"
