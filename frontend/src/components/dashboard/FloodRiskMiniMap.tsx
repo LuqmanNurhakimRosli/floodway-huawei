@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Polyline, Polygon } from 'react-leafle
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Maximize2, Shield } from 'lucide-react';
+import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_NAME, BASEMAP_URL } from '../../config/mapConfig';
 
 const userDotIcon = new L.DivIcon({
   className: 'user-mini-icon',
@@ -57,7 +58,7 @@ export function FloodRiskMiniMap() {
           </div>
           <div>
             <h3 className="text-sm font-bold text-slate-900 leading-none">Geospatial Flood Risk Radar</h3>
-            <span className="text-[11px] text-slate-400 font-medium">OpenStreetMap live evacuation corridor</span>
+            <span className="text-[11px] text-slate-400 font-medium">{BASEMAP_NAME} basemap · demo corridor</span>
           </div>
         </div>
 
@@ -76,14 +77,11 @@ export function FloodRiskMiniMap() {
           center={[3.1050, 101.6150]}
           zoom={11}
           zoomControl={false}
-          attributionControl={false}
+          attributionControl={true}
           dragging={true}
           className="w-full h-full z-0"
         >
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-            subdomains={['a', 'b', 'c', 'd']}
-          />
+          <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
 
           <Polygon
             positions={MINI_HAZARD}

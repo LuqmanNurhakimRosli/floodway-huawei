@@ -28,6 +28,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegramService';
 import { InPageActionDock } from './InPageActionDock';
 import { VisionHazardLayer } from './VisionHazardLayer';
+import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
 import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
 import { detourAroundHazards, hazardsKey } from '../../lib/vision/hazards';
 import { Shelter } from '../../types';
@@ -551,12 +552,7 @@ export function ShelterMapView() {
           scrollWheelZoom={true}
           className="w-full h-full z-0"
         >
-          {/* OpenStreetMap Standard Clean Raster Tiles */}
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            maxZoom={19}
-          />
+          <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
 
           {/* Live Vision CCTV Hazard Zones (<Circle> per WARNING/DANGER camera & ?focus= auto-fly) */}
           <VisionHazardLayer />
