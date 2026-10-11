@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { camTag } from '../lib/vision/camTag';
 import { haversineKm, KLCC } from '../lib/vision/geo';
-import { deriveHazards } from '../lib/vision/hazards';
+import { deriveHazards, detourAroundHazards, hazardsKey } from '../lib/vision/hazards';
+import type { VisionHazard } from '../lib/vision/hazards';
+import { levelSince } from '../lib/vision/history';
+import { spreadLabels } from '../lib/vision/labels';
 import { levelRank, ratioToLevel } from '../lib/vision/levels';
 import { linesAreValid, thresholdsFromCalibration } from '../lib/vision/thresholds';
 import { moveLine } from '../components/live/onboarding/CalibrationCanvas';
@@ -114,5 +117,73 @@ describe('store message handling', () => {
     expect(store.getState().cameras.some((c) => c.id === 'c')).toBe(true);
     store.applyMessage({ type: 'camera_removed', camera_id: 'c' });
     expect(store.getState().cameras.some((c) => c.id === 'c')).toBe(false);
+  });
+});
+
+describe('routes avoid vision flood zones', () => {
+  const zone: VisionHazard = { cameraId: 'z', name: 'Z', lat: 3.15, lon: 101.70, level: 'DANGER', waterRatio: 1, radiusM: 250 };
+  const metres = (a: [number, number], b: [number, number]) => haversineKm(a[0], a[1], b[0], b[1]) * 1000;
+  // Distance from the zone centre to the closest point of a segment, sampled finely.
+  const closest = (route: [number, number][]) => {
+    let best = Infinity;
+    for (let i = 1; i < route.length; i++) {
+      for (let k = 0; k <= 50; k++) {
+        const t = k / 50;
+        const p: [number, number] = [route[i - 1][0] + (route[i][0] - route[i - 1][0]) * t, route[i - 1][1] + (route[i][1] - route[i - 1][1]) * t];
+        best = Math.min(best, metres(p, [zone.lat, zone.lon]));
+      }
+    }
+    return best;
+  };
+
+  it('bends a segment that crosses a zone so it stays outside it', () => {
+    const straight: [number, number][] = [[3.15, 101.69], [3.15, 101.71]]; // passes right through the centre
+    expect(closest(straight)).toBeLessThan(zone.radiusM);
+    const out = detourAroundHazards(straight, [zone]);
+    expect(out.avoided).toEqual(['z']);
+    expect(out.route[0]).toEqual(straight[0]);
+    expect(out.route[out.route.length - 1]).toEqual(straight[1]);
+    expect(closest(out.route)).toBeGreaterThanOrEqual(zone.radiusM);
+  });
+  it('leaves routes that already miss every zone untouched', () => {
+    const far: [number, number][] = [[3.17, 101.69], [3.17, 101.71]];
+    expect(detourAroundHazards(far, [zone])).toEqual({ route: far, avoided: [] });
+    expect(detourAroundHazards(far, [])).toEqual({ route: far, avoided: [] });
+  });
+  it('does not try to route around a zone the user is already inside', () => {
+    const fromInside: [number, number][] = [[3.15, 101.70], [3.15, 101.72]];
+    expect(detourAroundHazards(fromInside, [zone]).avoided).toEqual([]);
+  });
+  it('real map geometry: the Kampung Baru shelter route bends around the Kampung Baru Drain zone', () => {
+    const route: [number, number][] = [[3.161, 101.7005], [3.1625, 101.7015], [3.165, 101.705]]; // ShelterMapView short route
+    const drain: VisionHazard = { cameraId: 'drain', name: 'Kampung Baru Drain', lat: 3.1642, lon: 101.7031, level: 'WARNING', waterRatio: 0.55, radiusM: 120 };
+    const out = detourAroundHazards(route, [drain]);
+    expect(out.avoided).toEqual(['drain']);
+    expect(out.route.length).toBeGreaterThan(route.length);
+  });
+  it('keys hazards by identity and level, not by reading', () => {
+    expect(hazardsKey([zone])).toBe(hazardsKey([{ ...zone, waterRatio: 0.99 }]));
+    expect(hazardsKey([zone])).not.toBe(hazardsKey([{ ...zone, level: 'WARNING' }]));
+  });
+});
+
+describe('label spreading', () => {
+  it('pushes close labels apart and keeps them in bounds', () => {
+    const out = spreadLabels([0.4, 0.41, 0.42], 0.1, 0, 1);
+    expect(out[1] - out[0]).toBeGreaterThanOrEqual(0.1 - 1e-9);
+    expect(out[2] - out[1]).toBeGreaterThanOrEqual(0.1 - 1e-9);
+    const edge = spreadLabels([0.9, 0.95, 0.99], 0.1, 0, 1);
+    expect(edge[2]).toBeLessThanOrEqual(1);
+    expect(edge[1] - edge[0]).toBeGreaterThanOrEqual(0.1 - 1e-9);
+  });
+  it('leaves well-separated labels alone', () => expect(spreadLabels([0.2, 0.5, 0.8], 0.1)).toEqual([0.2, 0.5, 0.8]));
+});
+
+describe('level history', () => {
+  it('finds when the current level started', () => {
+    const h = [reading('a', 'NORMAL', 0.1, 't1'), reading('a', 'WARNING', 0.6, 't2'), reading('a', 'WARNING', 0.62, 't3')];
+    expect(levelSince(h)).toBe('t2');
+    expect(levelSince(h.slice(1))).toBeNull();
+    expect(levelSince([])).toBeNull();
   });
 });
