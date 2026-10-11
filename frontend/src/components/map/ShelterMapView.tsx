@@ -566,9 +566,9 @@ export function ShelterMapView() {
               pathOptions={{
                 color: severityTokens.color,
                 fillColor: severityTokens.fillColor,
-                fillOpacity: severityTokens.fillOpacity,
-                weight: floodSeverity === 'danger' ? 2.5 : 1.8,
-                dashArray: floodSeverity === 'danger' ? '5, 5' : undefined,
+                fillOpacity: Math.min(0.14, severityTokens.fillOpacity),
+                weight: 1.5,
+                dashArray: '6 6', // dashed = demo scenario layer; camera zones are solid
               }}
             >
               <Popup>
@@ -577,21 +577,22 @@ export function ShelterMapView() {
                     {basin.name}
                   </b>
                   <span className="font-semibold text-slate-700 block mt-0.5">
-                    Est. Surge: {severityTokens.depth} ({severityTokens.label})
+                    Scenario surge: {severityTokens.depth} ({severityTokens.label})
                   </span>
-                  <span className="text-[10px] text-blue-600 font-bold block mt-1">
-                    Predictive Hydrodynamic Model
+                  <span className="text-xs text-slate-600 font-semibold block mt-1">
+                    Demo basin, simulated. Not from a hydrodynamic model.
                   </span>
                 </div>
               </Popup>
             </Polygon>
           ))}
 
-          {/* Safe Corridor Route Polyline (Green in normal, Electric Blue in avoidance mode) */}
+          {/* Approximate route. White casing first, so the line reads over tiles and coloured zones. */}
+          <Polyline positions={activeRoute} pathOptions={{ color: '#FFFFFF', weight: isNavigating ? 10 : 9, opacity: 0.85 }} />
           <Polyline
             positions={activeRoute}
             pathOptions={{
-              color: isNavigating ? '#1677FF' : floodSeverity === 'normal' ? '#10B981' : '#0284C7',
+              color: isNavigating ? '#1677FF' : '#0284C7',
               weight: isNavigating ? 6 : 5,
               opacity: 0.9,
               dashArray: isNavigating ? undefined : '8, 8',
@@ -605,8 +606,8 @@ export function ShelterMapView() {
               <Marker position={[3.0760, 101.5640]} icon={roadblockIcon('Batu Tiga Underpass')}>
                 <Popup>
                   <div className="text-xs p-1">
-                    <b className="text-red-600 block">Batu Tiga Underpass Submerged (60cm)</b>
-                    <span>Avoided by system. Traffic diverted to KESAS Elevated Flyover.</span>
+                    <b className="text-red-700 block">Demo roadblock: Batu Tiga Underpass</b>
+                    <span>Simulated scenario marker. Not a real report or closure.</span>
                   </div>
                 </Popup>
               </Marker>
@@ -615,8 +616,8 @@ export function ShelterMapView() {
               <Marker position={[3.1635, 101.7040]} icon={roadblockIcon('Jalan Raja Muda')}>
                 <Popup>
                   <div className="text-xs p-1">
-                    <b className="text-red-600 block">Jalan Raja Muda Musa Closed</b>
-                    <span>Waterlogging above curb datum. Diverting via SMART elevated viaduct.</span>
+                    <b className="text-red-700 block">Demo roadblock: Jalan Raja Muda Musa</b>
+                    <span>Simulated scenario marker. Not a real report or closure.</span>
                   </div>
                 </Popup>
               </Marker>
@@ -625,8 +626,8 @@ export function ShelterMapView() {
               <Marker position={[3.0370, 101.5330]} icon={roadblockIcon('Sri Muda Ingress')}>
                 <Popup>
                   <div className="text-xs p-1">
-                    <b className="text-red-600 block">Jalan Khidmat 25 Ingress Blocked</b>
-                    <span>Severe water surge. Navigating to SK Seksyen 24 on higher ground.</span>
+                    <b className="text-red-700 block">Demo roadblock: Jalan Khidmat 25</b>
+                    <span>Simulated scenario marker. Not a real report or closure.</span>
                   </div>
                 </Popup>
               </Marker>

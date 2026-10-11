@@ -25,7 +25,7 @@ export function LevelHistoryChart({ history, calibration }: Props) {
   const data = history.slice(-30);
   const x = (i: number) => (data.length < 2 ? W : (i / (data.length - 1)) * (W - 8) + 4);
   const last = data[data.length - 1];
-  const color = last ? LEVEL_META[last.level].hex : '#0EA5E9';
+  const color = last ? LEVEL_META[last.level].hex : LEVEL_META.ADVISORY.hex;
   const points = data.map((r, i) => `${x(i).toFixed(1)},${y(r.water_ratio).toFixed(1)}`).join(' ');
 
   return (

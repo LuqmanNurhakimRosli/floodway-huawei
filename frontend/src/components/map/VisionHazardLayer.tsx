@@ -38,7 +38,8 @@ export function VisionHazardLayer() {
           key={h.cameraId}
           center={[h.lat, h.lon]}
           radius={h.radiusM}
-          pathOptions={{ color: LEVEL_META[h.level].hex, fillColor: LEVEL_META[h.level].hex, fillOpacity: h.level === 'DANGER' ? 0.4 : 0.28, weight: 2, dashArray: h.level === 'DANGER' ? undefined : '6 4' }}
+          // Solid outline and a stronger fill: camera zones read as "live from a camera", unlike the dashed demo basins.
+          pathOptions={{ color: LEVEL_META[h.level].hex, fillColor: LEVEL_META[h.level].hex, fillOpacity: h.level === 'DANGER' ? 0.42 : 0.32, weight: 3 }}
         >
           <Popup>
             <strong>{h.name}</strong>
