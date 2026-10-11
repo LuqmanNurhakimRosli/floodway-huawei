@@ -8,7 +8,9 @@ class Forecaster:
     def __init__(self):
         self.endpoint = HUAWEI_MODELARTS_ENDPOINT
         self.key = HUAWEI_MODELARTS_APP_KEY
-        self.source = "Huawei ModelArts (Ascend 910 GRU)" if self.endpoint else "Huawei ModelArts Local Engine (Pre-trained GRU)"
+        # Honest label: this class evaluates a hand-written hydrologic formula (below). It is not a trained GRU, and it only
+        # calls a ModelArts endpoint if one is configured and implemented, which it is not.
+        self.source = "Rule-based hydrologic estimate (not a trained model)"
 
     async def predict_horizon(self, current_level_m: float, rainfall_rate_mm: float) -> dict:
         """
@@ -54,7 +56,8 @@ class Forecaster:
             "peak_level_m": peak_m,
             "time_to_peak_min": time_to_peak_min,
             "time_to_danger_min": time_to_danger_min,
-            "confidence_score": 0.88
+            "confidence_score": 0.88,  # fixed placeholder, NOT a measured confidence: do not show it as one
+            "method": "Hand-written hydrologic formula on simulated input. Not a trained or validated model.",
         }
 
 forecaster = Forecaster()

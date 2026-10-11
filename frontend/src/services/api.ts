@@ -19,7 +19,7 @@ export async function fetchTwinState(deviceId = 'fw-node-01') {
     phase: 'DANGER',
     is_stale: false,
     forecast: {
-      source: 'Huawei ModelArts (Ascend 910 GRU)',
+      source: 'Rule-based hydrologic estimate (not a trained model)',
       horizons_min: [0, 15, 30, 45, 60, 90, 120],
       p10: [1.20, 1.25, 1.34, 1.45, 1.55, 1.68, 1.75],
       p50: [1.20, 1.31, 1.48, 1.58, 1.65, 1.82, 1.91],
@@ -27,7 +27,8 @@ export async function fetchTwinState(deviceId = 'fw-node-01') {
       peak_level_m: 1.91,
       time_to_peak_min: 120,
       time_to_danger_min: 45,
-      confidence_score: 0.88
+      confidence_score: 0.88,
+      method: 'Hand-written hydrologic formula on simulated input. Not a trained or validated model.'
     }
   };
 }
@@ -156,105 +157,16 @@ export async function fetchReports(): Promise<CitizenReport[]> {
     }
   } catch (e) {}
 
+  // Used only when the backend is unreachable. Demo data: the reports are examples, nobody verified them, and the
+  // photos do not show the places named.
+  const demo = (r: Omit<CitizenReport, 'verifiedBy' | 'status'> & { status: CitizenReport['status'] }): CitizenReport => ({
+    ...r,
+    verifiedBy: 'Demo data (not verified)',
+  });
   return [
-    {
-      id: 'rep-01',
-      title: 'Jalan Raja Muda Musa Water Spillover',
-      location: 'Kampung Baru, Kuala Lumpur',
-      lat: 3.1642,
-      lon: 101.7031,
-      waterDepthCm: 35,
-      status: 'OFFICIAL_VERIFIED',
-      verifiedBy: 'Huawei ModelArts PanGu-CV & APM Civil Defense',
-      timestampStr: '12 min ago',
-      author: 'Ahmad F.',
-      upvotes: 28,
-      imageUrl: '/banjir2.jpg',
-      description: 'Water spilling over curbside into commercial alleyway. Depth approx 35cm, vehicles wading cautiously.',
-      aiVerification: {
-        verified: true,
-        confidenceScore: 0.974,
-        detectedHazards: ['Curbside Water Spillover', 'Commercial Lane Flooding', 'Vehicle Hydrolock Advisory'],
-        estimatedDepthCm: 36,
-        engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU)',
-        notes: 'PanGu-CV segmentation verified water boundary breaching road surface datum.'
-      },
-      humanVerification: {
-        verifiedBy: 'Captain Roslan (APM Kuala Lumpur)',
-        role: 'Civil Defense Officer',
-        reviewedAt: '8 min ago',
-        verdict: 'APPROVED',
-        officialNotes: 'Confirmed by patrolling APM Unit 4. Sandbag barriers dispatched.'
-      }
-    },
-    {
-      id: 'rep-02',
-      title: 'Submerged Drain & Road Clogged at Seksyen 25',
-      location: 'Taman Sri Muda, Seksyen 25',
-      lat: 3.0315,
-      lon: 101.5360,
-      waterDepthCm: 50,
-      status: 'AI_VERIFIED',
-      verifiedBy: 'Gemini 2.5 Flash Vision (Pending Authority Approval)',
-      timestampStr: '4 min ago',
-      author: 'Sarah T.',
-      upvotes: 14,
-      imageUrl: '/banjir3.jfif',
-      description: 'Monsoon drain overflowed onto Jalan Khidmat. Wheel hubs submerged on sedan cars.',
-      aiVerification: {
-        verified: true,
-        confidenceScore: 0.982,
-        detectedHazards: ['Drain Inundation', 'Vehicle Wheel Submergence', 'Severe Hydroplaning Hazard'],
-        estimatedDepthCm: 52,
-        engine: 'Gemini 2.5 Flash Vision (Google AI Studio)',
-        notes: 'Multimodal vision confirmed sedan car wheels submerged past 50cm threshold. Awaiting authority confirmation.'
-      }
-    },
-    {
-      id: 'rep-03',
-      title: 'Sungai Rasau Underpass Water Accumulation',
-      location: 'Sungai Rasau, Klang',
-      lat: 3.0510,
-      lon: 101.4880,
-      waterDepthCm: 42,
-      status: 'AI_VERIFIED',
-      verifiedBy: 'Huawei ModelArts PanGu-CV (Pending Authority Approval)',
-      timestampStr: '6 min ago',
-      author: 'Kamal R.',
-      upvotes: 6,
-      imageUrl: '/banjir_underpass.jpg',
-      description: 'Water ponding rapidly underneath the railway flyover. Low-clearance cars stranded.',
-      aiVerification: {
-        verified: true,
-        confidenceScore: 0.965,
-        detectedHazards: ['Underpass Ponding', 'Railway Bridge Drainage Congestion', 'Vehicle Hydrolock Warning'],
-        estimatedDepthCm: 44,
-        engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU)',
-        notes: 'Underpass basin depth measured at 44cm. Visible AWAS BANJIR warning signs and vehicle wheel submergence verified.'
-      }
-    },
-    {
-      id: 'rep-04',
-      title: 'Monsoon Drain Overflowing into Residential Road',
-      location: 'Seksyen 13, Shah Alam',
-      lat: 3.0845,
-      lon: 101.5321,
-      waterDepthCm: 38,
-      status: 'AI_VERIFIED',
-      verifiedBy: 'Huawei ModelArts PanGu-CV & Gemini Flash',
-      timestampStr: 'Just now',
-      author: 'Farhan M.',
-      upvotes: 9,
-      imageUrl: '/banjir_drain.jpg',
-      description: 'Concrete monsoon drainage canal overflowing with turbulent rainwater spilling over onto neighborhood street.',
-      aiVerification: {
-        verified: true,
-        confidenceScore: 0.985,
-        detectedHazards: ['Canal Overflow', 'Residential Street Inundation', 'Drain Backflow Risk'],
-        estimatedDepthCm: 38,
-        engine: 'Huawei ModelArts PanGu-CV (Ascend 910 NPU) & Gemini Flash',
-        notes: 'Monsoon drain overflow verified breaching residential road level. High turbulence and silt flow confirmed.'
-      }
-    }
+    demo({ id: 'rep-01', title: 'Jalan Raja Muda Musa Water Spillover', location: 'Kampung Baru, Kuala Lumpur', lat: 3.1642, lon: 101.7031, waterDepthCm: 35, status: 'VERIFIED', timestampStr: '12 min ago', author: 'Ahmad F.', upvotes: 28, imageUrl: '/banjir2.jpg', description: 'Example report: water spilling over a kerb into a lane, about 35 cm.' }),
+    demo({ id: 'rep-02', title: 'Submerged Drain & Road Clogged at Seksyen 25', location: 'Taman Sri Muda, Seksyen 25', lat: 3.0315, lon: 101.5360, waterDepthCm: 50, status: 'UNDER_REVIEW', timestampStr: '4 min ago', author: 'Sarah T.', upvotes: 14, imageUrl: '/banjir3.jfif', description: 'Example report: a drain has overflowed onto the road, about 50 cm.' }),
+    demo({ id: 'rep-03', title: 'Sungai Rasau Underpass Water Accumulation', location: 'Sungai Rasau, Klang', lat: 3.0510, lon: 101.4880, waterDepthCm: 42, status: 'UNDER_REVIEW', timestampStr: '6 min ago', author: 'Kamal R.', upvotes: 6, imageUrl: '/banjir_underpass.jpg', description: 'Example report: water ponding under a flyover, about 42 cm.' }),
+    demo({ id: 'rep-04', title: 'Monsoon Drain Overflowing into Residential Road', location: 'Seksyen 13, Shah Alam', lat: 3.0845, lon: 101.5321, waterDepthCm: 38, status: 'UNDER_REVIEW', timestampStr: 'Just now', author: 'Farhan M.', upvotes: 9, imageUrl: '/banjir_drain.jpg', description: 'Example report: a drain is overflowing onto a street, about 38 cm.' }),
   ];
 }

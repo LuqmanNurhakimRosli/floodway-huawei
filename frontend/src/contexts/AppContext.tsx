@@ -70,10 +70,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               status: 'OFFICIAL_VERIFIED',
               humanVerification: {
                 verifiedBy: reviewerName,
-                role: (role as any) || 'Civil Defense Officer',
+                role: (role as any) || 'Demo reviewer',
                 reviewedAt: 'Just now',
                 verdict: 'APPROVED',
-                officialNotes: notes || 'Verified on ground by APM responder unit.',
+                officialNotes: notes || 'Approved in the demo review desk. No agency was involved.',
               },
             }
           : item
@@ -89,11 +89,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               ...item,
               status: 'REJECTED',
               humanVerification: {
-                verifiedBy: 'District Duty Officer',
-                role: 'Civil Defense Officer',
+                verifiedBy: 'Demo reviewer',
+                role: 'Demo reviewer' as any,
                 reviewedAt: 'Just now',
                 verdict: 'REJECTED',
-                officialNotes: reason || 'Flagged as inaccurate / non-flooded image upon ground survey.',
+                officialNotes: reason || 'Rejected in the demo review desk.',
               },
             }
           : item

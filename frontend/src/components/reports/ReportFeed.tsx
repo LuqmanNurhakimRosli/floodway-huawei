@@ -13,6 +13,7 @@ import {
 import { useApp } from '../../contexts/AppContext';
 import { CitizenReport } from '../../types';
 import { formatCm } from '../../lib/format';
+import { reportStatusInfo } from '../../lib/reportStatus';
 
 interface Props {
   filter: 'all' | 'nearby' | 'verified' | 'active';
@@ -23,11 +24,10 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
   const { reports, upvoteReport, approveReport, rejectReport } = useApp();
 
   const filteredReports = reports.filter((r) => {
-    if (viewMode === 'authority') {
-      return r.status === 'AI_VERIFIED' || r.status === 'UNDER_REVIEW';
-    }
+    const info = reportStatusInfo(r.status);
+    if (viewMode === 'authority') return info.awaitingReview;
     if (r.status === 'REJECTED') return false;
-    if (filter === 'verified') return r.status === 'OFFICIAL_VERIFIED' || r.status === 'VERIFIED';
+    if (filter === 'verified') return info.published;
     if (filter === 'active') return r.waterDepthCm >= 30;
     return true;
   });
@@ -55,8 +55,9 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {filteredReports.map((report) => {
-        const isOfficial = report.status === 'OFFICIAL_VERIFIED';
-        const isAiVerified = report.status === 'AI_VERIFIED';
+        const info = reportStatusInfo(report.status);
+        const isOfficial = info.kind === 'reviewed';
+        const isAiVerified = info.kind === 'ai';
         const isHighRisk = report.waterDepthCm >= 35;
 
         // Simplify location string to short readable name
@@ -90,23 +91,21 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                   </div>
                 </div>
 
-                {/* Status Pill */}
-                {isOfficial ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                    <span>VERIFIED</span>
-                  </span>
-                ) : isAiVerified ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-[#1677FF]" />
-                    <span>AI SCREENED</span>
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-amber-600" />
-                    <span>PENDING</span>
-                  </span>
-                )}
+                {/* Status pill: wording and counts come from lib/reportStatus.ts so they cannot disagree */}
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 border ${
+                    info.kind === 'reviewed'
+                      ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                      : info.kind === 'ai'
+                      ? 'bg-sky-50 text-sky-900 border-sky-200'
+                      : info.kind === 'seed'
+                      ? 'bg-slate-100 text-slate-800 border-slate-300'
+                      : 'bg-amber-50 text-amber-900 border-amber-200'
+                  }`}
+                >
+                  {info.kind === 'reviewed' ? <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> : info.kind === 'ai' ? <ShieldCheck className="w-3 h-3" aria-hidden="true" /> : <Clock className="w-3 h-3" aria-hidden="true" />}
+                  <span>{info.pill}</span>
+                </span>
               </div>
 
               {/* Location Bar with Clear Icon */}
@@ -156,8 +155,8 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
 
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
                     <span className="text-[10px] font-semibold text-slate-400 block uppercase">Verification</span>
-                    <span className="text-[11px] font-bold text-emerald-600">
-                      {isOfficial ? 'Confirmed' : 'AI Verified'}
+                    <span className="text-xs font-bold text-slate-800">
+                      {info.tile}
                     </span>
                   </div>
                 </div>
@@ -169,7 +168,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
               {viewMode === 'authority' && !report.humanVerification ? (
                 <div className="flex items-center gap-2 w-full">
                   <button
-                    onClick={() => approveReport(report.id, 'Duty Operations Officer', 'Emergency Operations')}
+                    onClick={() => approveReport(report.id, 'Demo reviewer', 'Demo reviewer')}
                     className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer transition-colors"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />

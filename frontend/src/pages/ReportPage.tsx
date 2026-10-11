@@ -18,6 +18,7 @@ import {
 import { DashboardSidebar } from '../components/layout/DashboardSidebar';
 import { Header } from '../components/layout/Header';
 import { BottomNav } from '../components/layout/BottomNav';
+import { countReports } from '../lib/reportStatus';
 import { ReportFeed } from '../components/reports/ReportFeed';
 import { ReportModal } from '../components/reports/ReportModal';
 import { LiveCCTVModal } from '../components/reports/LiveCCTVModal';
@@ -31,8 +32,9 @@ export function ReportPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isCctvModalOpen, setIsCctvModalOpen] = useState(false);
 
-  const officialCount = reports.filter((r) => r.status === 'OFFICIAL_VERIFIED' || r.status === 'VERIFIED').length;
-  const pendingCount = reports.filter((r) => r.status === 'AI_VERIFIED' || r.status === 'UNDER_REVIEW').length;
+  const counts = countReports(reports);
+  const officialCount = counts.published;
+  const pendingCount = counts.awaitingReview;
   const activeCount = reports.filter((r) => r.waterDepthCm >= 30).length;
 
   return (
@@ -55,11 +57,11 @@ export function ReportPage() {
                   </h1>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-300 flex items-center gap-1">
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    Live Community Alerts
+                    Demo reports
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium">
-                  Crowdsourced ground-truth flood hazard reports with photo evidence to alert residents, disaster operations, and responders in real time.
+                  Citizen flood reports with a photo and a depth. Reports are unverified unless marked otherwise; nothing here is checked by an agency.
                 </p>
               </div>
             </div>
@@ -70,7 +72,7 @@ export function ReportPage() {
                 className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Video className="w-4 h-4 text-[#1677FF]" />
-                <span>Live CCTV</span>
+                <span>Sample cameras</span>
               </button>
 
               <button
@@ -86,24 +88,28 @@ export function ReportPage() {
           {/* Statistics Counter Bar (4 metrics) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
             <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-center">
-              <span className="font-heading font-extrabold text-2xl text-slate-900 block">{reports.length}</span>
-              <span className="text-[11px] font-semibold text-slate-500 uppercase">Total Submissions</span>
+              <span className="font-heading font-extrabold text-2xl text-slate-900 block">{counts.total}</span>
+              <span className="text-xs font-semibold text-slate-600 uppercase">Total reports</span>
             </div>
             <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-center">
               <span className="font-heading font-extrabold text-2xl text-[#1677FF] block">
-                {reports.filter((r) => r.status === 'AI_VERIFIED' || r.status === 'OFFICIAL_VERIFIED').length}
+                {counts.aiAssessed}
               </span>
-              <span className="text-[11px] font-semibold text-blue-800 uppercase">AI Screened</span>
+              <span className="text-xs font-semibold text-blue-900 uppercase">AI assessed</span>
             </div>
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-100 text-center">
               <span className="font-heading font-extrabold text-2xl text-amber-700 block">{pendingCount}</span>
-              <span className="text-[11px] font-semibold text-amber-800 uppercase">Pending Review</span>
+              <span className="text-xs font-semibold text-amber-900 uppercase">Awaiting review</span>
             </div>
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-center">
               <span className="font-heading font-extrabold text-2xl text-emerald-700 block">{officialCount}</span>
-              <span className="text-[11px] font-semibold text-emerald-800 uppercase">Live Published</span>
+              <span className="text-xs font-semibold text-emerald-900 uppercase">Published (demo)</span>
             </div>
           </div>
+
+          <p role="note" className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-700">
+            <b>Demo data.</b> The two starter reports and their photos are examples. They are not real incidents at the places named, and nothing on this page is verified by any agency.
+          </p>
 
           {/* TWO-LAYER DESK SWITCHER BAR (Public Feed vs Authority Review Desk) */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-slate-200 shadow-xs">
@@ -118,7 +124,7 @@ export function ReportPage() {
                 }`}
               >
                 <Award className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Public Official Feed ({officialCount})</span>
+                <span>Published reports ({officialCount})</span>
               </button>
 
               <button
@@ -130,7 +136,7 @@ export function ReportPage() {
                 }`}
               >
                 <UserCheck className="w-3.5 h-3.5" />
-                <span>Authority Review Desk ({pendingCount} Pending)</span>
+                <span>Review desk, demo ({pendingCount})</span>
               </button>
             </div>
 
@@ -139,7 +145,7 @@ export function ReportPage() {
               <div className="flex items-center gap-1 text-xs font-bold">
                 {[
                   { id: 'all', label: `All (${reports.length})` },
-                  { id: 'verified', label: `Official Only (${officialCount})` },
+                  { id: 'verified', label: `Published only (${officialCount})` },
                   { id: 'active', label: `Flash Hazards (${activeCount})` },
                 ].map((tab) => (
                   <button
@@ -163,9 +169,9 @@ export function ReportPage() {
             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
               <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold block">Civil Defense & NADMA Authority Review Queue</span>
+                <span className="font-bold block">Review desk (demo screen)</span>
                 <span>
-                  These incident photos have already passed <b>Layer 1 (AI Multimodal Vision)</b> with high confidence. As an authorized officer, inspect the ground evidence below and click <b>Approve & Gazette</b> to publish officially or <b>Reject</b> if inaccurate.
+                  This is a demo of how a review step could work. No agency uses it. Reports here are <b>unverified</b> until you press <b>Approve</b> or <b>Reject</b>; Approve only moves a report to the published list in this demo.
                 </span>
               </div>
             </div>

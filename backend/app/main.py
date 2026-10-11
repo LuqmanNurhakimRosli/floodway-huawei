@@ -11,7 +11,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="FloodWay 2.0 Backend - Huawei ICT Competition",
-    description="Enterprise life-safety intelligence platform powered by Huawei Cloud ModelArts, IoTDA & Ascend AI.",
+    description="FloodWay demo backend: flood-prevention prototype (camera water-level analysis, shelters, reports, alerts).",
     version="2.0.0",
     lifespan=lifespan
 )
@@ -40,6 +40,6 @@ def health_check():
     return {
         "status": "HEALTHY",
         "service": "FloodWay 2.0 Core Backend",
-        "engine": "Huawei Cloud ModelArts + Ascend AI",
+        "engine": "Demo backend (no Huawei Cloud service is called)",
         "version": "2.0.0"
     }

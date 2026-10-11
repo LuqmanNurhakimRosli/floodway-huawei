@@ -38,7 +38,10 @@ export interface ForecastData {
   peakLevelM: number;
   timeToPeakMin: number;
   timeToDangerMin: number | null;
+  /** A fixed placeholder, not a measured confidence. Do not present it as accuracy. */
   confidenceScore: number;
+  /** How the numbers were produced, in plain words. Show this next to the forecast. */
+  method?: string;
 }
 
 export interface Shelter {

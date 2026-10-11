@@ -14,7 +14,7 @@ DEMO_REPORTS = [
         "lon": 101.7031,
         "water_depth_cm": 35,
         "status": "VERIFIED",
-        "verified_by": "Huawei ModelArts CV (96.4% confidence)",
+        "verified_by": "Demo data (not verified)",
         "timestamp_str": "12 minutes ago",
         "author": "Ahmad F.",
         "upvotes": 28,
@@ -28,7 +28,7 @@ DEMO_REPORTS = [
         "lon": 101.5360,
         "water_depth_cm": 50,
         "status": "VERIFIED",
-        "verified_by": "Huawei ModelArts CV (98.1% confidence)",
+        "verified_by": "Demo data (not verified)",
         "timestamp_str": "25 minutes ago",
         "author": "Sarah T.",
         "upvotes": 41,
@@ -51,9 +51,10 @@ def get_reports():
 
 @router.post("")
 def submit_report(r: NewReport):
-    # Simulated ModelArts PanGu-CV multi-modal analysis
+    # Nothing verifies a submission here: it is stored as UNDER_REVIEW and says so. (It used to be auto-marked
+    # VERIFIED with a made-up 'Huawei ModelArts CV (97.2% confidence)' for any depth over 10 cm.)
     rep_id = f"rep-{int(time.time())}"
-    verified_status = "VERIFIED" if r.water_depth_cm > 10 else "UNDER_REVIEW"
+    verified_status = "UNDER_REVIEW"
     new_entry = {
         "id": rep_id,
         "title": r.title,
@@ -62,7 +63,7 @@ def submit_report(r: NewReport):
         "lon": r.lon,
         "water_depth_cm": r.water_depth_cm,
         "status": verified_status,
-        "verified_by": "Huawei ModelArts CV (97.2% confidence)",
+        "verified_by": "Not reviewed",
         "timestamp_str": "Just now",
         "author": r.author,
         "upvotes": 1,

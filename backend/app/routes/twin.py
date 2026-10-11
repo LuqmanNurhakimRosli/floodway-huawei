@@ -54,5 +54,5 @@ async def get_twin_state(
             "distance_km": round(dist_km, 2),
             "travel_time_min": max(3, round(dist_km * 4.5))
         },
-        "disclaimer": "Indicative only. Certified by Huawei Cloud ModelArts. Follow JPS/NADMA civil instructions."
+        "disclaimer": "Indicative only. Demo output from a simple formula on simulated input; not certified by any agency. Follow official instructions."
     }
