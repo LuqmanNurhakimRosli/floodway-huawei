@@ -1,14 +1,29 @@
-"""Sample cameras so the page is alive on first run. These are SYNTHETIC (self-running) scenes,
-clearly flagged as playback in the API/UI. They are placeholders, not real agency feeds.
-Replace or extend them with real sources (see backend/app/vision/sources/)."""
+"""Sample cameras so the page is alive on first run.
+
+Each sample camera uses the AI-generated photo set in `sample_media/` when it is present (four photos of one fixed view,
+one per water level, plus `calibration.json`). If a camera's photos or calibration are missing, it falls back to the
+vector `SyntheticRiverSource`, so the app still runs. Either way the camera is a SAMPLE: self-running and clearly flagged
+as playback in the API and UI. They are placeholders, not real agency feeds.
+"""
 from __future__ import annotations
 
-import time
+import json
+import logging
+from pathlib import Path
+from typing import Optional
+
+import cv2
 
 from .engine import VisionEngine
+from .levels import thresholds_from_calibration
 from .schemas import Calibration, Lines
+from .sources.base import FrameSource
+from .sources.frameset import LEVELS, FrameSetSource
 from .sources.synthetic import BED_Y, CH_X1, CH_X0, DANGER_Y, H, W, SyntheticRiverSource
 
+logger = logging.getLogger("FloodWayVisionSeed")
+
+MEDIA_DIR = Path(__file__).parent / "sample_media"
 _PX = H - 1  # analyser normalises y by (height - 1)
 
 
@@ -17,6 +32,8 @@ def _ny(px: float) -> float:
 
 
 def sample_calibration() -> Calibration:
+    """Calibration for the vector fallback scene."""
+
     def line_at(ratio: float) -> float:
         return _ny(BED_Y - ratio * (BED_Y - DANGER_Y))
 
@@ -26,23 +43,71 @@ def sample_calibration() -> Calibration:
     )
 
 
-# id, name, provider, lat, lon, ratio_min, ratio_max, period_s, phase
+# id, name, provider, lat, lon, ratio_min, ratio_max, period_s, phase, media prefix
+# Ranges and periods are tuned so that within about two minutes several cameras visibly change level.
 SAMPLES = [
-    ("sample-klang-jamek", "Sg. Klang @ Masjid Jamek", "city", 3.1490, 101.6960, 0.40, 1.10, 240, 0.00),
-    ("sample-gombak-tun-razak", "Sg. Gombak @ Jln Tun Razak", "city", 3.1620, 101.7200, 0.12, 0.50, 300, 0.30),
-    ("sample-smart-tunnel", "SMART Tunnel entrance", "public", 3.1380, 101.7030, 0.03, 0.18, 360, 0.55),
-    ("sample-batu-sentul", "Sg. Batu @ Sentul", "public", 3.1840, 101.6930, 0.05, 0.30, 330, 0.80),
-    ("sample-kampung-baru-drain", "Kampung Baru Drain", "mine", 3.1642, 101.7031, 0.18, 0.55, 270, 0.15),
+    ("sample-klang-jamek", "Sg. Klang @ Masjid Jamek", "city", 3.1490, 101.6960, 0.40, 1.10, 180, 0.00, "klang"),
+    ("sample-gombak-tun-razak", "Sg. Gombak @ Jln Tun Razak", "city", 3.1620, 101.7200, 0.12, 0.75, 200, 0.30, "gombak"),
+    ("sample-smart-tunnel", "SMART Tunnel entrance", "public", 3.1380, 101.7030, 0.03, 0.45, 220, 0.55, "smart"),
+    ("sample-batu-sentul", "Sg. Batu @ Sentul", "public", 3.1840, 101.6930, 0.05, 0.62, 210, 0.80, "batu"),
+    ("sample-kampung-baru-drain", "Kampung Baru Drain", "mine", 3.1642, 101.7031, 0.18, 0.80, 190, 0.15, "drain"),
 ]
 
 
-def seed_samples(engine: VisionEngine) -> None:
+def load_media_calibrations(media_dir: Path = MEDIA_DIR) -> dict[str, Calibration]:
+    """Calibrations from sample_media/calibration.json. Entries that fail validation are skipped, not trusted."""
+    path = media_dir / "calibration.json"
+    if not path.exists():
+        return {}
+    out: dict[str, Calibration] = {}
+    for cam_id, raw in json.loads(path.read_text(encoding="utf-8")).items():
+        try:
+            out[cam_id] = Calibration(roi=[tuple(p) for p in raw["roi"]], lines=raw["lines"])
+        except Exception as exc:  # malformed entry: fall back for that camera
+            logger.warning("ignoring invalid calibration for %s: %s", cam_id, exc)
+    return out
+
+
+def load_frames(prefix: str, media_dir: Path = MEDIA_DIR) -> Optional[dict]:
+    """The four photos for a camera, or None if any is missing or unreadable."""
+    frames = {}
+    for level in LEVELS:
+        img = cv2.imread(str(media_dir / f"{prefix}-{level}.jpg"))
+        if img is None:
+            return None
+        frames[level] = img
+    return frames
+
+
+def build_sample_source(prefix: str, cam_id: str, lo: float, hi: float, period: float, phase: float, seed: int,
+                 media_dir: Path = MEDIA_DIR, calibrations: Optional[dict] = None) -> tuple[FrameSource, Calibration, str]:
+    """(source, calibration, kind) where kind is 'photos' or 'synthetic'."""
+    calibrations = load_media_calibrations(media_dir) if calibrations is None else calibrations
+    cal = calibrations.get(cam_id)
+    frames = load_frames(prefix, media_dir) if cal else None
+    if cal and frames:
+        thr = thresholds_from_calibration(cal)
+        src = FrameSetSource(frames, (thr.normal, thr.warning, thr.danger), lo, hi, period, phase, seed=seed)
+        return src, cal, "photos"
+    return SyntheticRiverSource(lo, hi, period, phase, seed=seed), sample_calibration(), "synthetic"
+
+
+def seed_samples(engine: VisionEngine, media_dir: Path = MEDIA_DIR) -> dict[str, str]:
+    """Register the sample cameras. Returns {camera_id: 'photos'|'synthetic'} for logging and tests."""
     interval = engine.settings.default_interval_s
     offset = engine.settings.sample_clock_offset_s
-    clock = (lambda: time.time() + offset) if offset else time.time
-    for i, (cid, name, provider, lat, lon, lo, hi, period, phase) in enumerate(SAMPLES):
-        engine.register_synthetic(cid, name, provider, lat, lon, sample_calibration(),
-                                  SyntheticRiverSource(lo, hi, period, phase, seed=i, clock=clock), interval)
+    calibrations = load_media_calibrations(media_dir)
+    kinds: dict[str, str] = {}
+    for i, (cid, name, provider, lat, lon, lo, hi, period, phase, prefix) in enumerate(SAMPLES):
+        source, cal, kind = build_sample_source(prefix, cid, lo, hi, period, phase, i, media_dir, calibrations)
+        if offset:
+            import time
+
+            source.clock = lambda off=offset: time.time() + off  # testing aid, see VISION_SAMPLE_CLOCK_OFFSET_S
+        engine.register_synthetic(cid, name, provider, lat, lon, cal, source, interval)
+        kinds[cid] = kind
+    logger.info("sample cameras: %s", ", ".join(f"{k}={v}" for k, v in kinds.items()))
     # Genuinely unreachable URL (.invalid never resolves) so the offline state is real.
     engine.register_offline_placeholder("sample-backyard-stream", "Backyard Stream", 3.1700, 101.7100,
                                         sample_calibration(), "https://backyard-camera.invalid/frame.jpg", interval)
+    return kinds

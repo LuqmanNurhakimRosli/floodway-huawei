@@ -96,6 +96,8 @@ class TestTracker:
 
 def test_sample_clock_offset_shifts_the_scene(monkeypatch):
     """VISION_SAMPLE_CLOCK_OFFSET_S moves the sample scenes in time (testing aid, backend only)."""
+    import time
+
     from app.vision import seed
     from app.vision.config import VisionSettings
 
@@ -110,6 +112,6 @@ def test_sample_clock_offset_shifts_the_scene(monkeypatch):
         def register_offline_placeholder(self, *args):
             pass
 
-    monkeypatch.setattr(seed.time, "time", lambda: 50.0)
+    monkeypatch.setattr(time, "time", lambda: 50.0)
     seed.seed_samples(FakeEngine())
-    assert captured and all(src.clock() == 1050.0 for src in captured)
+    assert len(captured) == 5 and all(src.clock() == 1050.0 for src in captured)

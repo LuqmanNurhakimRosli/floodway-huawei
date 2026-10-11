@@ -130,7 +130,7 @@ class VisionEngine:
 
     # ───────────── registry ─────────────
     def register_synthetic(self, camera_id: str, name: str, provider: str, lat: float, lon: float,
-                           calibration: Calibration, source: SyntheticRiverSource, interval_s: int) -> CameraRecord:
+                           calibration: Calibration, source: FrameSource, interval_s: int) -> CameraRecord:
         rec = CameraRecord(id=camera_id, name=name, provider=provider, lat=lat, lon=lon, source_type="synthetic",
                            source=source, calibration=calibration, interval_s=interval_s, seeded=True)
         self.cameras[camera_id] = rec

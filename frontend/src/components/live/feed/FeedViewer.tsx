@@ -1,6 +1,7 @@
 import { useId, useRef, useState } from 'react';
-import { Clock, RotateCw, WifiOff } from 'lucide-react';
+import { Clock, Film, Radio, RotateCw, WifiOff } from 'lucide-react';
 import { useCaptureCycle } from '../../../hooks/vision/useCaptureCycle';
+import { useDemoVideo } from '../../../hooks/vision/useDemoVideo';
 import { useElementHeight } from '../../../hooks/vision/useElementSize';
 import { sourceLabel } from '../../../lib/vision/describe';
 import { pct, timeAgo } from '../../../lib/vision/format';
@@ -48,7 +49,13 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
   const reading = camera.reading;
   const cal = camera.calibration;
   const kind = camera.source_type === 'synthetic' ? 'SAMPLE' : camera.is_playback ? 'PLAYBACK' : 'LIVE';
-  const stale = camera.online && cycle.phase === 'stale';
+  // A camera may offer an AI-generated demo loop. It is not tied to the readings, so it is an explicit, labelled view.
+  const demo = useDemoVideo(camera.id, !compact);
+  const [loopOn, setLoopOn] = useState(false);
+  const showLoop = Boolean(demo) && loopOn;
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const live = camera.online && !showLoop; // overlays and the stale bar describe the live frame only
+  const stale = live && cycle.phase === 'stale';
   const imgFailed = reading !== null && failedAt === reading.timestamp; // a new reading retries the frame
 
   const roiPoints = cal.roi.map(([x, y]) => `${x * 100},${y * 100}`).join(' ');
@@ -67,7 +74,20 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
       role="img"
       aria-label={`${camera.name}, ${kind.toLowerCase()} feed${reading ? `, water at ${pct(reading.water_ratio)} of bank height` : ''}${stale ? ', feed is stale' : ''}`}
     >
-      {!camera.online ? null : useScene ? (
+      {showLoop && demo ? (
+        <video
+          key={demo.src}
+          src={demo.src}
+          poster={demo.poster}
+          muted
+          loop
+          playsInline
+          autoPlay={!reducedMotion}
+          controls={reducedMotion}
+          className="h-full w-full object-cover"
+          aria-label="Demo loop of the water rising and falling. AI-generated sample footage, not tied to the readings."
+        />
+      ) : !camera.online ? null : useScene ? (
         <RiverScene ratio={reading?.water_ratio ?? 0} />
       ) : !reading ? (
         <div className="flex h-full w-full items-center justify-center bg-slate-700 text-sm/5 text-slate-200">Waiting for the first frame…</div>
@@ -77,7 +97,7 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
         <img src={frameUrl(camera.id, reading.timestamp)} alt="" className="h-full w-full object-cover" onError={() => setFailedAt(reading.timestamp)} />
       )}
 
-      {camera.online && (
+      {live && (
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
           <defs>
             <clipPath id={clipId}>
@@ -96,14 +116,14 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
         </svg>
       )}
 
-      {camera.online && overlays.lines && !compact &&
+      {live && overlays.lines && !compact &&
         LINE_KEYS.map((k, i) => (
           <span key={k} className={`pointer-events-none absolute right-0 -translate-y-1/2 rounded-l-md px-2 py-0.5 text-xs/4 font-semibold ${LINES[k].tag} ${onFrame}`} style={{ top: `${tagTops[i] * 100}%` }}>
             {LINES[k].label}
           </span>
         ))}
 
-      {camera.online && overlays.waterline && waterY !== null && reading && !compact && (
+      {live && overlays.waterline && waterY !== null && reading && !compact && (
         <>
           <span className={`pointer-events-none absolute -translate-x-1/2 -translate-y-[calc(100%+6px)] whitespace-nowrap rounded-lg bg-[#0958D9] px-2.5 py-1 text-xs/4 font-semibold text-white ${onFrame}`} style={{ left: `${((xMin + xMax) / 2) * 100}%`, top: `${waterY * 100}%` }}>
             Water at <span className={num}>{pct(reading.water_ratio)}</span> of bank
@@ -112,15 +132,30 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
         </>
       )}
 
-      <span className={`${num} absolute left-2 top-2 rounded-md bg-black/65 font-medium text-white ${chip}`}>{compact ? tag : formatStamp(reading?.timestamp)}</span>
+      <span className={`${num} absolute left-2 top-2 rounded-md bg-black/65 font-medium text-white ${chip}`}>{compact ? tag : showLoop ? 'DEMO LOOP' : formatStamp(reading?.timestamp)}</span>
       {!compact && <span className={`${num} absolute right-2 top-2 rounded-md bg-black/65 px-2.5 py-1 text-xs/4 font-medium text-white`}>{tag}</span>}
-      <span className={`absolute left-2 ${stale ? 'bottom-10' : 'bottom-2'} inline-flex items-center gap-1 rounded-full font-semibold ${chip} ${onFrame} ${kind === 'LIVE' ? 'bg-red-600 text-white' : 'bg-amber-400 text-slate-950'}`}>
-        {kind === 'LIVE' && <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />}
-        {kind}
-        {!compact && kind !== 'SAMPLE' && <span className="font-medium">· {sourceLabel(camera)}</span>}
+      <span className={`absolute left-2 ${stale ? 'bottom-10' : 'bottom-2'} inline-flex items-center gap-1 rounded-full font-semibold ${chip} ${onFrame} ${kind === 'LIVE' && !showLoop ? 'bg-red-600 text-white' : 'bg-amber-400 text-slate-950'}`}>
+        {kind === 'LIVE' && !showLoop && <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />}
+        {showLoop ? 'PLAYBACK' : kind}
+        {!compact && !showLoop && kind !== 'SAMPLE' && <span className="font-medium">· {sourceLabel(camera)}</span>}
       </span>
 
-      {!camera.online && (
+      {demo && !compact && (
+        <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5">
+          {showLoop && <span className="rounded-md bg-black/65 px-2 py-1 text-xs/4 font-medium text-white">AI-generated demo loop, not tied to the readings</span>}
+          <button
+            type="button"
+            aria-pressed={showLoop}
+            onClick={() => setLoopOn(!loopOn)}
+            className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs/4 font-semibold shadow ring-1 ring-black/25 ${interactive} ${showLoop ? 'bg-white text-slate-900' : 'bg-slate-900/80 text-white hover:bg-slate-900'}`}
+          >
+            {showLoop ? <Radio className="h-3.5 w-3.5" aria-hidden="true" /> : <Film className="h-3.5 w-3.5" aria-hidden="true" />}
+            {showLoop ? 'Back to live frame' : 'Demo loop'}
+          </button>
+        </div>
+      )}
+
+      {!camera.online && !showLoop && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-900/90 px-4 text-center">
           <WifiOff className="h-7 w-7 text-slate-300" aria-hidden="true" />
           <p className="font-heading text-base/6 font-bold text-white">Camera offline</p>

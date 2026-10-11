@@ -114,3 +114,16 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - Architecture: [01_ARCHITECTURE.md](./01_ARCHITECTURE.md)
 - Known Issues: [13_KNOWN_ISSUES.md](./13_KNOWN_ISSUES.md)
 - Coding Conventions: [14_CODING_CONVENTIONS.md](./14_CODING_CONVENTIONS.md)
+
+## Live Vision: restarts, seed data and sample media (2026-10-11)
+
+- **Demo default:** `VISION_SEED_SAMPLES=1`. With it on, a cold start registers five sample cameras (`backend/app/vision/seed.py`)
+  plus the offline `sample-backyard-stream`. With `0`, a cold start shows no cameras.
+- **What survives a restart:** cameras added by users and their calibration (`cameras.json` under `VISION_DATA_DIR`). Sample cameras
+  are re-seeded each start. Readings, history and alerts are in memory and are lost. (Test: `test_user_cameras_survive_a_cold_restart`.)
+- **Sample imagery:** each sample camera uses the photo set in `backend/app/vision/sample_media/` (`FrameSetSource`). If a camera's
+  four photos or its calibration are missing it falls back to the drawn vector scene, so the app still runs.
+- **Known defect in that media:** the WATCH/WARNING/DANGER frames are a flat rectangle drawn over the NORMAL frame, not generated water.
+  See `sample_media/README.md` and `docs/PLAN_A_GEMINI_MEDIA.md` ("Defect found"). The 20/20 classification result is not an accuracy figure.
+- **Testing aid:** `VISION_SAMPLE_CLOCK_OFFSET_S` shifts the sample cameras' clock so a given level can be reached on demand.
+- **Write protection:** set `VISION_WRITE_TOKEN` to require `Authorization: Bearer <token>` on camera writes, the Telegram relay and the AI check.

@@ -168,3 +168,27 @@ def test_added_camera_starts_its_capture_loop_and_can_be_removed(client):
     while not rec.task.done() and time.time() < deadline:
         time.sleep(0.02)
     assert rec.task.done(), "capture loop kept running after removal"
+
+
+def test_user_cameras_survive_a_cold_restart(settings, monkeypatch):
+    """A restart must not lose cameras people added, or their calibration (P5-06)."""
+
+    async def no_loops(self, run_loops=True):
+        self._loop = asyncio.get_running_loop()
+        self._running = True
+        self._load_user_cameras()  # the real start() does this before spawning loops
+
+    monkeypatch.setattr(VisionEngine, "start", no_loops)
+    draft = _draft("https://93.184.216.34/a.jpg")
+    with TestClient(create_app(build_default_engine(settings))) as first:
+        created = first.post("/api/v1/vision/cameras", json=draft)
+        assert created.status_code == 201, created.text
+        cam_id = created.json()["id"]
+
+    # A brand new engine on the same data directory, as after a process restart.
+    with TestClient(create_app(build_default_engine(settings))) as second:
+        cams = {c["id"]: c for c in second.get("/api/v1/vision/cameras").json()}
+        assert cam_id in cams, "the user camera was lost on restart"
+        assert cams[cam_id]["calibration"]["lines"] == draft["calibration"]["lines"]
+        assert cams[cam_id]["provider"] == "mine"
+        assert {"sample-klang-jamek", "sample-backyard-stream"} <= set(cams), "sample cameras should be seeded on a cold start"
