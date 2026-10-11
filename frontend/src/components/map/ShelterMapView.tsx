@@ -29,6 +29,8 @@ import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegram
 import { InPageActionDock } from './InPageActionDock';
 import { VisionHazardLayer } from './VisionHazardLayer';
 import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
+import { formatCapacity, formatKm, formatMin, formatPct, percentOf } from '../../lib/format';
+import { estimateEtaMin } from '../../lib/mappers';
 import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
 import { detourAroundHazards, hazardsKey } from '../../lib/vision/hazards';
 import { Shelter } from '../../types';
@@ -376,13 +378,8 @@ export function ShelterMapView() {
     });
   }, [shelters, filter]);
 
-  const getTransportDetails = () => {
-    if (transportMode === 'bike') return { time: '10 min', speed: '45 km/h' };
-    if (transportMode === 'walk') return { time: '48 min', speed: '4.5 km/h' };
-    return { time: '14 min', speed: '35 km/h' };
-  };
-
-  const transport = getTransportDetails();
+  // Straight-line distance over an assumed speed: an estimate, shown with "~".
+  const etaFor = (km: number) => formatMin(estimateEtaMin(km, transportMode));
 
   // Dynamic route calculation: Automatically recalculates to whichever shelter is selected!
   // Live Vision flood zones (cameras at WARNING/DANGER) bend the route around them. Keyed on zone identity so the
@@ -681,7 +678,7 @@ export function ShelterMapView() {
                       {s.status}
                     </span>
                     <span className="text-slate-600 font-bold">
-                      {s.currentCapacity} / {s.maxCapacity} ({Math.round((s.currentCapacity / s.maxCapacity) * 100)}%)
+                      {formatCapacity(s.currentCapacity, s.maxCapacity)} ({formatPct(s.currentCapacity, s.maxCapacity)})
                     </span>
                   </div>
                   <span className="text-slate-500 block text-[11px]">{s.address}</span>
@@ -801,7 +798,7 @@ export function ShelterMapView() {
                 <div className="flex justify-between">
                   <span className="text-slate-400">Shelter Capacity:</span>
                   <span className="font-bold text-white">
-                    {selectedShelter?.currentCapacity} / {selectedShelter?.maxCapacity}
+                    {formatCapacity(selectedShelter?.currentCapacity, selectedShelter?.maxCapacity)}
                   </span>
                 </div>
               </div>
@@ -852,7 +849,7 @@ export function ShelterMapView() {
                 {selectedShelter?.name || 'Selected Shelter'}
               </div>
               <div className="text-[10px] text-slate-500 flex items-center gap-2">
-                <span>{selectedShelter?.distanceKm ?? 0.8} km away</span>
+                <span>{formatKm(selectedShelter?.distanceKm)} away</span>
                 <span>·</span>
                 <span className="text-emerald-600 font-bold">{selectedShelter?.status ?? 'OPEN'}</span>
               </div>
@@ -968,10 +965,10 @@ export function ShelterMapView() {
               <h2 className="font-heading font-extrabold text-base text-slate-900">
                 Evacuation Relief Centers
               </h2>
-              <span className="text-[11px] text-slate-500">Maximum 6 Safe Havens Registered</span>
+              <span className="text-[11px] text-slate-500">{shelters.length} safe {shelters.length === 1 ? 'haven' : 'havens'} registered (demo list)</span>
             </div>
             <span className="text-xs font-extrabold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">
-              {filteredShelters.length} / 6 Shown
+              {filteredShelters.length} / {shelters.length} shown
             </span>
           </div>
 
@@ -987,7 +984,7 @@ export function ShelterMapView() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {mode === 'all' ? 'All (6)' : mode === 'open' ? 'Open Only' : 'Recommended'}
+                {mode === 'all' ? `All (${shelters.length})` : mode === 'open' ? 'Open Only' : 'Recommended'}
               </button>
             ))}
           </div>
@@ -1028,7 +1025,7 @@ export function ShelterMapView() {
         <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 overscroll-contain pb-28 md:pb-6">
           {filteredShelters.map((s) => {
             const isSelected = s.id === selectedShelter?.id;
-            const capPct = Math.round((s.currentCapacity / s.maxCapacity) * 100);
+            const capPct = percentOf(s.currentCapacity, s.maxCapacity);
             const isFull = s.status === 'FULL';
             const isClosed = s.status === 'CLOSED';
             const isBlocked = s.routeStatus === 'BLOCKED';
@@ -1083,10 +1080,10 @@ export function ShelterMapView() {
                 </div>
 
                 <div className="flex items-center gap-2.5 my-2 text-xs text-slate-600">
-                  <span className="font-bold text-slate-800">{s.distanceKm} km</span>
+                  <span className="font-bold text-slate-800">{formatKm(s.distanceKm)}</span>
                   <span>·</span>
                   <span className="font-semibold text-[#1677FF]">
-                    ~{transport.time} ({transportMode})
+                    ~{etaFor(s.distanceKm)} ({transportMode})
                   </span>
                   <span>·</span>
                   <span
@@ -1101,21 +1098,21 @@ export function ShelterMapView() {
                 {/* Capacity Bar */}
                 <div className="space-y-1 mt-2">
                   <div className="flex justify-between text-[11px] text-slate-500 font-medium">
-                    <span>Capacity ({capPct}%)</span>
-                    <span className={`font-bold ${capPct >= 100 ? 'text-red-600' : 'text-slate-700'}`}>
-                      {s.currentCapacity} / {s.maxCapacity}
+                    <span>Capacity ({capPct === null ? '–' : `${capPct}%`})</span>
+                    <span className={`font-bold ${(capPct ?? 0) >= 100 ? 'text-red-600' : 'text-slate-700'}`}>
+                      {formatCapacity(s.currentCapacity, s.maxCapacity)}
                     </span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${
-                        capPct >= 100
+                        (capPct ?? 0) >= 100
                           ? 'bg-red-600'
-                          : capPct > 80
+                          : (capPct ?? 0) > 80
                           ? 'bg-amber-500'
                           : 'bg-emerald-500'
                       }`}
-                      style={{ width: `${Math.min(100, capPct)}%` }}
+                      style={{ width: `${capPct ?? 0}%` }}
                     />
                   </div>
                 </div>

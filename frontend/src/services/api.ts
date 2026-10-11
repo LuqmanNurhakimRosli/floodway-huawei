@@ -1,4 +1,5 @@
 import { Shelter, CitizenReport, ForecastData } from '../types';
+import { mapReport, mapShelter } from '../lib/mappers';
 
 const BACKEND_URL = 'http://localhost:8080/api/v1';
 
@@ -34,7 +35,10 @@ export async function fetchTwinState(deviceId = 'fw-node-01') {
 export async function fetchShelters(): Promise<Shelter[]> {
   try {
     const res = await fetch(`${BACKEND_URL}/shelters`, { signal: AbortSignal.timeout(3000) });
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const raw = await res.json();
+      if (Array.isArray(raw) && raw.length > 0) return raw.map((r) => mapShelter(r));
+    }
   } catch (e) {}
 
   return [
@@ -146,7 +150,10 @@ export async function fetchShelters(): Promise<Shelter[]> {
 export async function fetchReports(): Promise<CitizenReport[]> {
   try {
     const res = await fetch(`${BACKEND_URL}/reports`, { signal: AbortSignal.timeout(3000) });
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const raw = await res.json();
+      if (Array.isArray(raw) && raw.length > 0) return raw.map((r) => mapReport(r));
+    }
   } catch (e) {}
 
   return [

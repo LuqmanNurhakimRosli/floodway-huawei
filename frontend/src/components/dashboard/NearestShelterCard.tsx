@@ -2,23 +2,25 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Navigation, Users, CheckCircle2, Phone } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
+import { formatCapacity, formatKm, formatMin, percentOf } from '../../lib/format';
+import { mapShelter } from '../../lib/mappers';
+import type { Shelter } from '../../types';
+
+/** Nearest shelter that is open; if none is open, the nearest of all. */
+function nearestShelter(shelters: Shelter[]): Shelter | undefined {
+  const byDistance = (a: Shelter, b: Shelter) => a.distanceKm - b.distanceKm;
+  const open = shelters.filter((s) => s.status === 'OPEN').sort(byDistance);
+  return open[0] ?? [...shelters].sort(byDistance)[0];
+}
 
 export function NearestShelterCard() {
   const navigate = useNavigate();
   const { shelters } = useApp();
-  const primaryShelter = shelters[0] || {
-    id: 'shelter-01',
-    name: 'SK Seksyen 24 Shah Alam',
-    category: 'Relief Center / School',
-    status: 'OPEN',
-    currentCapacity: 146,
-    maxCapacity: 200,
-    distanceKm: 1.2,
-    travelTimeMin: 7,
-    routeStatus: 'CLEAR'
-  };
+  const primaryShelter =
+    nearestShelter(shelters) ??
+    mapShelter({ id: 'shelter-01', name: 'SK Seksyen 24 Shah Alam', category: 'Relief Center / School', status: 'OPEN', lat: 3.045, lon: 101.528, currentCapacity: 146, maxCapacity: 200, routeStatus: 'CLEAR' });
 
-  const capacityPct = Math.round((primaryShelter.currentCapacity / primaryShelter.maxCapacity) * 100);
+  const capacityPct = percentOf(primaryShelter.currentCapacity, primaryShelter.maxCapacity);
 
   return (
     <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs flex flex-col justify-between h-full">
@@ -43,7 +45,7 @@ export function NearestShelterCard() {
         {/* Distance and Route Badge */}
         <div className="flex items-center gap-3 my-4 text-xs">
           <div className="px-2.5 py-1 rounded-lg bg-slate-100 font-semibold text-slate-700">
-            {primaryShelter.distanceKm} km · ~{primaryShelter.travelTimeMin} min (by car)
+            {formatKm(primaryShelter.distanceKm)} · ~{formatMin(primaryShelter.travelTimeMin)} by car (estimate)
           </div>
           <div className="flex items-center gap-1 text-emerald-700 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
@@ -59,15 +61,15 @@ export function NearestShelterCard() {
               Shelter Occupancy
             </span>
             <span className="font-bold text-slate-800">
-              {primaryShelter.currentCapacity} / {primaryShelter.maxCapacity} ({capacityPct}%)
+              {formatCapacity(primaryShelter.currentCapacity, primaryShelter.maxCapacity)}{capacityPct === null ? '' : ` (${capacityPct}%)`}
             </span>
           </div>
           <div className="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${
-                capacityPct > 85 ? 'bg-red-500' : capacityPct > 60 ? 'bg-amber-500' : 'bg-emerald-500'
+                (capacityPct ?? 0) > 85 ? 'bg-red-500' : (capacityPct ?? 0) > 60 ? 'bg-amber-500' : 'bg-emerald-500'
               }`}
-              style={{ width: `${capacityPct}%` }}
+              style={{ width: `${capacityPct ?? 0}%` }}
             />
           </div>
         </div>

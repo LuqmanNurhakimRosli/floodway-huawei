@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { CitizenReport } from '../../types';
+import { formatCm } from '../../lib/format';
 
 interface Props {
   filter: 'all' | 'nearby' | 'verified' | 'active';
@@ -117,7 +118,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                   isHighRisk ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
                 }`}>
-                  {report.waterDepthCm} cm
+                  {formatCm(report.waterDepthCm)}
                 </span>
               </div>
 
@@ -143,7 +144,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 <div className="grid grid-cols-3 gap-1.5 pt-1">
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
                     <span className="text-[10px] font-semibold text-slate-400 block uppercase">Water Depth</span>
-                    <span className="font-mono text-xs font-bold text-slate-900">{report.waterDepthCm} cm</span>
+                    <span className="font-mono text-xs font-bold text-slate-900">{formatCm(report.waterDepthCm)}</span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
