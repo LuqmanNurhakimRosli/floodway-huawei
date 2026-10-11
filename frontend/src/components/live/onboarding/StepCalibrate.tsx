@@ -21,8 +21,8 @@ export function StepCalibrate({ imageUrl, value, onChange }: Props) {
   return (
     <div className="space-y-3">
       <CalibrationCanvas imageUrl={imageUrl} value={value} onChange={onChange} />
-      <p className="rounded-xl bg-blue-50 px-3 py-2 text-sm text-slate-800">
-        Place the <b>Danger</b> line at the top of the bank and <b>Warning</b> about halfway. The <b>Normal</b> line marks the usual water level. Outline only the water channel, not the road.
+      <p className="rounded-xl bg-blue-50 px-3 py-2 text-sm/5 text-slate-800">
+        Drag <b>Danger</b> to the top of the bank, <b>Normal</b> to the usual water level, <b>Warning</b> between. Outline only the water.
       </p>
       <div className="flex flex-wrap gap-2">
         <button type="button" className={tool} disabled={value.roi.length === 0} onClick={() => onChange({ ...value, roi: value.roi.slice(0, -1) })}>

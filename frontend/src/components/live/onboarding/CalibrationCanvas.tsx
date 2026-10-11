@@ -1,12 +1,17 @@
+import { GripHorizontal } from 'lucide-react';
 import { useRef } from 'react';
 import type { KeyboardEvent, PointerEvent } from 'react';
 import type { Calibration, Lines, Point } from '../../../types/vision';
+import { useElementHeight } from '../../../hooks/vision/useElementSize';
+import { spreadLabels } from '../../../lib/vision/labels';
 import { RiverScene } from '../feed/RiverScene';
 
 type LineKey = keyof Lines;
 type Drag = { kind: 'line'; key: LineKey } | { kind: 'point'; index: number } | null;
 
 const GAP = 0.03;
+const PILL_PX = 36; // pill height plus breathing room
+const LINE_ORDER: LineKey[] = ['danger', 'warning', 'normal']; // top to bottom
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const LINE_UI: Record<LineKey, { label: string; stroke: string; tag: string }> = {
   danger: { label: 'Danger', stroke: '#EF4444', tag: 'bg-red-600 text-white' },
@@ -31,6 +36,7 @@ interface Props {
 export function CalibrationCanvas({ imageUrl, value, onChange }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const drag = useRef<Drag>(null);
+  const height = useElementHeight(box);
 
   const toNorm = (e: { clientX: number; clientY: number }): Point => {
     const r = box.current?.getBoundingClientRect();
@@ -78,6 +84,9 @@ export function CalibrationCanvas({ imageUrl, value, onChange }: Props) {
     }
   };
 
+  // Pills are offset from their lines when lines sit close, so they never cover each other.
+  const pillTops = spreadLabels(LINE_ORDER.map((k) => value.lines[k]), height ? PILL_PX / height : 0.1, 0.06, 0.94);
+
   const polyPoints = value.roi.map(([x, y]) => `${x * 100},${y * 100}`).join(' ');
 
   return (
@@ -99,7 +108,7 @@ export function CalibrationCanvas({ imageUrl, value, onChange }: Props) {
         ))}
       </svg>
 
-      {(Object.keys(LINE_UI) as LineKey[]).map((k) => (
+      {LINE_ORDER.map((k, i) => (
         <div
           key={k}
           role="slider"
@@ -112,10 +121,13 @@ export function CalibrationCanvas({ imageUrl, value, onChange }: Props) {
           onPointerDown={(e) => begin(e, { kind: 'line', key: k })}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => keyLine(e, k)}
-          className="absolute right-0 flex h-11 w-32 -translate-y-1/2 cursor-ns-resize touch-none items-center justify-end rounded-l-full focus:outline-none focus-visible:bg-white/25"
-          style={{ top: `${value.lines[k] * 100}%` }}
+          className="group absolute right-0 z-10 flex h-11 w-28 -translate-y-1/2 cursor-ns-resize touch-none items-center justify-end rounded-l-full focus:outline-none"
+          style={{ top: `${pillTops[i] * 100}%` }}
         >
-          <span className={`mr-1 flex h-8 items-center rounded-full px-3 text-xs font-bold shadow ${LINE_UI[k].tag}`}>{LINE_UI[k].label} ⇅</span>
+          <span className={`mr-1 flex h-8 items-center gap-1 rounded-full px-3 text-xs font-semibold shadow ring-1 ring-black/20 group-focus-visible:ring-2 group-focus-visible:ring-[#1677FF] group-focus-visible:ring-offset-2 ${LINE_UI[k].tag}`}>
+            <GripHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+            {LINE_UI[k].label}
+          </span>
         </div>
       ))}
 
@@ -127,15 +139,15 @@ export function CalibrationCanvas({ imageUrl, value, onChange }: Props) {
           onPointerDown={(e) => begin(e, { kind: 'point', index: i })}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => keyPoint(e, i)}
-          className="group absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none items-center justify-center focus:outline-none"
+          className="group absolute z-20 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none items-center justify-center focus:outline-none"
           style={{ left: `${x * 100}%`, top: `${y * 100}%` }}
         >
-          <span className="h-4 w-4 rounded-full border-[3px] border-[#1677FF] bg-white shadow group-focus-visible:ring-2 group-focus-visible:ring-white" />
+          <span className="h-4 w-4 rounded-full border-[3px] border-[#1677FF] bg-white shadow group-focus-visible:ring-2 group-focus-visible:ring-[#1677FF] group-focus-visible:ring-offset-2" />
         </button>
       ))}
 
       {value.roi.length === 0 && (
-        <p className="pointer-events-none absolute inset-x-0 top-3 mx-auto w-fit rounded-full bg-black/65 px-3 py-1 text-xs font-semibold text-white">Tap the frame to outline the water zone</p>
+        <p className="pointer-events-none absolute inset-x-0 top-3 mx-auto w-fit rounded-full bg-black/65 px-3 py-1 text-xs font-semibold text-white">Tap to outline the water</p>
       )}
     </div>
   );

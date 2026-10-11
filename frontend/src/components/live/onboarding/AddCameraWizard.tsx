@@ -61,15 +61,26 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
 
   const close = useCallback(() => { reset(); onClose(); }, [reset, onClose]);
 
-  // Escape closes, focus moves into the dialog, page scroll is locked while open.
+  // Escape closes, focus moves into the dialog and stays there (Tab wraps), page scroll is locked,
+  // and focus returns to whatever opened the dialog.
   useEffect(() => {
     if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
     dialog.current?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') return close();
+      if (e.key !== 'Tab' || !dialog.current) return;
+      const focusable = [...dialog.current.querySelectorAll<HTMLElement>('button:not([disabled]), input, select, [tabindex="0"]')];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog.current)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
     document.addEventListener('keydown', onKey);
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = previous; };
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = previous; opener?.focus?.(); };
   }, [open, close]);
 
   const runTest = useCallback(async () => {
@@ -100,7 +111,8 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
         setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url; });
         setStep(1);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Could not reach that camera.');
+        if (err instanceof ApiError && err.status === 422) setError(`This URL can't be used: ${err.message}.`);
+        else setError(err instanceof Error ? `Could not get a frame from that camera: ${err.message}` : 'Could not reach that camera.');
       } finally {
         setBusy(false);
       }
@@ -127,21 +139,25 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
   const canNext = step === 1 ? linesAreValid(calibration) : true;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="presentation">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" role="presentation">
       <div className="absolute inset-0 bg-slate-900/60" onClick={close} aria-hidden="true" />
-      <div ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="wiz-title" className="relative flex max-h-[92vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl focus:outline-none sm:max-w-3xl sm:rounded-3xl">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <h2 id="wiz-title" className={`${heading} text-lg`}>Add my camera</h2>
-          <button type="button" onClick={close} aria-label="Close" className={`flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 ${focusRing}`}>
+      <div ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="wiz-title" className="relative flex h-[100dvh] w-full flex-col bg-white shadow-xl focus:outline-none sm:h-auto sm:max-h-[min(92dvh,880px)] sm:max-w-[720px] sm:rounded-2xl">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-6 sm:py-4">
+          <div className="min-w-0">
+            <h2 id="wiz-title" className={`${heading} text-lg/7`}>Add my camera</h2>
+            <p className="text-xs/4 text-slate-600">Step {step + 1} of {STEPS.length}: {STEPS[step]}</p>
+          </div>
+          <button type="button" onClick={close} aria-label="Close" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 ${focusRing}`}>
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
-        <ol className="flex items-center gap-2 px-5 pt-4" aria-label="Progress">
+        <ol className="flex items-center gap-2 px-4 pt-4 sm:px-6" aria-label="Progress">
           {STEPS.map((label, i) => (
             <li key={label} className="flex flex-1 items-center gap-2" aria-current={i === step ? 'step' : undefined}>
-              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i < step ? 'bg-emerald-700 text-white' : i === step ? 'bg-[#1677FF] text-white' : 'bg-slate-200 text-slate-600'}`}>
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${i < step ? 'bg-emerald-700 text-white' : i === step ? 'bg-[#1677FF] text-white' : 'bg-slate-200 text-slate-700'}`}>
                 {i < step ? <Check className="h-4 w-4" aria-hidden="true" /> : i + 1}
+                <span className="sr-only">{i < step ? ' (done)' : ''}</span>
               </span>
               <span className={`hidden text-sm font-semibold sm:inline ${i === step ? 'text-slate-900' : 'text-slate-600'}`}>{label}</span>
               {i < STEPS.length - 1 && <span className="h-px flex-1 bg-slate-200" aria-hidden="true" />}
@@ -149,13 +165,13 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
           ))}
         </ol>
 
-        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6">
           {step === 0 && <StepSource form={form} onChange={setForm} error={error} onUseMyLocation={gpsAvailable ? () => setForm({ ...form, lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4) }) : null} />}
           {step === 1 && <StepCalibrate imageUrl={previewUrl} value={calibration} onChange={setCalibration} />}
           {step === 2 && <StepTest loading={testing} error={testError} reading={reading} offlineSample={offlineDemo} onRetry={runTest} />}
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-5 py-4">
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:rounded-b-2xl sm:px-6 sm:py-4">
           <button type="button" onClick={() => (step === 0 ? close() : setStep(step - 1))} className={btnSecondary}>
             {step === 0 ? 'Cancel' : 'Back'}
           </button>

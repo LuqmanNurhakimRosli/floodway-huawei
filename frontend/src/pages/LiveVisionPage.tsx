@@ -172,7 +172,7 @@ export default function LiveVisionPage() {
                     <AnalysisColumn
                       camera={selected}
                       history={state.history[selected.id] ?? []}
-                      action={<RouteAction level={selectedLevel} onClick={() => showOnMap(selected.id)} className="hidden @min-[760px]/main:inline-flex" />}
+                      action={<div className="hidden @min-[760px]/main:block"><RouteAction level={selectedLevel} onClick={() => showOnMap(selected.id)} /></div>}
                     />
                   </aside>
                 )}

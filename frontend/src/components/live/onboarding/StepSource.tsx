@@ -1,4 +1,5 @@
 import { Smartphone } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import type { CameraDraft } from '../../../types/vision';
 import { focusRing } from '../shared/ui';
 
@@ -24,6 +25,9 @@ const input = `min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 
 const label = 'mb-1 block text-sm font-semibold text-slate-800';
 
 export function StepSource({ form, onChange, error, onUseMyLocation }: Props) {
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  // The error sits under the form; bring it into view so the user sees why nothing happened.
+  useEffect(() => { if (error) errorRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, [error]);
   const set = <K extends keyof SourceForm>(key: K, value: SourceForm[K]) => onChange({ ...form, [key]: value });
   const types: { id: CameraDraft['source_type'] | 'phone'; text: string; disabled?: boolean }[] = [
     { id: 'stream', text: 'Stream URL (RTSP / HLS)' },
@@ -105,7 +109,7 @@ export function StepSource({ form, onChange, error, onUseMyLocation }: Props) {
       </div>
 
       {error && (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
+        <p ref={errorRef} role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm/5 font-semibold text-red-800">
           {error}
         </p>
       )}
