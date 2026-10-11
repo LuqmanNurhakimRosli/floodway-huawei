@@ -32,6 +32,10 @@ let probeTimer: ReturnType<typeof setInterval> | null = null;
 let releaseTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const getState = (): VisionState => state;
+
+/** True when the server cannot be reached at all: no live socket AND the last REST refresh failed. A dropped socket
+ *  alone is not "down" (polling still brings readings in), which is why both are required. */
+export const isServerDown = (s: VisionState): boolean => s.status === 'ready' && !s.usingMock && !s.connected && s.error !== null;
 export function subscribe(listener: () => void): () => void {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -138,7 +142,11 @@ async function connectLive(): Promise<void> {
   closeSocket = openVisionSocket({
     onMessage: applyMessage,
     onOpen: () => setState({ connected: true }),
-    onClose: () => setState({ connected: false }),
+    // A dropped socket triggers an immediate REST check, so a dead server is noticed now, not at the next 5 s poll.
+    onClose: () => {
+      setState({ connected: false });
+      void refresh();
+    },
   });
   startPolling();
 }

@@ -187,3 +187,19 @@ describe('level history', () => {
     expect(levelSince([])).toBeNull();
   });
 });
+
+describe('isServerDown', () => {
+  const base = store.getState();
+  const s = (over: Partial<typeof base>) => ({ ...base, status: 'ready' as const, usingMock: false, connected: false, error: null, ...over });
+  it('is down only when there is no socket AND the last REST refresh failed', () => {
+    expect(store.isServerDown(s({ error: 'Failed to fetch' }))).toBe(true);
+  });
+  it('a dropped socket alone is not down: polling still brings readings in', () => {
+    expect(store.isServerDown(s({ connected: false, error: null }))).toBe(false);
+  });
+  it('is not down while connected, on sample data, or before the first load', () => {
+    expect(store.isServerDown(s({ connected: true, error: 'x' }))).toBe(false);
+    expect(store.isServerDown(s({ usingMock: true, error: 'x' }))).toBe(false);
+    expect(store.isServerDown(s({ status: 'loading', error: 'x' }))).toBe(false);
+  });
+});

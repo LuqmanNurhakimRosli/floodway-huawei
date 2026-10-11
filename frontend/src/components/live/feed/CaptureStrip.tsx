@@ -11,7 +11,8 @@ export function CaptureStrip({ camera }: { camera: Camera }) {
   const reading = camera.reading;
 
   let label = `Next capture in ${cycle.secondsLeft}s`;
-  if (cycle.phase === 'offline') label = 'Camera offline. Retrying automatically.';
+  if (cycle.phase === 'disconnected') label = 'Server unreachable. Retrying automatically.';
+  else if (cycle.phase === 'offline') label = 'Camera offline. Retrying automatically.';
   else if (cycle.phase === 'stale') label = 'Waiting for a fresh frame';
   else if (cycle.phase === 'analysing') label = 'Analysing a burst of frames…';
 

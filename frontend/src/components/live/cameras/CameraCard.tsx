@@ -19,6 +19,7 @@ interface Props {
 }
 
 export function cycleStatus(camera: Camera, phase: string, secondsLeft: number): string {
+  if (phase === 'disconnected') return 'Server unreachable, retrying';
   if (!camera.online) return camera.last_frame_at ? `Offline for ${timeAgo(camera.last_frame_at).replace(' ago', '')}` : 'Offline · no frames yet';
   if (phase === 'stale') return 'Stale feed';
   if (phase === 'analysing') return 'Analysing…';

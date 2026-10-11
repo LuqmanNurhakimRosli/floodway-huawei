@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { Camera } from '../../types/vision';
+import { useServerDown } from './useServerDown';
 
-export type CyclePhase = 'offline' | 'stale' | 'analysing' | 'waiting';
+export type CyclePhase = 'disconnected' | 'offline' | 'stale' | 'analysing' | 'waiting';
 
 export interface CycleState {
   phase: CyclePhase;
@@ -12,12 +13,15 @@ export interface CycleState {
 /** Drives the "Next capture in 7s" indicator from the last reading's timestamp. The server does the capturing;
  *  this is only a visual countdown that resets whenever a new reading arrives. */
 export function useCaptureCycle(camera: Camera): CycleState {
+  const serverDown = useServerDown();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(t);
   }, []);
 
+  // Server gone: say so, instead of "Analysing…" (which used to show for up to 16 s).
+  if (serverDown) return { phase: 'disconnected', secondsLeft: 0, progress: 0 };
   if (!camera.online) return { phase: 'offline', secondsLeft: 0, progress: 0 };
   const reading = camera.reading;
   if (!reading) return { phase: 'analysing', secondsLeft: 0, progress: 0 };

@@ -12,7 +12,7 @@ export function CountdownRing({ cycle, size = 44 }: Props) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const analysing = cycle.phase === 'analysing';
-  const dim = cycle.phase === 'offline' || cycle.phase === 'stale';
+  const dim = cycle.phase === 'offline' || cycle.phase === 'stale' || cycle.phase === 'disconnected';
   const dash = analysing ? c * 0.28 : c * Math.max(0, Math.min(1, cycle.progress));
   const label = analysing ? 'Analysing now' : dim ? 'No countdown' : `${cycle.secondsLeft} seconds to next capture`;
   return (
