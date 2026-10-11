@@ -59,3 +59,60 @@ Baseline health: `pytest -q` 58 passed. `tsc -b` clean. Backend reachable, CORS 
 6. Wizard: focus trap, full-height phone sheet, non-overlapping pills (D22).
 7. Map: routes bend around vision zones (S5). Remove dead 3D code and lazy-load `/studio` (S2, S3).
 8. Accessibility sweep, then the full viewport matrix.
+
+## Result (after the polish pass)
+
+All screenshots below are in `docs/screenshots/after/`, captured against the real backend (`:8080`) unless noted.
+States that need the backend to change were driven on an isolated pair (`:5174` -> `:8091`) so the main servers were
+never restarted; that backend used `VISION_SAMPLE_CLOCK_OFFSET_S` to reach states on demand.
+
+### Viewport matrix (`live-<W>x<H>.png`)
+
+| Viewport | Content width | Layout | H-scroll | Text < 12px | Console errors | Failed requests |
+|---|---|---|---|---|---|---|
+| 1920x1080 | 1660 | 3 col | no | 0 | 0 | 0 |
+| 1536x864 | 1276 | 3 col (full sidebar) | no | 0 | 0 | 0 |
+| 1440x900 | 1364 | 3 col (icon rail) | no | 0 | 0 | 0 |
+| 1366x768 | 1290 | 3 col (icon rail) | no | 0 | 0 | 0 |
+| 1280x720 | 1204 | 2 col | no | 0 | 0 | 0 |
+| 1024x768 | 948 | 2 col | no | 0 | 0 | 0 |
+| 820x1180 | 744 | 1 col, 2-up analysis | no | 0 | 0 | 0 |
+| 768x1024 | 692 | 1 col, 2-up analysis | no | 0 | 0 | 0 |
+| 430x932 | 430 | phone | no | 0 | 0 | 0 |
+| 390x844 | 390 | phone | no | 0 | 0 | 0 |
+| 360x740 | 360 | phone | no | 0 | 0 | 0 |
+| 1366 / 1440, sidebar expanded (`-sidebar-expanded`) | 1106 / 1180 | 2 col | no | - | 0 | - |
+
+### States (`state-<W>x<H>-<state>.png`, at 1366x768 and 390x844)
+
+| State | Result |
+|---|---|
+| loading | skeleton uses the real grid |
+| backend-down | one-line notice, chip says "Sample data" |
+| recovered | switched to live data by itself (no reload) about 5 s after the server came up |
+| toast | WARNING escalation: toast + browser notification ("FloodWay WARNING …") + Recent alerts |
+| reconnecting | chip says "Reconnecting" when the server dies with the page open |
+| stale | stale overlay / "Stale feed" status after the cycle overruns |
+| (reconnect) | websocket reconnected on its own after the server returned |
+| grid | all 12 cameras, equal tiles |
+| one-camera / my-cameras / empty | search to 1 result; My cameras tab; no-match search with "Clear search" |
+| offline-camera | offline overlay, "no frames yet", "Try now" |
+| long-name | 70+ character name truncates with a title tooltip |
+| map-route-avoids-zone | route bends around a WARNING camera zone; panel says so |
+
+Wizard (`wizard-*` in the session scratch, summarised): focus trapped (25 Tabs stayed inside), validation error,
+SSRF rejection ("This URL can't be used: that address is on a private or reserved network."), real preview frame,
+lines moved by keyboard, pills never overlap, test result, Escape closes. Checked at 1366x768 and 390x844.
+
+### Accessibility (automated, `prefers-reduced-motion: reduce`)
+
+- Keyboard: 31 focus stops at 1366 and 18 at 390 inside `<main>`, all with a visible focus indicator.
+- Contrast: 149 (desktop) and 91 (phone) text nodes checked against WCAG AA; 0 below threshold.
+- No CSS animation runs under reduced motion.
+
+### Build and tests
+
+- `npm run build`: passes (three.js now a separate 922 kB chunk that only `/studio` loads).
+- `npx tsc -b`: clean.
+- `pytest -q` (backend): 60 passed (58 original + 2 new).
+- Frontend: 26 passed with `npx vitest@2.1.9 run` (vitest is not a project dependency; run through npx).

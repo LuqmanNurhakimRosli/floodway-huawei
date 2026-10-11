@@ -48,6 +48,18 @@
 - Replaced placeholder `.env` values with real Firebase config
 - Fixed authentication flow (login → redirect to /home)
 
+## 2026-10-11
+
+### Live Vision polish pass (branch `live-vision-polish`)
+- Audited the Antigravity Live Vision integration against the running app; findings and evidence in `docs/LIVE_VISION_AUDIT.md`.
+- Layout now follows the width of the page's content area (Tailwind container queries), fixing overlapping columns at 1024px and the crushed feed at 1366px; sidebar starts as an icon rail on /live below 1536px.
+- Store recovers from sample data when the server comes up (the "Showing sample data" banner used to stick until reload).
+- Backend: `POST /cameras` returned 500 and new cameras were never analysed (task spawned off the event loop); fixed with a regression test. Added `VISION_SAMPLE_CLOCK_OFFSET_S` (testing aid, backend only).
+- Map: evacuation routes bend around Live Vision WARNING/DANGER zones.
+- Removed the unreachable 3D SimulationPage and components/simulation; /studio is lazy-loaded so three.js no longer loads on every page.
+- Wizard: focus trap, full-height phone sheet, non-overlapping calibration pills. Contrast raised to WCAG AA.
+- Files: frontend/src/pages/LiveVisionPage.tsx, frontend/src/components/live/**, frontend/src/lib/vision/**, frontend/src/hooks/vision/**, frontend/src/services/vision/visionStore.ts, frontend/src/components/map/ShelterMapView.tsx, frontend/src/App.tsx, backend/app/vision/{engine,config,seed}.py.
+
 ---
 
 ## Format for Future Entries
