@@ -28,6 +28,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { dispatchArrivalCheckin, TELEGRAM_CONFIG } from '../../services/telegramService';
 import { InPageActionDock } from './InPageActionDock';
 import { VisionHazardLayer } from './VisionHazardLayer';
+import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
+import { detourAroundHazards, hazardsKey } from '../../lib/vision/hazards';
 import { Shelter } from '../../types';
 
 // Custom Animated Leaflet DivIcons
@@ -382,13 +384,20 @@ export function ShelterMapView() {
   const transport = getTransportDetails();
 
   // Dynamic route calculation: Automatically recalculates to whichever shelter is selected!
+  // Live Vision flood zones (cameras at WARNING/DANGER) bend the route around them. Keyed on zone identity so the
+  // route only changes when a zone appears, disappears or changes level, not on every reading.
+  const visionHazards = useVisionHazards();
+  const visionKey = hazardsKey(visionHazards);
   const routeCalculation = useMemo(() => {
-    return calculateRouteForShelter(
+    const base = calculateRouteForShelter(
       currentDestLat,
       currentDestLon,
       floodSeverity
     );
-  }, [currentDestLat, currentDestLon, floodSeverity]);
+    const detour = detourAroundHazards(base.route, visionHazards);
+    return { ...base, route: detour.route, isDetour: base.isDetour || detour.avoided.length > 0, visionAvoided: detour.avoided };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentDestLat, currentDestLon, floodSeverity, visionKey]);
 
   const activeRoute = routeCalculation.route;
   const activeRoadblocks = routeCalculation.roadblocks;
@@ -948,6 +957,12 @@ export function ShelterMapView() {
               </span>
             )}
           </div>
+          {routeCalculation.visionAvoided.length > 0 && (
+            <p className="mt-2 flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-800">
+              <Route className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              Route bends around {routeCalculation.visionAvoided.length} Live Vision flood zone{routeCalculation.visionAvoided.length > 1 ? 's' : ''}.
+            </p>
+          )}
         </div>
 
         {/* SECTION 2: TRANSPORT MODE SWITCHER */}
