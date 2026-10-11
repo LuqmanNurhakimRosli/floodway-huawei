@@ -18,8 +18,14 @@ const availability = new Map<string, Promise<boolean>>();
 export function isVideoAvailable(url: string): Promise<boolean> {
   let p = availability.get(url);
   if (!p) {
-    p = fetch(url, { method: 'HEAD' })
-      .then((res) => res.ok && (res.headers.get('content-type') ?? '').startsWith('video/'))
+    // A tiny ranged GET that we read to the end. (A HEAD on a video URL gets its body cancelled by Chrome and shows up
+    // as a red ERR_ABORTED in the Network panel, even though nothing is wrong.)
+    p = fetch(url, { headers: { Range: 'bytes=0-0' } })
+      .then(async (res) => {
+        const ok = (res.status === 200 || res.status === 206) && (res.headers.get('content-type') ?? '').startsWith('video/');
+        await res.arrayBuffer().catch(() => undefined);
+        return ok;
+      })
       .catch(() => false);
     availability.set(url, p);
   }

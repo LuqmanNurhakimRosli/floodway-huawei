@@ -85,7 +85,7 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
           autoPlay={!reducedMotion}
           controls={reducedMotion}
           className="h-full w-full object-cover"
-          aria-label="Demo loop of the water rising and falling. AI-generated sample footage, not tied to the readings."
+          aria-label="Sample loop of the water rising and falling. An AI-generated base photo with a synthetic water overlay, not tied to the readings."
         />
       ) : !camera.online ? null : useScene ? (
         <RiverScene ratio={reading?.water_ratio ?? 0} />
@@ -142,7 +142,7 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
 
       {demo && !compact && (
         <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5">
-          {showLoop && <span className="rounded-md bg-black/65 px-2 py-1 text-xs/4 font-medium text-white">AI-generated demo loop, not tied to the readings</span>}
+          {showLoop && <span className="rounded-md bg-black/65 px-2 py-1 text-xs/4 font-medium text-white">Sample loop (AI base photo, synthetic water), not tied to the readings</span>}
           <button
             type="button"
             aria-pressed={showLoop}
