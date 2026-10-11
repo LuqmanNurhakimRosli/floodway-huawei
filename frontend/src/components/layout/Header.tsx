@@ -66,7 +66,7 @@ export function Header() {
         {/* Live operational badge */}
         <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-700">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>Live Telemetry · 14 Sensors Active</span>
+          <span>Demo scenario · simulated sensors</span>
         </div>
       </div>
 

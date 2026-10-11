@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../contexts/AppContext';
 
 export function EmergencyAlertBanner() {
-  const { floodPhase } = useApp();
+  const { floodPhase, waterLevelM } = useApp();
   const navigate = useNavigate();
 
   if (floodPhase !== 'DANGER' && floodPhase !== 'WARNING') return null;
@@ -13,9 +13,9 @@ export function EmergencyAlertBanner() {
     <div className="bg-gradient-to-r from-[#DC2626] to-[#B91C1C] text-white px-4 py-2 text-xs md:text-sm font-medium flex items-center justify-between shadow-md">
       <div className="flex items-center gap-2 max-w-[85%] truncate">
         <AlertTriangle className="w-4 h-4 shrink-0 text-amber-200 animate-pulse" />
-        <span className="font-bold">CRITICAL WARNING:</span>
+        <span className="font-bold">DEMO SCENARIO:</span>
         <span className="truncate">
-          River water depth exceeded safe threshold (1.20m). Evacuation advised for low-lying zones.
+          Simulated river level {waterLevelM.toFixed(2)} m is above the warning threshold. Evacuation advised for low-lying zones (simulated).
         </span>
       </div>
       <button

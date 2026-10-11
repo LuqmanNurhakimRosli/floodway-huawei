@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Radio, Battery, Activity, Usb, CheckCircle2, ChevronDown } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { connectUsbSerial } from '../../services/telemetryService';
+import { DEMO_SCENARIO } from '../../config/demoScenario';
 
 export function IoTHeaderPopover() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +22,7 @@ export function IoTHeaderPopover() {
       >
         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
         {/* Full label — hidden on very small phones */}
-        <span className="hidden sm:inline">IoT 12/14 Online</span>
+        <span className="hidden sm:inline">IoT demo · {DEMO_SCENARIO.sensors.online}/{DEMO_SCENARIO.sensors.active} (simulated)</span>
         {/* Icon-only on xs */}
         <Radio className="w-3.5 h-3.5 sm:hidden" />
         <ChevronDown className="w-3 h-3 text-slate-400" />
@@ -30,16 +31,16 @@ export function IoTHeaderPopover() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
-            <span className="font-heading font-bold text-sm text-slate-900">Station Telemetry</span>
+            <span className="font-heading font-bold text-sm text-slate-900">Station telemetry (simulated)</span>
             <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">
-              #FW-KL-04
+              {DEMO_SCENARIO.station.id}
             </span>
           </div>
 
           <div className="space-y-2.5 text-xs">
             <div className="flex justify-between text-slate-600">
               <span>Location:</span>
-              <span className="font-semibold text-slate-800">Kampung Baru Sluice</span>
+              <span className="font-semibold text-slate-800">{DEMO_SCENARIO.station.name}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Ultrasonic Distance:</span>
@@ -52,7 +53,7 @@ export function IoTHeaderPopover() {
             <div className="flex justify-between text-slate-600">
               <span>Battery & Signal:</span>
               <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                <Battery className="w-3.5 h-3.5" /> 94% · -68 dBm
+                <Battery className="w-3.5 h-3.5" /> {DEMO_SCENARIO.station.batteryPct}% · {DEMO_SCENARIO.station.signalDbm} dBm
               </span>
             </div>
           </div>

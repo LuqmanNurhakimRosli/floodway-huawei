@@ -830,7 +830,7 @@ export function ShelterMapView() {
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: severityTokens.color }} />
-            <span>5 Flood Basins ({severityTokens.label})</span>
+            <span>Demo flood basins ({severityTokens.label}, simulated)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
@@ -946,7 +946,7 @@ export function ShelterMapView() {
                   ? 'bg-amber-100 text-amber-800 border border-amber-300'
                   : 'bg-red-100 text-red-800 border border-red-300'
               }`}>
-                0 Hazards
+                {visionHazards.length} camera {visionHazards.length === 1 ? 'zone' : 'zones'}
               </span>
             )}
           </div>
