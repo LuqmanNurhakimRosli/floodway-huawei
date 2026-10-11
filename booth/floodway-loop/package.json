@@ -1,0 +1,22 @@
+{
+  "name": "floodway-booth-film",
+  "version": "2.0.0",
+  "private": true,
+  "description": "FloodWay 60-second product film: build (build.mjs), export + QA (render.mjs). index.html itself needs no dependencies.",
+  "scripts": {
+    "build": "node build.mjs",
+    "render": "node build.mjs && node render.mjs",
+    "stills": "node render.mjs --stills",
+    "sheet": "node render.mjs --sheet",
+    "qa": "node build.mjs && node render.mjs --qa && node audit-claims.mjs",
+    "bench": "node render.mjs --bench",
+    "audio": ".venv\\Scripts\\python.exe make_audio.py"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@fontsource/outfit": "5.3.0",
+    "playwright-core": "1.60.0"
+  }
+}

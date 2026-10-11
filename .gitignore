@@ -1,23 +1,57 @@
-# Dependencies
+# ============================================================
+# Dependencies (Anywhere in repo)
+# ============================================================
 node_modules/
-*/node_modules/
+**/node_modules/
 
-# Python
-__pycache__/
-*/__pycache__/
-*/*/__pycache__/
-*.py[cod]
-*$py.class
-venv/
+# ============================================================
+# Python virtual environments & caches (Anywhere in repo)
+# ============================================================
 .venv/
+**/.venv/
+venv/
+**/venv/
 env/
+**/env/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+**/*.py[cod]
+*$py.class
+.pytest_cache/
+**/.pytest_cache/
 
-# Build artifacts
+# ============================================================
+# Build artifacts & Heavy Render Outputs
+# ============================================================
 dist/
 build/
-*/dist/
+**/dist/
+**/build/
+**/out/
+out/
+*.tsbuildinfo
+**/*.tsbuildinfo
 
-# Environment variables
+# ============================================================
+# Large Binary Models & Speech synthesis (>100MB)
+# ============================================================
+**/models/*.onnx
+**/models/*.bin
+booth/**/models/
+booth/**/out/
+booth/**/audio-tts/
+loop/
+
+# ============================================================
+# Agent Workspace Customizations & Local Tooling
+# ============================================================
+.agents/
+claude-code-setup/
+
+# ============================================================
+# Environment variables & Local Secrets
+# ============================================================
 .env
 .env.*
 *.env
@@ -28,10 +62,11 @@ build/
 !.env.example
 !**/.env.example
 
-# Editor & OS
+# ============================================================
+# Editor & OS Artifacts
+# ============================================================
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 files (*)/
-

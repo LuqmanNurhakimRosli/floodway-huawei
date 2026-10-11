@@ -38,7 +38,7 @@ Unlike legacy rural river alert systems that require thousands of expensive, fra
    * **Citizen Sentinel Hub (`/reports`):** Public alerting feed with two-tier validation (AI Vision + Human Authority Desk).
    * **Telegram Emergency Siren (`@floodway_bot`):** Automated urgent warnings and safe arrival check-ins to family groups.
 
-*For complete architectural specifications, see [docs/URBAN_FLASH_FLOOD_ARCHITECTURE.md](docs/URBAN_FLASH_FLOOD_ARCHITECTURE.md).*
+*For complete architectural specifications and end-to-end Input-Process-Output flows, see [docs/FLOODWAY_SYSTEM_SPECIFICATION.md](docs/FLOODWAY_SYSTEM_SPECIFICATION.md) and [docs/URBAN_FLASH_FLOOD_ARCHITECTURE.md](docs/URBAN_FLASH_FLOOD_ARCHITECTURE.md).*
 
 ---
 

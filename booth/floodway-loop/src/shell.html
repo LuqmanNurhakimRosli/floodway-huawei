@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data:">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FloodWay · 60-second product film</title>
+<link rel="icon" href="data:,">
+<style>
+/*__FONTFACES__*/
+html, body { margin: 0; height: 100%; background: #03080F; overflow: hidden; }
+body.nocursor, body.nocursor * { cursor: none !important; }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; background: #071426; }
+#stage canvas { position: absolute; left: 0; top: 0; }
+#world, #over { width: 1920px; height: 1080px; }
+#phone { width: 460px; height: 940px; transform-origin: 230px 470px; display: none; }
+#debug { position: fixed; left: 14px; top: 14px; z-index: 9; display: none; padding: 10px 16px; background: rgba(3, 11, 23, 0.92);
+  border: 1px solid #1E293B; border-radius: 8px; color: #38BDF8; white-space: pre; pointer-events: none;
+  font: 600 16px/1.4 Consolas, 'Cascadia Mono', monospace; }
+</style>
+</head>
+<body>
+<div id="stage" role="img" aria-label="FloodWay product film: Malaysians caught in heavy rain use FloodWay to see the water level, find a route that avoids flooded roads to a safe shelter, and let their family know with one tap.">
+  <canvas id="world" width="1920" height="1080"></canvas>
+  <canvas id="phone" width="1150" height="2350"></canvas>
+  <canvas id="over" width="1920" height="1080"></canvas>
+</div>
+<div id="debug" aria-hidden="true"></div>
+<script>
+/*__SCRIPT__*/
+</script>
+</body>
+</html>
