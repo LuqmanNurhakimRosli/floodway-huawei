@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -6,11 +6,12 @@ import { WelcomePage } from './pages/WelcomePage';
 import { HomePage } from './pages/HomePage';
 import { MapPage } from './pages/MapPage';
 import LiveVisionPage from './pages/LiveVisionPage';
-import { SimulationPage } from './pages/SimulationPage';
 import { ReportPage } from './pages/ReportPage';
 import { NavigationPage } from './pages/NavigationPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { HouseStudio360 } from './components/sandbox/HouseStudio360';
+
+// three.js is only needed by the 3D studio, so it loads with that route instead of on every page.
+const HouseStudio360 = lazy(() => import('./components/sandbox/HouseStudio360').then((m) => ({ default: m.HouseStudio360 })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -30,7 +31,7 @@ export function App() {
           <Route path="/shelters" element={<Navigate to="/map" replace />} />
           <Route path="/live" element={<ProtectedRoute><LiveVisionPage /></ProtectedRoute>} />
           <Route path="/simulation" element={<Navigate to="/live" replace />} />
-          <Route path="/studio" element={<ProtectedRoute><HouseStudio360 /></ProtectedRoute>} />
+          <Route path="/studio" element={<ProtectedRoute><Suspense fallback={null}><HouseStudio360 /></Suspense></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
           <Route path="/navigation/:shelterId" element={<ProtectedRoute><NavigationPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
