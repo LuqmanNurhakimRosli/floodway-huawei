@@ -49,7 +49,7 @@ class Notifier:
             f"🌊 <b>Reported Water Level:</b> {depth_cm} cm\n"
             f"🏛 <b>Target Refuge:</b> {shelter}\n"
             f"📍 <b>Live GPS Location:</b> <a href='{maps_link}'>{lat:.4f}, {lon:.4f}</a>\n\n"
-            f"<i>Powered by Huawei Cloud ModelArts & Telegram Gateway. Check-in will be sent upon arrival.</i>"
+            f"<i>FloodWay demo alert. A check-in message follows on arrival.</i>"
         )
 
         tg_sent = await self.send_telegram(msg)

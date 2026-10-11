@@ -60,6 +60,10 @@ export interface Shelter {
 }
 
 export interface AiVerificationResult {
+  /** false when the AI check did not run (no key, server unreachable...). Absent on legacy demo data. */
+  ran?: boolean;
+  /** null when the model could not tell. */
+  appearsAuthentic?: boolean | null;
   verified: boolean;
   confidenceScore: number;
   detectedHazards: string[];

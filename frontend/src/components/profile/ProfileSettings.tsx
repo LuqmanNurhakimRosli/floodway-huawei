@@ -5,8 +5,7 @@ import { sendTelegramMessage } from '../../services/telegramService';
 
 export function ProfileSettings() {
   const { user } = useAuth();
-  const [tgToken, setTgToken] = useState(() => localStorage.getItem('floodway_tg_token') || '');
-  const [tgChatId, setTgChatId] = useState(() => localStorage.getItem('floodway_tg_chat_id') || '@FloodWaySafetyAlerts');
+  const [tgChatId, setTgChatId] = useState(() => localStorage.getItem('floodway_tg_chat_id') || '');
   const [testSent, setTestSent] = useState(false);
 
   const [contacts, setContacts] = useState([
@@ -18,14 +17,17 @@ export function ProfileSettings() {
   const [newPhone, setNewPhone] = useState('');
 
   const handleSaveTelegram = () => {
-    localStorage.setItem('floodway_tg_token', tgToken);
     localStorage.setItem('floodway_tg_chat_id', tgChatId);
     alert('Telegram Bot Settings Saved!');
   };
 
+  const [tgStatus, setTgStatus] = useState<string | null>(null);
+
   const handleTestTelegram = async () => {
-    const ok = await sendTelegramMessage('🔔 Test alert from FloodWay. Bot connectivity verified!', tgToken, tgChatId);
-    if (ok) setTestSent(true);
+    setTgStatus('Sending…');
+    const res = await sendTelegramMessage('Test alert from the FloodWay demo.', tgChatId.trim() || undefined);
+    setTestSent(res.success);
+    setTgStatus(res.success ? 'Delivered by the FloodWay bot.' : res.error || 'Not delivered.');
   };
 
   const addContact = (e: React.FormEvent) => {
@@ -64,25 +66,15 @@ export function ProfileSettings() {
         </div>
 
         <p className="text-xs text-slate-600">
-          Configure your Telegram Bot token and channel/chat ID to receive instant automated evacuation alerts and geofence shelter arrival check-ins.
+          Enter the chat or channel ID that should receive demo alerts. The bot token stays on the FloodWay server and is never sent to your browser.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Telegram Bot Token</label>
-            <input
-              type="text"
-              placeholder="e.g. 8192398492:AAH-xX9023..."
-              value={tgToken}
-              onChange={(e) => setTgToken(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#1677FF]"
-            />
-          </div>
-          <div>
             <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Telegram Chat / Channel ID</label>
             <input
               type="text"
-              placeholder="e.g. @MyFamilyFloodGroup or -10012345678"
+              placeholder="e.g. @your_channel or -10012345678 (optional)"
               value={tgChatId}
               onChange={(e) => setTgChatId(e.target.value)}
               className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#1677FF]"
@@ -104,9 +96,9 @@ export function ProfileSettings() {
           >
             Send Test Alert
           </button>
-          {testSent && (
-            <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-              <CheckCircle2 className="w-4 h-4" /> Dispatched!
+          {tgStatus && (
+            <span role="status" className={`text-xs font-semibold flex items-center gap-1 ${testSent ? 'text-emerald-700' : 'text-slate-700'}`}>
+              {testSent && <CheckCircle2 className="w-4 h-4" aria-hidden="true" />} {tgStatus}
             </span>
           )}
         </div>

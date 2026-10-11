@@ -10,7 +10,8 @@ import {
   Send,
   Radio,
   FileImage,
-  Trash2
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -77,7 +78,6 @@ export function ReportModal({ isOpen, onClose }: Props) {
       imageUrl: selectedImage,
       userDescription: title,
       reportedDepthCm: depthCm,
-      engine: 'gemini',
     });
     setAiResult(result);
     setAnalyzing(false);
@@ -86,14 +86,8 @@ export function ReportModal({ isOpen, onClose }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const finalAi: AiVerificationResult = aiResult || {
-      verified: true,
-      confidenceScore: 0.98,
-      detectedHazards: ['Road Inundation', 'Drain Backflow', 'Curb Submergence'],
-      estimatedDepthCm: depthCm,
-      engine: 'Automated Visual AI',
-      notes: 'Automated AI visual assessment confirmed surface flood breach.',
-    };
+    // Only claim what actually happened: a report is AI-assessed only if the check ran and judged it flooding.
+    const aiAssessed = Boolean(aiResult?.ran && aiResult.verified);
 
     const authorName = user?.name || 'Citizen Responder';
 
@@ -104,14 +98,14 @@ export function ReportModal({ isOpen, onClose }: Props) {
       lat: 3.1642,
       lon: 101.7031,
       waterDepthCm: depthCm,
-      status: 'AI_VERIFIED',
-      verifiedBy: 'Automated Visual Verification',
+      status: aiAssessed ? 'AI_VERIFIED' : 'UNDER_REVIEW',
+      verifiedBy: aiAssessed ? 'AI assessment (not an official verification)' : 'Not yet reviewed',
       timestampStr: 'Just now',
       author: authorName,
       upvotes: 1,
       imageUrl: selectedImage,
-      description: `Reported flood incident. Depth approximately ${depthCm}cm. Automatically verified by visual AI.`,
-      aiVerification: finalAi,
+      description: `Reported flood incident. Depth reported by the user: ${depthCm} cm.${aiAssessed ? ' A visual AI assessment judged the photo to show flooding.' : ' No AI check was completed.'}`,
+      aiVerification: aiResult ?? undefined,
     });
 
     // Immediately broadcast ground-truth flood incident alert to community via Telegram Bot
@@ -403,33 +397,31 @@ export function ReportModal({ isOpen, onClose }: Props) {
             </button>
 
             {aiResult && (
-              <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 text-xs text-emerald-950 space-y-2 animate-in fade-in zoom-in-95">
-                <div className="flex items-center justify-between font-bold">
-                  <span className="flex items-center gap-1.5 text-emerald-800">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Visual AI Verification Passed ({Math.round(aiResult.confidenceScore * 100)}% Confidence)</span>
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 font-extrabold">
-                    {aiResult.estimatedDepthCm} cm Depth
-                  </span>
-                </div>
-
-                <div className="p-2 rounded-xl bg-white/80 border border-emerald-200 text-[11px] space-y-1">
-                  <div className="flex items-center gap-1 text-emerald-800 font-bold">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Authenticity: Genuine Field Photo (Deepfake Check Passed)</span>
+              <div role="status" className={`p-3 rounded-2xl border text-xs space-y-2 ${aiResult.ran ? 'bg-sky-50/90 border-sky-300 text-sky-950' : 'bg-slate-50 border-slate-300 text-slate-800'}`}>
+                {aiResult.ran ? (
+                  <>
+                    <div className="flex items-center justify-between gap-2 font-bold">
+                      <span className="flex items-center gap-1.5 text-sky-900">
+                        <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
+                        <span>{aiResult.verified ? 'AI assessment: looks like flooding' : 'AI assessment: could not confirm flooding'} ({Math.round(aiResult.confidenceScore * 100)}% model certainty)</span>
+                      </span>
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-sky-200/80 text-sky-900 font-bold shrink-0">~{aiResult.estimatedDepthCm} cm</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-white/80 border border-sky-200 text-xs space-y-1">
+                      <div className="text-slate-700">
+                        <b>Photo authenticity:</b> {aiResult.appearsAuthentic === true ? 'looks genuine' : aiResult.appearsAuthentic === false ? 'looks suspicious' : 'model could not tell'}. This is an opinion, not proof.
+                      </div>
+                      {aiResult.detectedHazards.length > 0 && <div className="text-slate-700"><b>Hazards seen:</b> {aiResult.detectedHazards.join(', ')}</div>}
+                      <p className="text-slate-600 italic">"{aiResult.notes}"</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-start gap-1.5 font-semibold">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-slate-600" aria-hidden="true" />
+                    <span>AI check not run. {aiResult.notes}</span>
                   </div>
-                  <div className="text-slate-700">
-                    <b>Detected Hazards:</b> {aiResult.detectedHazards.join(', ')}
-                  </div>
-                  <p className="text-slate-600 italic text-[10px] mt-1">
-                    "{aiResult.notes}"
-                  </p>
-                </div>
-
-                <div className="text-[10px] text-emerald-700/80 text-right font-medium">
-                  {aiResult.engine}
-                </div>
+                )}
+                <div className="text-[11px] text-slate-600 text-right font-medium">{aiResult.engine}</div>
               </div>
             )}
           </div>
@@ -438,7 +430,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
           <div className="text-[11px] text-slate-500 p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-1.5">
             <Radio className="w-3.5 h-3.5 text-[#1677FF] shrink-0 mt-0.5" />
             <span>
-              <b>Workflow:</b> Submitting will mark this report as <b>AI Verified</b>. It will route to the <b>Operations Desk</b> to be published publicly.
+              <b>Workflow:</b> The report is saved as <b>unverified</b>. It is marked <b>AI assessed</b> only if you run the AI check above and it judges the photo to show flooding. No agency reviews it in this demo.
             </span>
           </div>
 

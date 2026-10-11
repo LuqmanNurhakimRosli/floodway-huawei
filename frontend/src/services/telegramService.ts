@@ -1,122 +1,48 @@
-// Telegram Bot API SOS & Shelter Arrival Check-In Service
-// Connected to official Bot: @floodway_bot (Huawei Innovation Contest 2026)
+// Telegram alerts. The browser NEVER holds a bot token: every message goes to the FloodWay backend
+// (POST /api/v1/alerts/telegram), which sends it with a server-side token. Do not add VITE_ secrets here.
+import { API_BASE } from './vision/config';
 
 export const TELEGRAM_CONFIG = {
-  BOT_TOKEN: (import.meta as any).env?.VITE_TELEGRAM_BOT_TOKEN || '',
   BOT_USERNAME: (import.meta as any).env?.VITE_TELEGRAM_BOT_USERNAME || 'floodway_bot',
   BOT_URL: 'https://t.me/floodway_bot',
-  DEFAULT_CHAT_ID: (import.meta as any).env?.VITE_TELEGRAM_DEFAULT_CHAT_ID || '',
   STORAGE_CHAT_KEY: 'floodway_tg_chat_id',
-  STORAGE_TOKEN_KEY: 'floodway_tg_token',
 };
 
-/**
- * Checks Telegram Bot getUpdates to auto-discover the user's chat_id
- * if they clicked /start or sent a message to @floodway_bot.
- */
-export async function syncTelegramChatId(): Promise<{
-  success: boolean;
-  chatId?: string;
-  senderName?: string;
-  message?: string;
-}> {
-  const token = localStorage.getItem(TELEGRAM_CONFIG.STORAGE_TOKEN_KEY) || TELEGRAM_CONFIG.BOT_TOKEN;
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
-    if (!res.ok) {
-      return { success: false, message: `Telegram API responded with ${res.status}` };
-    }
-    const data = await res.json();
-    if (data.ok && Array.isArray(data.result) && data.result.length > 0) {
-      // Find the most recent message with a valid chat id
-      for (let i = data.result.length - 1; i >= 0; i--) {
-        const item = data.result[i];
-        const chat = item.message?.chat || item.channel_post?.chat || item.my_chat_member?.chat;
-        if (chat?.id) {
-          const cid = String(chat.id);
-          localStorage.setItem(TELEGRAM_CONFIG.STORAGE_CHAT_KEY, cid);
-          const name = chat.first_name ? `${chat.first_name} ${chat.last_name || ''}`.trim() : chat.title || 'User';
-          return { success: true, chatId: cid, senderName: name };
-        }
-      }
-    }
-    return { success: false, message: 'No active chat yet. Open @floodway_bot on Telegram and send /start.' };
-  } catch (err: any) {
-    console.warn('[Telegram Sync]', err);
-    return { success: false, message: err.message || 'Network error connecting to Telegram API' };
-  }
-}
+export type TelegramResult = { success: boolean; simulated?: boolean; error?: string };
 
 /**
- * Sends a message via Telegram HTTP Bot API.
+ * Sends a message through the backend. `success` is true only when Telegram actually delivered it.
+ * When Telegram is not configured on the server the result is `simulated: true` and nothing was sent.
  */
-export async function sendTelegramMessage(
-  text: string,
-  customToken?: string,
-  customChatId?: string
-): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
-  const token = customToken || localStorage.getItem(TELEGRAM_CONFIG.STORAGE_TOKEN_KEY) || TELEGRAM_CONFIG.BOT_TOKEN;
-  let chatId =
-    customChatId ||
-    localStorage.getItem(TELEGRAM_CONFIG.STORAGE_CHAT_KEY) ||
-    TELEGRAM_CONFIG.DEFAULT_CHAT_ID;
-
-  // If no chat_id is saved yet, attempt auto-sync
-  if (!chatId) {
-    const syncResult = await syncTelegramChatId();
-    if (syncResult.success && syncResult.chatId) {
-      chatId = syncResult.chatId;
-    }
-  }
-
-  // If still no chat_id, broadcast in simulation/preview mode so the application flow remains smooth
-  if (!chatId) {
-    console.info('[Telegram Broadcast Simulation - Bot @floodway_bot]', text);
-    return {
-      success: true,
-      simulated: true,
-      error: 'Telegram @floodway_bot is ready! Start a chat at https://t.me/floodway_bot to receive real-time messages.'
-    };
-  }
-
+export async function sendTelegramMessage(text: string, customChatId?: string): Promise<TelegramResult> {
+  const chatId = (customChatId || localStorage.getItem(TELEGRAM_CONFIG.STORAGE_CHAT_KEY) || '').trim();
   try {
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-    const res = await fetch(url, {
+    const res = await fetch(`${API_BASE}/api/v1/alerts/telegram`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-        parse_mode: 'HTML',
-        disable_web_page_preview: false,
-      }),
+      body: JSON.stringify(chatId ? { text, chat_id: chatId } : { text }),
+      signal: AbortSignal.timeout(10000),
     });
-
-    const data = await res.json();
-    if (res.ok && data.ok) {
-      return { success: true };
-    } else {
-      console.warn('[Telegram Send Error]', data);
-      return { success: false, error: data.description || 'Failed to dispatch via Telegram' };
-    }
-  } catch (e: any) {
-    console.warn('[Telegram Network Fallback]', e);
-    return { success: true, simulated: true, error: e.message };
+    if (res.status === 429) return { success: false, error: 'Too many alerts in a short time. Try again in a minute.' };
+    if (res.status === 401) return { success: false, error: 'Alerts are protected on this server.' };
+    if (res.status === 422) return { success: false, error: 'The chat ID is not valid. Use @channelname or a numeric chat ID.' };
+    if (!res.ok) return { success: false, error: `The server answered ${res.status}.` };
+    const body = (await res.json()) as { sent: boolean; simulated: boolean; detail: string };
+    return body.sent ? { success: true } : { success: false, simulated: true, error: body.detail };
+  } catch {
+    return { success: false, error: 'Could not reach the FloodWay server.' };
   }
 }
 
 function escapeHtml(text: string): string {
   if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/**
- * 1. FLOOD ALERT / EMERGENCY SOS BROADCAST
- * Triggered automatically when flood reaches DANGER or user taps 1-Tap SOS.
- */
+// Message templates state only what the app knows. No invented actions ("electrical cut-off confirmed"),
+// no claimed registrations, no claimed verification.
+
+/** Emergency SOS, sent when the user taps 1-tap SOS in the demo. */
 export async function dispatchEmergencySosAlert(payload: {
   userName: string;
   phone: string;
@@ -124,60 +50,41 @@ export async function dispatchEmergencySosAlert(payload: {
   lon: number;
   waterDepthCm: number;
   shelterName: string;
-}): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
+}): Promise<TelegramResult> {
   const mapLink = `https://maps.google.com/?q=${payload.lat.toFixed(5)},${payload.lon.toFixed(5)}`;
   const message =
-    `🚨 <b>FLOODWAY · CRITICAL FLOOD INUNDATION ALERT</b>\n\n` +
-    `⚠️ <b>STATUS: CRITICAL FLOOD BREACH DETECTED</b>\n` +
+    `🚨 <b>FLOODWAY DEMO · FLOOD ALERT</b>\n\n` +
+    `<b>Status:</b> citizen-reported flooding\n` +
     `👤 <b>Citizen:</b> ${escapeHtml(payload.userName)} (${escapeHtml(payload.phone)})\n` +
-    `🌊 <b>Water Depth:</b> ${payload.waterDepthCm} cm (Main DB Board &amp; Living Room Floor Breached)\n` +
-    `🏛 <b>Designated Refuge:</b> ${escapeHtml(payload.shelterName)}\n` +
-    `📍 <b>GPS Coordinates:</b> <a href="${mapLink}">${payload.lat.toFixed(4)}, ${payload.lon.toFixed(4)}</a>\n\n` +
-    `⚡ <i>Action Taken: Electrical cut-off confirmed. Immediate safe evacuation in progress.</i>\n` +
-    `📡 <i>Connected via Huawei Cloud ModelArts &amp; Telegram Bot @floodway_bot. Arrival confirmation will follow automatically.</i>`;
-
+    `🌊 <b>Water depth:</b> ${payload.waterDepthCm} cm (as reported by the user)\n` +
+    `🏛 <b>Designated refuge:</b> ${escapeHtml(payload.shelterName)}\n` +
+    `📍 <b>Position:</b> <a href="${mapLink}">${payload.lat.toFixed(4)}, ${payload.lon.toFixed(4)}</a>\n\n` +
+    `<i>Demo message sent by the FloodWay app. An arrival confirmation follows when the user reaches the shelter on the map.</i>`;
   return sendTelegramMessage(message);
 }
 
-/**
- * 2. SHELTER ARRIVAL SAFETY CHECK-IN
- * Triggered automatically when the user reaches the shelter on the map.
- */
+/** Shelter arrival check-in, sent when the user reaches the shelter on the demo map. */
 export async function dispatchArrivalCheckin(payload: {
   userName: string;
   shelterName: string;
   dateStr?: string;
   timeStr?: string;
-}): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
+}): Promise<TelegramResult> {
   const dateText =
-    payload.dateStr ||
-    new Date().toLocaleDateString('en-MY', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  const timeText =
-    payload.timeStr ||
-    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+    payload.dateStr || new Date().toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const timeText = payload.timeStr || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const message =
-    `✅ <b>FLOODWAY · SAFE SHELTER ARRIVAL CONFIRMED</b>\n\n` +
+    `✅ <b>FLOODWAY DEMO · SHELTER ARRIVAL</b>\n\n` +
     `👤 <b>Evacuee:</b> ${escapeHtml(payload.userName)}\n` +
     `🏛 <b>Destination:</b> <b>${escapeHtml(payload.shelterName)}</b>\n` +
     `📅 <b>Date:</b> ${escapeHtml(dateText)}\n` +
     `🕒 <b>Time:</b> ${escapeHtml(timeText)}\n` +
-    `🛡 <b>Geofence Status:</b> Confirmed inside shelter perimeter (&lt;50m).\n` +
-    `📋 <b>Status:</b> Safe &amp; Registered with NADMA Relief Command.\n\n` +
-    `<i>Family safety loop safely closed via FloodWay &amp; Telegram Bot @floodway_bot.</i>`;
-
+    `🛡 <b>Check-in:</b> reached the shelter on the demo map (simulated position).\n\n` +
+    `<i>Demo message. This is not a registration with any relief agency.</i>`;
   return sendTelegramMessage(message);
 }
 
-/**
- * 3. CITIZEN FLOOD HAZARD REPORT & PHOTO EVIDENCE BROADCAST
- * Broadcasts an alert to everyone about live flood incidents with uploaded photo evidence.
- */
+/** Citizen flood report. Sent as unverified: the app does not verify reports. */
 export async function dispatchFloodIncidentReportAlert(payload: {
   title: string;
   location: string;
@@ -185,19 +92,15 @@ export async function dispatchFloodIncidentReportAlert(payload: {
   author: string;
   dateStr?: string;
   hasPhotoEvidence: boolean;
-}): Promise<{ success: boolean; simulated?: boolean; error?: string }> {
-  const dateText =
-    payload.dateStr ||
-    new Date().toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
-
+}): Promise<TelegramResult> {
+  const dateText = payload.dateStr || new Date().toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' });
   const message =
-    `📢 <b>FLOODWAY · LIVE FLOOD HAZARD ALERT</b>\n\n` +
+    `📢 <b>FLOODWAY DEMO · CITIZEN FLOOD REPORT</b>\n\n` +
     `⚠️ <b>Incident:</b> ${escapeHtml(payload.title)}\n` +
     `📍 <b>Location:</b> ${escapeHtml(payload.location)}\n` +
-    `🌊 <b>Reported Depth:</b> ${payload.waterDepthCm} cm\n` +
-    `📸 <b>Visual Evidence:</b> ${payload.hasPhotoEvidence ? 'Verified Photo Upload Attached' : 'Citizen Ground-Truth Report'}\n` +
+    `🌊 <b>Reported depth:</b> ${payload.waterDepthCm} cm\n` +
+    `📸 <b>Photo:</b> ${payload.hasPhotoEvidence ? 'attached (not independently verified)' : 'none'}\n` +
     `👤 <b>Reported by:</b> ${escapeHtml(payload.author)} on ${escapeHtml(dateText)}\n\n` +
-    `🚨 <i>Take immediate precautions! Avoid this location and navigate to safe shelters via FloodWay Map.</i>`;
-
+    `<i>Unverified citizen report from the FloodWay demo.</i>`;
   return sendTelegramMessage(message);
 }

@@ -146,3 +146,13 @@ console.log('🔍 [AI Verification] Golden Record:', {...});
 - Firebase: Always have offline fallback (seed data)
 - OSRM: Fallback to bezier curve route
 - Gemini: Fallback to `mockAnalysis()`
+
+## Secrets and honesty (added 2026-10-11)
+
+- **No secret may be prefixed `VITE_`.** Everything with that prefix is compiled into the browser bundle. Tokens, API keys and
+  signing secrets live in `backend/.env` only. After a build, check the bundle: search `frontend/dist` for the secret values.
+- Messages and AI results must state only what happened. If an AI check did not run, the UI says "AI check not run";
+  never return a made-up verification, confidence or "verified" status as a fallback.
+- Anything that is not computed from data is either labelled "simulated" or lives in `frontend/src/config/demoScenario.ts`.
+- Never render `NaN`, `undefined` or an empty value. Use the formatters in `frontend/src/lib/format.ts`.
+- Backend responses are snake_case; map them to the camelCase UI types in `frontend/src/lib/mappers.ts`, at the API boundary.
