@@ -40,7 +40,7 @@ const MATS = {
   roadAsphalt: new THREE.MeshStandardMaterial({ color: '#181e26', roughness: 0.95 }),
   grassLawn: new THREE.MeshStandardMaterial({ color: '#15803d', roughness: 0.85 }),
   boundaryWall: new THREE.MeshStandardMaterial({ color: '#fef3c7', roughness: 0.85 }), // Light cream boundary
-  gateSteel: new THREE.MeshStandardMaterial({ color: '#decebfff', roughness: 0.30, metalness: 0.75 }),
+  gateSteel: new THREE.MeshStandardMaterial({ color: '#decebf', roughness: 0.30, metalness: 0.75 }),
 
   // Roof & Fascia (DoubleSide ensures both slopes render reliably from all angles)
   roofClay: new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.45, metalness: 0.10, side: THREE.DoubleSide }),
@@ -691,7 +691,7 @@ export function HouseStudio360() {
       {/* 360 3D Studio Canvas */}
       <div className="relative flex-1 w-full h-full bg-gradient-to-b from-[#7ec0ee] to-[#cce8fd]">
         <Canvas
-          shadows
+          shadows="percentage"
           camera={{ position: [0, 3.5, 17], fov: 45 }}
           className="w-full h-full cursor-grab active:cursor-grabbing"
         >
