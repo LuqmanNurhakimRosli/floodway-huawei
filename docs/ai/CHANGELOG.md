@@ -86,6 +86,13 @@ One-line summaries live in `docs/ai/PROGRESS.md`. Put the long write-up for a ch
 
 ## 2026-10-12
 
+### Poster: advisor edits and an editable PowerPoint
+- Header logo bar with UiTM, Evolusi 7 Dekad UiTM and Huawei (checkerboard backgrounds of the supplied images cleaned to white, cropped; raw copies in `docs/_to-delete/raw-logos/`). Team line moved to the footer.
+- Removed the "Prototype" footer at the advisor's request. The Sen1Floods11 source line for 95.34% and 86.96% moved into the Proof card (AGENTS.md honesty rule); the 100% figure keeps "in 100 simulated scenarios".
+- Centre Solution card: "Huawei technology: Our Huawei Cloud architecture" with ModelArts, OBS, ECS, SMN and their roles, replacing the How-Live-Vision steps; right card is now "Endorsed and recognised".
+- `scripts/poster-to-pptx.mjs`: reads the rendered poster (boxes, text runs, images, icons) and writes a native one-slide PowerPoint with pptxgenjs (`scripts/pptx-tool/`). Verified by exporting the slide from PowerPoint over COM: validation passes, QR decodes, mean pixel difference to the HTML poster 11/255.
+- Installed Outfit, Inter and JetBrains Mono for the current Windows user so PowerPoint renders the deck with the poster fonts.
+
 ### Preliminary-round pack (briefing call, poster, script)
 - Transcribed the briefing recording with Whisper `base` (English). `medium` stopped at 16% after 13 minutes, so it needs about an hour. Transcript in `docs/product/preliminary-round/transcript/`.
 - New folder `docs/product/preliminary-round/`: `MEETING_SUMMARY.md` and `.pdf`, `PITCH_SCRIPT.md` (moved from `docs/product/` and rewritten for one slide and three speakers; the old one is in `docs/_to-delete/pitch-script-old/`), `poster/` (moved from `docs/product/poster/`), `transcript/`.

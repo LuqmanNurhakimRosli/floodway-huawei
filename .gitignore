@@ -92,3 +92,6 @@ backend/data-public/
 
 # Large audio recordings
 *.aac
+
+# Poster to PowerPoint intermediate files (scripts/poster-to-pptx.mjs)
+docs/product/preliminary-round/poster/.pptx-build/
