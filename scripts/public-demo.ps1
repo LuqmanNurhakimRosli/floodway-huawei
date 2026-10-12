@@ -74,7 +74,9 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'frontend build failed' }
   $secrets = Get-Content '.env' | Where-Object { $_ -match '^VITE_(TELEGRAM_BOT_TOKEN|OPENROUTER_API_KEY)=(.+)$' } | ForEach-Object { ($_ -split '=', 2)[1].Trim() } | Where-Object { $_ }
   foreach ($s in $secrets) {
-    if (Get-ChildItem dist -Recurse -Filter *.js | Select-String -SimpleMatch -Quiet $s) { throw 'a secret from frontend/.env is in the bundle; not deploying' }
+    foreach ($f in Get-ChildItem dist -Recurse -File) {
+      if ([IO.File]::ReadAllText($f.FullName).Contains($s)) { throw 'a secret from frontend/.env is in the built files; not deploying' }
+    }
   }
   # 5. Deploy to Cloudflare Pages production. CI=true stops wrangler from waiting on an interactive prompt.
   $env:CI = 'true'
