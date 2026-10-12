@@ -56,7 +56,7 @@ def test_analyze_returns_reading_and_frame(client):
     body = r.json()
     assert body["frames_analyzed"] >= 1 and 0 <= body["confidence"] <= 1
     assert body["level"] in {"NORMAL", "ADVISORY", "WARNING", "DANGER"}
-    assert body["model"] == "classical-v1"
+    assert body["model"] == "reference-diff-v1"  # sample cameras are read against their own dry frame
     frame = client.get("/api/v1/vision/cameras/sample-klang-jamek/frame.jpg")
     assert frame.status_code == 200 and frame.headers["content-type"] == "image/jpeg"
     assert frame.content[:2] == b"\xff\xd8"

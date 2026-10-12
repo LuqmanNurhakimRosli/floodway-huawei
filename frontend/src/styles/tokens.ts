@@ -21,7 +21,7 @@ export const btnSecondary = `inline-flex min-h-11 items-center justify-center ga
 
 // Type scale
 export const heading = 'font-heading font-bold text-slate-900';
-export const pageTitle = 'font-heading text-xl/7 font-bold text-slate-900 @min-[640px]/main:text-2xl/8';
+export const pageTitle = 'font-heading text-[32px]/10 font-bold tracking-tight text-slate-900 @min-[640px]/main:text-2xl/8';
 export const cardTitle = 'font-heading text-base/6 font-bold text-slate-900';
 export const label = 'text-xs/4 font-medium text-slate-600';
 export const muted = 'text-slate-600';

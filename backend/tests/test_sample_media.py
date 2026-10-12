@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from app.vision import seed
-from app.vision.analysis.classical import ClassicalWaterAnalyzer
+from app.vision.analysis.reference_diff import ReferenceDiffAnalyzer
 from app.vision.config import VisionSettings
 from app.vision.levels import ratio_to_level, thresholds_from_calibration
 from app.vision.schemas import Calibration
@@ -65,8 +65,8 @@ def test_every_sample_camera_uses_photos_and_keeps_its_sample_flag():
         settings = VisionSettings(data_dir=Path("."))
         registered = []
 
-        def register_synthetic(self, cid, name, provider, lat, lon, cal, source, interval):
-            self.registered.append((cid, source))
+        def register_synthetic(self, cid, name, provider, lat, lon, cal, source, interval, analyzer=None):
+            self.registered.append((cid, source, analyzer))
 
         def register_offline_placeholder(self, *a):
             pass
@@ -74,7 +74,8 @@ def test_every_sample_camera_uses_photos_and_keeps_its_sample_flag():
     eng = Eng()
     kinds = seed.seed_samples(eng)
     assert set(kinds.values()) == {"photos"}
-    assert all(src.is_playback for _, src in eng.registered)  # still flagged as playback/sample
+    assert all(src.is_playback for _, src, _a in eng.registered)  # still flagged as playback/sample
+    assert all(a is not None and a.name == "reference-diff-v1" for _c, _s, a in eng.registered)
 
 
 def test_falls_back_to_the_vector_scene_without_media(tmp_path):
@@ -86,13 +87,13 @@ def test_falls_back_to_the_vector_scene_without_media(tmp_path):
 @needs_media
 def test_each_photo_classifies_at_its_level_even_with_sensor_noise():
     """The same 20/20 check as sample_media/check_frames.py, but run on the noisy frames the app really serves."""
-    analyzer = ClassicalWaterAnalyzer()
     cals = seed.load_media_calibrations()
     misses = []
     for cam_id, *_rest, prefix in seed.SAMPLES:
         cal = cals[cam_id]
         thr = thresholds_from_calibration(cal)
         frames = seed.load_frames(prefix)
+        analyzer = ReferenceDiffAnalyzer(seed.load_ladder(prefix)[0])
         src = FrameSetSource(frames, (thr.normal, thr.warning, thr.danger), 0, 1, 100, seed=7)
         for level, expected in EXPECT.items():
             noisy = src._noisy(frames[level])
@@ -112,10 +113,54 @@ def test_media_files_stay_within_the_size_limits():
 
 
 @needs_media
-@pytest.mark.xfail(strict=True, reason="KNOWN DEFECT: the rising-water frames are a flat patch drawn over the NORMAL frame, "
-                                       "not generated water. Regenerate them (docs/PLAN_A_GEMINI_MEDIA.md, 'Defect found'), then remove this xfail.")
 def test_rising_water_frames_are_not_pasted_patches():
     from app.vision.sample_media import check_realism as cr
 
     pasted = [f"{c}-{l}" for c in cr.CAMERAS for l in cr.LEVELS if cr.measure(c, l)["pasted"]]
     assert not pasted, f"{len(pasted)} frames look like pasted patches: {pasted}"
+
+
+from app.vision.sources.frameset import RUNG_COUNT, nearest_rung
+
+
+def _ladder():
+    return {i: np.full((36, 64, 3), i * 20, np.uint8) for i in range(RUNG_COUNT)}
+
+
+def _four():
+    return {k: np.zeros((36, 64, 3), np.uint8) for k in LEVELS}
+
+
+def test_nearest_rung_rounds_to_tenths_and_clamps():
+    assert [nearest_rung(x) for x in (-0.2, 0.0, 0.04, 0.06, 0.56, 1.09, 1.5)] == [0, 0, 0, 1, 6, 11, 11]
+
+
+def test_frameset_shows_the_rung_matching_the_reading():
+    src = FrameSetSource(_four(), (0.26, 0.63, 0.97), 0.62, 0.62, 100, ladder=_ladder(), noise_sigma=0, clock=lambda: 0.0)
+    frame = src.grab_frames(1, 0)[0]
+    assert int(frame[0, 0, 0]) == 6 * 20          # ratio 0.62 -> rung 6
+
+
+def test_frameset_rejects_an_incomplete_ladder():
+    ladder = _ladder()
+    del ladder[5]
+    with pytest.raises(ValueError):
+        FrameSetSource(_four(), (0.26, 0.63, 0.97), 0.1, 0.9, 100, ladder=ladder)
+
+
+@needs_media
+def test_every_sample_camera_has_a_full_ladder():
+    for prefix in ("klang", "gombak", "smart", "batu", "drain"):
+        ladder = seed.load_ladder(prefix)
+        assert ladder is not None and len(ladder) == RUNG_COUNT, prefix
+
+
+@needs_media
+def test_the_analyser_reads_each_ladder_rung_near_its_nominal_ratio():
+    """What the page shows must match what the reading says: every camera, 10 of 12 rungs within 0.10."""
+    cals = seed.load_media_calibrations()
+    for cam_id, *_rest, prefix in seed.SAMPLES:
+        ladder = seed.load_ladder(prefix)
+        analyzer = ReferenceDiffAnalyzer(ladder[0])
+        good = sum(abs(analyzer.analyze(ladder[i], cals[cam_id]).ratio - i / 10) <= 0.10 for i in range(RUNG_COUNT))
+        assert good >= 10, f"{cam_id}: only {good}/12 rungs read within 0.10"

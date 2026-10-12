@@ -37,6 +37,15 @@ export const getReadings = (id: string, limit = 30) => request<Reading[]>(`/came
 export const listAlerts = (limit = 20) => request<AlertEvent[]>(`/alerts?limit=${limit}`);
 export const testCamera = (draft: CameraDraft) => request<Reading>('/cameras/test', { method: 'POST', body: JSON.stringify(draft) });
 
+export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+export const PHOTO_TYPES = ['image/jpeg', 'image/png'];
+
+/** Send a photo as the raw request body (no multipart). Returns the `upload:<id>` reference to use as source_url. */
+export async function uploadPhoto(file: File): Promise<string> {
+  const { source_url } = await request<{ source_url: string }>('/cameras/upload', { method: 'POST', body: file, headers: { 'Content-Type': file.type } });
+  return source_url;
+}
+
 /** Fetch one frame from a draft source. Returns an object URL; revoke it when done. */
 export async function previewFrame(draft: Pick<CameraDraft, 'source_type' | 'source_url' | 'username' | 'password'>): Promise<string> {
   const res = await fetch(`${VISION_API}/cameras/preview`, {

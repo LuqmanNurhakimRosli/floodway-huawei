@@ -3,6 +3,7 @@
     GET    /cameras                      list cameras with latest reading
     POST   /cameras                      add a camera (SSRF-guarded)
     DELETE /cameras/{id}                 remove a user camera
+    POST   /cameras/upload               store an uploaded photo (raw JPEG/PNG body), returns its source reference
     POST   /cameras/preview              one frame from a draft source (wizard step 2)
     POST   /cameras/test                 one analysis for an unsaved camera (wizard step 3)
     POST   /cameras/{id}/analyze         run a cycle now
@@ -56,6 +57,26 @@ def list_cameras(request: Request):
 @router.post("/cameras", response_model=CameraPublic, status_code=201, dependencies=[Depends(require_write_token)])
 def create_camera(draft: CameraCreate, request: Request):
     return _guard(lambda: _engine(request).add_camera(draft))
+
+
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+
+
+@router.post("/cameras/upload", status_code=201, dependencies=[Depends(require_write_token)])
+async def upload_photo(request: Request):
+    engine = _engine(request)
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, "photo is larger than 5 MB")
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():  # count as it arrives: Content-Length can be missing or wrong
+        size += len(chunk)
+        if size > MAX_UPLOAD_BYTES:
+            raise HTTPException(413, "photo is larger than 5 MB")
+        chunks.append(chunk)
+    source_url = await asyncio.to_thread(_guard, lambda: engine.store_upload(b"".join(chunks)))
+    return {"source_url": source_url}
 
 
 @router.post("/cameras/preview", dependencies=[Depends(require_write_token)])

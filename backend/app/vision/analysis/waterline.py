@@ -20,7 +20,8 @@ def polygon_mask(shape: tuple[int, int], roi: list[tuple[float, float]]) -> np.n
 
 
 def ratio_from_mask(
-    water_mask: np.ndarray, roi_mask: np.ndarray, cal: Calibration, edge_rows: int = 0, bed_tolerance_rows: int = 10
+    water_mask: np.ndarray, roi_mask: np.ndarray, cal: Calibration, edge_rows: int = 0, bed_tolerance_rows: int = 10,
+    row_fraction: float = 0.5, gap_rows: int = 0,
 ) -> FrameResult:
     h, _ = water_mask.shape
     ys, xs = np.nonzero(roi_mask)
@@ -40,15 +41,23 @@ def ratio_from_mask(
     rows = row_frac.shape[0]
     start = rows - 1
     floor = max(0, rows - 1 - bed_tolerance_rows)
-    while start >= floor and row_frac[start] < 0.5:
+    while start >= floor and row_frac[start] < row_fraction:
         start -= 1
     if start < floor:  # nothing wet at the bed: report "dry" with modest confidence
         return FrameResult(0.0, bed, 0.35)
 
-    # Walk up while at least half of the zone is water.
-    y = start
-    while y >= 0 and row_frac[y] >= 0.5:
+    # Walk up while at least `row_fraction` of the zone's width is water (half, unless the caller knows the water is patchy).
+    # A bar, lid or pole can hide a few rows of water: skip up to `gap_rows` non-wet rows if wet rows resume above.
+    top, misses, y = start, 0, start
+    while y >= 0:
+        if row_frac[y] >= row_fraction:
+            top, misses = y, 0
+        else:
+            misses += 1
+            if misses > gap_rows:
+                break
         y -= 1
+    y = top - 1
     detected_row = y + 1  # first wet row at the detected edge (confidence is measured HERE)
 
     below = row_frac[detected_row : detected_row + 6]

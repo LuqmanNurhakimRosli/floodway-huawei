@@ -12,7 +12,7 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 flex items-center justify-around z-40 shadow-lg">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[var(--nav-h)] pb-[env(safe-area-inset-bottom)] bg-white/80 backdrop-blur-xl border-t border-slate-200/70 px-2 flex items-center justify-around z-40">
       {tabs.map((tab) => (
         <NavLink
           key={tab.path}

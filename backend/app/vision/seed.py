@@ -18,7 +18,8 @@ from .engine import VisionEngine
 from .levels import thresholds_from_calibration
 from .schemas import Calibration, Lines
 from .sources.base import FrameSource
-from .sources.frameset import LEVELS, FrameSetSource
+from .analysis.reference_diff import ReferenceDiffAnalyzer
+from .sources.frameset import LEVELS, RUNG_COUNT, FrameSetSource
 from .sources.synthetic import BED_Y, CH_X1, CH_X0, DANGER_Y, H, W, SyntheticRiverSource
 
 logger = logging.getLogger("FloodWayVisionSeed")
@@ -79,6 +80,17 @@ def load_frames(prefix: str, media_dir: Path = MEDIA_DIR) -> Optional[dict]:
     return frames
 
 
+def load_ladder(prefix: str, media_dir: Path = MEDIA_DIR) -> Optional[dict[int, "cv2.Mat"]]:
+    """The 12 ladder photos (r000 .. r110) for a camera, or None if any is missing or unreadable."""
+    ladder = {}
+    for i in range(RUNG_COUNT):
+        img = cv2.imread(str(media_dir / f"{prefix}-r{i * 10:03d}.jpg"))
+        if img is None:
+            return None
+        ladder[i] = img
+    return ladder
+
+
 def build_sample_source(prefix: str, cam_id: str, lo: float, hi: float, period: float, phase: float, seed: int,
                  media_dir: Path = MEDIA_DIR, calibrations: Optional[dict] = None) -> tuple[FrameSource, Calibration, str]:
     """(source, calibration, kind) where kind is 'photos' or 'synthetic'."""
@@ -87,7 +99,7 @@ def build_sample_source(prefix: str, cam_id: str, lo: float, hi: float, period: 
     frames = load_frames(prefix, media_dir) if cal else None
     if cal and frames:
         thr = thresholds_from_calibration(cal)
-        src = FrameSetSource(frames, (thr.normal, thr.warning, thr.danger), lo, hi, period, phase, seed=seed)
+        src = FrameSetSource(frames, (thr.normal, thr.warning, thr.danger), lo, hi, period, phase, seed=seed, ladder=load_ladder(prefix, media_dir))
         return src, cal, "photos"
     return SyntheticRiverSource(lo, hi, period, phase, seed=seed), sample_calibration(), "synthetic"
 
@@ -104,7 +116,9 @@ def seed_samples(engine: VisionEngine, media_dir: Path = MEDIA_DIR) -> dict[str,
             import time
 
             source.clock = lambda off=offset: time.time() + off  # testing aid, see VISION_SAMPLE_CLOCK_OFFSET_S
-        engine.register_synthetic(cid, name, provider, lat, lon, cal, source, interval)
+        # Photographic water is rippled, so these cameras are read by change against their own dry frame (rung r000).
+        analyzer = ReferenceDiffAnalyzer(source.ladder[0]) if kind == "photos" and getattr(source, "ladder", None) else None
+        engine.register_synthetic(cid, name, provider, lat, lon, cal, source, interval, analyzer=analyzer)
         kinds[cid] = kind
     logger.info("sample cameras: %s", ", ".join(f"{k}={v}" for k, v in kinds.items()))
     # Genuinely unreachable URL (.invalid never resolves) so the offline state is real.

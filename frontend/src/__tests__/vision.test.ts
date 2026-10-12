@@ -8,6 +8,7 @@ import { spreadLabels } from '../lib/vision/labels';
 import { levelRank, ratioToLevel } from '../lib/vision/levels';
 import { linesAreValid, thresholdsFromCalibration } from '../lib/vision/thresholds';
 import { moveLine } from '../components/live/onboarding/CalibrationCanvas';
+import { DEFAULT_OVERLAYS } from '../components/live/feed/OverlayToggles';
 import * as store from '../services/vision/visionStore';
 import { mockCameras } from '../services/vision/mockVision';
 import type { Calibration, Camera, Reading } from '../types/vision';
@@ -201,5 +202,11 @@ describe('isServerDown', () => {
     expect(store.isServerDown(s({ connected: true, error: 'x' }))).toBe(false);
     expect(store.isServerDown(s({ usingMock: true, error: 'x' }))).toBe(false);
     expect(store.isServerDown(s({ status: 'loading', error: 'x' }))).toBe(false);
+  });
+});
+
+describe('feed overlays', () => {
+  it('shows the photo clean by default: reference lines and waterline only', () => {
+    expect(DEFAULT_OVERLAYS).toEqual({ roi: false, lines: true, mask: false, waterline: true });
   });
 });

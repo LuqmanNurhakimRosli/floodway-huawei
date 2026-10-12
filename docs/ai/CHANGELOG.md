@@ -1,4 +1,6 @@
-# FloodWay — Development Log
+# FloodWay: Development Log (detail)
+
+One-line summaries live in `docs/ai/PROGRESS.md`. Put the long write-up for a change here, newest date first within its group.
 
 ## 2026-05-09
 
@@ -81,6 +83,32 @@
 - Removed the unreachable 3D SimulationPage and components/simulation; /studio is lazy-loaded so three.js no longer loads on every page.
 - Wizard: focus trap, full-height phone sheet, non-overlapping calibration pills. Contrast raised to WCAG AA.
 - Files: frontend/src/pages/LiveVisionPage.tsx, frontend/src/components/live/**, frontend/src/lib/vision/**, frontend/src/hooks/vision/**, frontend/src/services/vision/visionStore.ts, frontend/src/components/map/ShelterMapView.tsx, frontend/src/App.tsx, backend/app/vision/{engine,config,seed}.py.
+
+## 2026-10-12
+
+### Media V2: photographic ladder, reference-diff analyser, clean feed (branch `live-ui-upgrade`)
+- Gemini produced 60 frames (5 cameras x 12 rungs, r000 to r110). `export_ladder.py` made the 640x360 JPEGs, 960x540 WebPs and the four legacy copies. The classical analyser read 0 on every frame (water texture std 13 to 54 against a cut of 4.5).
+- Tried a colour segmenter (10 of 60 rungs read right) and a dry-reference difference with the old zones (28 of 60). Re-fitted the zones from the change masks, searched each camera's bed row, then added `row_fraction` (0.25) and `gap_rows` (60, for the drain's lid) to `waterline.ratio_from_mask` (defaults 0.5 and 0, so the classical analyser is unchanged). `check_ladder` now PASSES.
+- `ReferenceDiffAnalyzer` (`analysis/reference_diff.py`) is attached per camera (`CameraRecord.analyzer`, `register_synthetic(..., analyzer=)`) for the sample cameras only; readings report `model: reference-diff-v1`. User cameras keep the classical analyser.
+- `FrameSetSource` takes a 12-rung ladder and serves `nearest_rung(ratio)`; `seed.load_ladder` loads it.
+- `DEFAULT_OVERLAYS` is now `{ roi: false, lines: true, mask: false, waterline: true }`.
+- Tests: backend 130 (new `test_reference_diff.py`, ladder and analyser tests in `test_sample_media.py`), frontend 120. Verified in a browser against a second backend on :8081 (the dev backend on :8080 was an older process): Klang at 102% shows brown water at the bank top, matching the Danger line, with no box.
+- Poster screenshots recaptured and both posters re-rendered.
+
+### Live Vision UI/UX upgrade (branch `live-ui-upgrade`, Plan C: `docs/PLAN_C_LIVE_UIUX_UPGRADE.md`)
+- Photo upload for the camera wizard: `POST /api/v1/vision/cameras/upload` (raw JPEG/PNG body, 5 MB cap counted while streaming, magic-byte type check, decoded and re-encoded to JPEG so EXIF/GPS is dropped, scaled to 1920 px, write-token protected). New `upload` source type backed by a stored still (`sources/still.py`); the stored file is deleted with the camera and unreferenced uploads are pruned after 24 h. Frontend: "Upload a photo" source option, client-side type/size check, PHOTO label.
+- Sample water frames regenerated without an AI model: `backend/app/vision/sample_media/make_water.py` builds watch/warning/danger from each NORMAL photo (water mirrored up, smoothed to murky band, soft wavy top). `check_realism` 0/15 flagged (was 15/15); `check_frames` 20/20; the strict-xfail on the realism test was removed. Demo loop `klang-rise.mp4` and the public webp copies rebuilt from the same generator. Sample feeds keep the "simulated" label.
+- Live page: one countdown (ring in the feed header), water pill off the danger line, selected camera chip scrolls into view.
+- iPhone-style phone UI: large title, system font stack, sliding segmented controls (source tabs, radius), translucent tab bar, safe-area padding via `--nav-h` and `viewport-fit=cover`, `dvh` heights, 44 px touch targets on Live, header and tab bar. Applies to all pages that use the shared header, tab bar and page title.
+- Tests: backend 119 passed + 1 expected xfail (12 new in `tests/test_upload.py`); frontend 119 passed (4 new in `photoUpload.test.ts`); `layout-check` clean on `/live` and the four other main routes at 360, 390, 1024 and 1366.
+- Files: backend/app/vision/{engine,routes,schemas,config}.py, backend/app/vision/sources/{factory,still}.py, backend/tests/test_upload.py, frontend/src/components/live/**, frontend/src/components/layout/{Header,BottomNav}.tsx, frontend/src/components/dashboard/IoTHeaderPopover.tsx, frontend/src/pages/{LiveVision,Map,Navigation}Page.tsx, frontend/src/styles/{index.css,tokens.ts}, frontend/index.html.
+
+### Logo, Live media, poster and pitch (branch `live-ui-upgrade`)
+- Logo: the uploaded FloodWay wave was traced into a vector (`frontend/public/logo.svg`, `logo-white.svg`, PNG exports) and replaces the lucide "Waves" brand tile in the sidebar, mobile header, reports page and welcome page via `components/brand/FloodWayLogo.tsx`; new favicon; OG card (`scripts/make_og_image.py`) uses it.
+- Live media: removed the flat tan bar drawn on the NORMAL frames (klang, gombak, smart, batu, drain) by inpainting; rebuilt all water frames, the rise loop and the webp copies from the cleaned frames. `check_realism` 0/15, `check_frames` 20/20. The Drain scene is still the crude drawing (bar removed): free local SD-Turbo could not produce a usable replacement. See `scripts/generate_image.py` (SD-Turbo, CPU, non-commercial licence).
+- Poster: `docs/poster/poster.html` rendered to `docs/poster/FloodWay_Poster_1920x1080.png` with `node scripts/render-poster.mjs`. Huawei Cloud tiles are marked prepared or planned; no unverified accuracy figures.
+- Pitch: `docs/PITCH_SCRIPT_PRELIM.md`, 575 spoken words, about 4:25 at 130 wpm.
+- Flag: the submitted entry form states 96.5% depth accuracy, 98.2% forgery detection, 8.4x training and 4.2x inference speed-ups and under 850 ms on Ascend. None is traceable in this repo (96.5% appears only as another project's vessel precision), and `docs/DEMO_RUNBOOK.md` says no Huawei Cloud service is called. The poster and script do not repeat them.
 
 ---
 

@@ -9,6 +9,7 @@ try { npm run check; if ($LASTEXITCODE -ne 0) { throw "frontend check failed" } 
 
 Write-Host "== backend: pytest -q ==" -ForegroundColor Cyan
 Push-Location (Join-Path $root 'backend')
-try { python -m pytest -q; if ($LASTEXITCODE -ne 0) { throw "backend tests failed" } } finally { Pop-Location }
+$py = if (Test-Path '.venv\Scripts\python.exe') { '.venv\Scripts\python.exe' } else { 'python' }  # prefer the backend venv
+try { & $py -m pytest -q; if ($LASTEXITCODE -ne 0) { throw "backend tests failed" } } finally { Pop-Location }
 
 Write-Host "All checks passed." -ForegroundColor Green

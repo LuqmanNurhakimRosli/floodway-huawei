@@ -36,6 +36,7 @@ from .schemas import (
     SourceDraft,
 )
 from .sources import FrameSource, SourceError, build_source
+from .sources.still import UPLOAD_PREFIX, upload_id_from_url
 from .sources.synthetic import SyntheticRiverSource
 from .url_guard import UnsafeURL, validate_source_url
 
@@ -48,6 +49,12 @@ OFFLINE_AFTER_FAILURES = 3
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+
+JPEG_MAGIC = bytes([0xFF, 0xD8, 0xFF])
+PNG_MAGIC = bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+UPLOAD_MAX_SIDE = 1920
+UPLOAD_KEEP_S = 24 * 3600
 
 
 def _jpeg(frame: np.ndarray) -> bytes:
@@ -80,6 +87,7 @@ class CameraRecord:
     readings: deque = field(default_factory=lambda: deque(maxlen=HISTORY_LIMIT))
     lock: threading.Lock = field(default_factory=threading.Lock)
     task: Optional[asyncio.Task] = None
+    analyzer: Optional[WaterAnalyzer] = None  # overrides the engine's analyser for this camera (sample cameras)
 
 
 class VisionEngine:
@@ -130,9 +138,10 @@ class VisionEngine:
 
     # ───────────── registry ─────────────
     def register_synthetic(self, camera_id: str, name: str, provider: str, lat: float, lon: float,
-                           calibration: Calibration, source: FrameSource, interval_s: int) -> CameraRecord:
+                           calibration: Calibration, source: FrameSource, interval_s: int,
+                           analyzer: Optional[WaterAnalyzer] = None) -> CameraRecord:
         rec = CameraRecord(id=camera_id, name=name, provider=provider, lat=lat, lon=lon, source_type="synthetic",
-                           source=source, calibration=calibration, interval_s=interval_s, seeded=True)
+                           source=source, calibration=calibration, interval_s=interval_s, seeded=True, analyzer=analyzer)
         self.cameras[camera_id] = rec
         return rec
 
@@ -148,7 +157,7 @@ class VisionEngine:
     def add_camera(self, draft: CameraCreate) -> CameraPublic:
         if not self.settings.allow_user_cameras:
             raise PermissionError("adding cameras is disabled on this server")
-        validate_source_url(draft.source_url, self.settings.allow_private_urls)
+        self._check_source(draft)
         source = build_source(draft.source_type, draft.source_url, draft.username, draft.password, self.settings)
         cam_id = f"cam-{uuid.uuid4().hex[:8]}"
         rec = CameraRecord(id=cam_id, name=draft.name, provider=draft.provider, lat=draft.lat, lon=draft.lon,
@@ -170,6 +179,8 @@ class VisionEngine:
             raise PermissionError("sample cameras cannot be removed")
         if rec.task:
             self._on_loop(rec.task.cancel)
+        if rec.source_type == "upload":
+            (self.settings.uploads_dir / f"{upload_id_from_url(rec.source_url)}.jpg").unlink(missing_ok=True)
         del self.cameras[camera_id]
         self._persist()
         self._publish_threadsafe({"type": "camera_removed", "camera_id": camera_id})
@@ -198,8 +209,9 @@ class VisionEngine:
         return self.get(camera_id).last_jpeg
 
     # ───────────── analysis ─────────────
-    def _analyse_frames(self, frames: list[np.ndarray], cal: Calibration):
-        return aggregate([self.analyzer.analyze(f, cal) for f in frames])
+    def _analyse_frames(self, frames: list[np.ndarray], cal: Calibration, analyzer: Optional[WaterAnalyzer] = None):
+        analyzer = analyzer or self.analyzer
+        return aggregate([analyzer.analyze(f, cal) for f in frames])
 
     def analyze_once(self, camera_id: str) -> tuple[Reading, Optional[AlertEvent]]:
         """Blocking: one full capture -> analyse -> level cycle for a saved camera."""
@@ -223,7 +235,7 @@ class VisionEngine:
                 rec.last_frame_at = _now_iso()
             rec.last_jpeg = jpeg
 
-            window = self._analyse_frames(frames, rec.calibration)
+            window = self._analyse_frames(frames, rec.calibration, rec.analyzer)
             if window.ratio is None:
                 raise SourceError("analysis produced no result")
 
@@ -243,7 +255,7 @@ class VisionEngine:
                 low_confidence=window.confidence < 0.6,
                 lines_crossed=lines_crossed(window.ratio, thr),
                 trend=compute_trend(history),  # type: ignore[arg-type]
-                model=self.analyzer.name, latency_ms=int(elapsed * 1000),
+                model=(rec.analyzer or self.analyzer).name, latency_ms=int(elapsed * 1000),
                 action="show_on_map" if rank(level) >= rank(Level.ADVISORY) else "none",
             )
             rec.readings.append(reading)
@@ -260,7 +272,7 @@ class VisionEngine:
 
     def test_draft(self, draft: CameraCreate) -> Reading:
         """Run one analysis for an unsaved camera (wizard step 3). Nothing is stored."""
-        validate_source_url(draft.source_url, self.settings.allow_private_urls)
+        self._check_source(draft)
         source = build_source(draft.source_type, draft.source_url, draft.username, draft.password, self.settings)
         frames = source.grab_frames(self.settings.burst_frames, self.settings.burst_gap_s)
         started = time.perf_counter()
@@ -280,8 +292,40 @@ class VisionEngine:
             action="show_on_map" if rank(level) >= rank(Level.ADVISORY) else "none",
         )
 
+    def _check_source(self, draft: SourceDraft | CameraCreate) -> None:
+        # An upload reference is validated by the factory (hex id under uploads/); URLs go through the SSRF guard.
+        if draft.source_type != "upload":
+            validate_source_url(draft.source_url, self.settings.allow_private_urls)
+
+    def store_upload(self, data: bytes) -> str:
+        """Validate and re-encode an uploaded photo; return its 'upload:<id>' reference.
+        Magic bytes decide the type (not the filename). Decoding and re-encoding to JPEG drops EXIF, including GPS."""
+        if not (data.startswith(JPEG_MAGIC) or data.startswith(PNG_MAGIC)):
+            raise UnsafeURL("only JPEG and PNG photos are accepted")
+        frame = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
+        if frame is None:
+            raise UnsafeURL("that file is not a readable photo")
+        longest = max(frame.shape[:2])
+        if longest > UPLOAD_MAX_SIDE:
+            scale = UPLOAD_MAX_SIDE / longest
+            frame = cv2.resize(frame, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+        upload_id = uuid.uuid4().hex
+        directory = self.settings.uploads_dir
+        directory.mkdir(parents=True, exist_ok=True)
+        self._prune_uploads()
+        (directory / f"{upload_id}.jpg").write_bytes(_jpeg(frame))
+        return f"{UPLOAD_PREFIX}{upload_id}"
+
+    def _prune_uploads(self) -> None:
+        """Drop photos nobody saved a camera with after a day, so abandoned wizards do not fill the disk."""
+        kept = {upload_id_from_url(r.source_url) for r in self.cameras.values() if r.source_type == "upload"}
+        cutoff = time.time() - UPLOAD_KEEP_S
+        for path in self.settings.uploads_dir.glob("*.jpg"):
+            if path.stem not in kept and path.stat().st_mtime < cutoff:
+                path.unlink(missing_ok=True)
+
     def preview_draft(self, draft: SourceDraft) -> bytes:
-        validate_source_url(draft.source_url, self.settings.allow_private_urls)
+        self._check_source(draft)
         source = build_source(draft.source_type, draft.source_url, draft.username, draft.password, self.settings)
         return _jpeg(source.grab_frames(1, 0.0)[-1])
 

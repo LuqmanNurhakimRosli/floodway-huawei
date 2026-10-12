@@ -40,8 +40,6 @@ d = ImageDraw.Draw(img)
 
 # photo on the right, rounded, with a thin blue edge
 photo = Image.open(PHOTO).convert("RGB")
-# The NORMAL frame has a thin drawn band near its bottom edge (see sample_media/README.md); leave it out of the preview.
-photo = photo.crop((0, 0, photo.width, int(photo.height * 0.88)))
 pw, ph = 520, 520
 scale = max(pw / photo.width, ph / photo.height)
 photo = photo.resize((int(photo.width * scale), int(photo.height * scale)), Image.LANCZOS)
@@ -54,8 +52,10 @@ d.rounded_rectangle((W - pw - 55, (H - ph) // 2, W - 55, (H + ph) // 2), radius=
 
 # text on the left
 x = 70
-d.rounded_rectangle((x, 70, x + 64, 134), radius=16, fill=BLUE)
-d.text((x + 32, 102), "FW", font=font("segoeuib.ttf", 26), fill=WHITE, anchor="mm")
+d.rounded_rectangle((x, 62, x + 84, 146), radius=20, fill=WHITE)
+logo = Image.open(Path(__file__).resolve().parents[1] / "frontend" / "public" / "logo-512.png").convert("RGBA")
+logo.thumbnail((60, 60), Image.LANCZOS)
+img.paste(logo, (x + (84 - logo.width) // 2, 62 + (84 - logo.height) // 2), logo)
 d.text((x, 175), "FloodWay", font=font("segoeuib.ttf", 76), fill=WHITE)
 y = 275
 for line in wrap(d, "Flood-prevention prototype: camera water-level analysis, evacuation guidance and citizen reports.", font("segoeui.ttf", 31), 480):

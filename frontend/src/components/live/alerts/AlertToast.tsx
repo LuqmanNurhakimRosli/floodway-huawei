@@ -26,7 +26,7 @@ export function AlertToast({ alert, onOpen, onDismiss }: Props) {
   const Icon = meta.icon;
 
   return (
-    <div role="alert" className="fixed inset-x-3 top-[4.5rem] z-50 motion-safe:animate-[live-toast-in_200ms_ease-out] sm:left-auto sm:right-6 sm:top-20 sm:w-[400px]">
+    <div role="alert" className="fixed inset-x-3 top-[calc(4.5rem+env(safe-area-inset-top,0px))] z-50 motion-safe:animate-[live-toast-in_200ms_ease-out] sm:left-auto sm:right-6 sm:top-20 sm:w-[400px]">
       <div className={`flex items-start gap-3 rounded-2xl border bg-white p-3 shadow-lg shadow-slate-900/10 ${meta.border}`}>
         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${meta.solid}`}>
           <Icon className="h-5 w-5" aria-hidden="true" />

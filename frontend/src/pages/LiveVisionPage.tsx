@@ -94,9 +94,9 @@ export default function LiveVisionPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
+    <div className="flex min-h-dvh bg-[#F8FAFC]">
       <DashboardSidebar defaultCollapsed={compactSidebar} />
-      <div className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden pb-16 md:pb-0">
+      <div className="flex h-dvh min-w-0 flex-1 flex-col overflow-hidden pb-[var(--nav-h)] md:pb-0">
         <Header />
         <main className="@container/main flex-1 overflow-y-auto overscroll-contain" aria-label="Live Vision">
           <div className="mx-auto w-full max-w-[1600px] p-4 @min-[640px]/main:p-6 @min-[1280px]/main:p-8">

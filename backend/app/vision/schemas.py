@@ -15,7 +15,7 @@ class Level(str, Enum):
 
 
 Provider = Literal["public", "city", "mine"]
-SourceType = Literal["snapshot", "stream", "synthetic", "file"]
+SourceType = Literal["snapshot", "stream", "synthetic", "file", "upload"]
 Trend = Literal["rising", "steady", "falling"]
 
 
@@ -55,7 +55,7 @@ class Calibration(BaseModel):
 
 
 class SourceDraft(BaseModel):
-    source_type: Literal["snapshot", "stream"]
+    source_type: Literal["snapshot", "stream", "upload"]
     source_url: str = Field(min_length=8, max_length=2048)
     username: Optional[str] = Field(default=None, max_length=128)
     password: Optional[str] = Field(default=None, max_length=256)
@@ -66,7 +66,7 @@ class CameraCreate(BaseModel):
     provider: Provider = "mine"
     lat: float = Field(ge=-90, le=90)
     lon: float = Field(ge=-180, le=180)
-    source_type: Literal["snapshot", "stream"]
+    source_type: Literal["snapshot", "stream", "upload"]
     source_url: str = Field(min_length=8, max_length=2048)
     username: Optional[str] = Field(default=None, max_length=128)
     password: Optional[str] = Field(default=None, max_length=256)

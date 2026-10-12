@@ -2,11 +2,12 @@ import { Check, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { visionActions } from '../../../hooks/vision/useVisionStore';
 import { linesAreValid } from '../../../lib/vision/thresholds';
-import { ApiError, previewFrame, testCamera } from '../../../services/vision/visionApi';
+import { ApiError, previewFrame, testCamera, uploadPhoto } from '../../../services/vision/visionApi';
 import type { Calibration, CameraDraft, Reading } from '../../../types/vision';
 import { btnPrimary, btnSecondary, focusRing, heading } from '../shared/ui';
 import { DEFAULT_LINES, StepCalibrate } from './StepCalibrate';
 import { StepSource } from './StepSource';
+import { photoProblem } from './StepSource';
 import type { SourceForm } from './StepSource';
 import { StepTest } from './StepTest';
 
@@ -23,9 +24,14 @@ const STEPS = ['Source', 'Calibrate', 'Test & save'] as const;
 
 function validateSource(f: SourceForm): string | null {
   if (f.name.trim().length < 2) return 'Give the camera a name.';
+  if (f.source_type === 'upload') return photoProblem(f.photo) ?? validateLocation(f);
   if (!/^(https?|rtsps?):\/\/.+/i.test(f.source_url.trim())) return 'Enter a full URL starting with http://, https:// or rtsp://.';
   if (/^[^:]+:\/\/[^/]*@/.test(f.source_url.trim())) return 'Put the username and password in their own fields, not in the URL.';
   if (Boolean(f.username) !== Boolean(f.password)) return 'Enter both a username and a password, or neither.';
+  return validateLocation(f);
+}
+
+function validateLocation(f: SourceForm): string | null {
   const lat = Number(f.lat);
   const lon = Number(f.lon);
   if (!Number.isFinite(lat) || lat < -90 || lat > 90) return 'Latitude must be a number between -90 and 90.';
@@ -35,7 +41,8 @@ function validateSource(f: SourceForm): string | null {
 
 export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, gpsAvailable }: Props) {
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState<SourceForm>({ name: '', source_type: 'snapshot', source_url: '', username: '', password: '', lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4), feed_refresh_s: 0 });
+  const [form, setForm] = useState<SourceForm>({ name: '', source_type: 'snapshot', source_url: '', username: '', password: '', lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4), feed_refresh_s: 0, photo: null });
+  const uploaded = useRef<{ file: File; ref: string } | null>(null); // reuse the stored photo when the user steps back and forward
   const [calibration, setCalibration] = useState<Calibration>({ roi: [], lines: DEFAULT_LINES });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -56,7 +63,8 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
     setStep(0); setError(null); setTestError(null); setReading(null); setBusy(false); setTesting(false);
     setCalibration({ roi: [], lines: DEFAULT_LINES });
     setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return null; });
-    setForm((f) => ({ ...f, name: '', source_url: '', username: '', password: '', lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4) }));
+    uploaded.current = null;
+    setForm((f) => ({ ...f, name: '', source_url: '', photo: null, username: '', password: '', lat: origin.lat.toFixed(4), lon: origin.lon.toFixed(4) }));
   }, [origin.lat, origin.lon]);
 
   const close = useCallback(() => { reset(); onClose(); }, [reset, onClose]);
@@ -104,14 +112,22 @@ export function AddCameraWizard({ open, onClose, onSaved, origin, offlineDemo, g
     if (step === 0) {
       const problem = validateSource(form);
       if (problem) return setError(problem);
+      if (offlineDemo && form.source_type === 'upload') return setError('Photo upload needs the FloodWay server, which is not reachable right now.');
       if (offlineDemo) { setPreviewUrl(null); return setStep(1); }
       setBusy(true);
       try {
-        const url = await previewFrame({ source_type: form.source_type, source_url: form.source_url.trim(), username: form.username || undefined, password: form.password || undefined });
+        let sourceUrl = form.source_url.trim();
+        if (form.source_type === 'upload' && form.photo) {
+          if (uploaded.current?.file !== form.photo) uploaded.current = { file: form.photo, ref: await uploadPhoto(form.photo) };
+          sourceUrl = uploaded.current.ref;
+          setForm((f) => ({ ...f, source_url: sourceUrl }));
+        }
+        const url = await previewFrame({ source_type: form.source_type, source_url: sourceUrl, username: form.username || undefined, password: form.password || undefined });
         setPreviewUrl((old) => { if (old) URL.revokeObjectURL(old); return url; });
         setStep(1);
       } catch (err) {
-        if (err instanceof ApiError && err.status === 422) setError(`This URL can't be used: ${err.message}.`);
+        if (err instanceof ApiError && err.status === 413) setError('That photo is larger than 5 MB. Choose a smaller one.');
+        else if (err instanceof ApiError && err.status === 422) setError(form.source_type === 'upload' ? `This photo can't be used: ${err.message}.` : `This URL can't be used: ${err.message}.`);
         else setError(err instanceof Error ? `Could not get a frame from that camera: ${err.message}` : 'Could not reach that camera.');
       } finally {
         setBusy(false);

@@ -40,3 +40,7 @@ class VisionSettings:
     @property
     def cameras_file(self) -> Path:
         return self.data_dir / "cameras.json"
+
+    @property
+    def uploads_dir(self) -> Path:
+        return self.data_dir / "uploads"

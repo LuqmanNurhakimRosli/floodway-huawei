@@ -106,7 +106,7 @@ def test_sample_clock_offset_shifts_the_scene(monkeypatch):
     class FakeEngine:
         settings = VisionSettings(sample_clock_offset_s=1000.0)
 
-        def register_synthetic(self, *args):
+        def register_synthetic(self, *args, **kwargs):
             captured.append(args[6])
 
         def register_offline_placeholder(self, *args):

@@ -1,6 +1,7 @@
 import { ChevronDown, MapPin, Search } from 'lucide-react';
 import type { CameraTab } from '../../../hooks/vision/useNearbyCameras';
 import type { Place } from '../../../lib/vision/geo';
+import { Segmented } from '../shared/Segmented';
 import { focusRing } from '../shared/ui';
 
 interface Props {
@@ -38,23 +39,13 @@ export function NearbyFilters({ places, placeId, onPlace, radiusKm, onRadius, ta
         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
       </label>
 
+      <Segmented kind="tabs" label="Camera source" options={TABS} value={tab} onChange={onTab} />
+
       <div className="flex items-center gap-3">
         <span className="text-sm font-semibold text-slate-700">Radius</span>
-        <div className="grid flex-1 grid-cols-3 rounded-full border border-slate-200 bg-slate-50 p-0.5" role="group" aria-label="Search radius">
-          {RADII.map((km) => (
-            <button key={km} type="button" aria-pressed={radiusKm === km} onClick={() => onRadius(km)} className={`min-h-9 rounded-full text-sm font-bold ${focusRing} ${radiusKm === km ? 'bg-[#0958D9] text-white' : 'text-slate-700 hover:text-slate-900'}`}>
-              {km} km
-            </button>
-          ))}
+        <div className="flex-1">
+          <Segmented label="Search radius" options={RADII.map((km) => ({ id: km, label: `${km} km` }))} value={radiusKm} onChange={onRadius} />
         </div>
-      </div>
-
-      <div className="grid grid-cols-3 border-b border-slate-200" role="tablist" aria-label="Camera source">
-        {TABS.map((t) => (
-          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => onTab(t.id)} className={`-mb-px min-h-11 border-b-2 text-sm font-bold ${focusRing} ${tab === t.id ? 'border-[#1677FF] text-[#0958D9]' : 'border-transparent text-slate-600 hover:text-slate-900'}`}>
-            {t.label}
-          </button>
-        ))}
       </div>
 
       <label className="relative block">

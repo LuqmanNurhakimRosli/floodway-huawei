@@ -1,5 +1,5 @@
 // Demo playback loops (AI-generated sample imagery). A loop is NOT tied to the live readings, so the UI offers it
-// as an explicit "Demo loop" view and labels it. Files are made by docs/PLAN_A_GEMINI_MEDIA.md.
+// as an explicit "Demo loop" view and labels it. Files are made by docs/plans/GEMINI_LIVE_MEDIA_V2.md.
 export interface DemoVideo {
   src: string;
   poster: string;

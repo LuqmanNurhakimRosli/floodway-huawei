@@ -9,7 +9,7 @@ interface Props {
 
 /**
  * What is real and what is simulated, in plain words. Shown on the welcome page and on Profile so no judge or user
- * can mistake the demo for an operational system. Keep this text in step with docs/PLAN_B_SYSTEM_UPGRADE.md, section 1.
+ * can mistake the demo for an operational system. Keep this text in step with docs/ops/DEMO_RUNBOOK.md, section 1.
  */
 export function AboutDemo({ tone = 'light', className = '' }: Props) {
   const dark = tone === 'dark';

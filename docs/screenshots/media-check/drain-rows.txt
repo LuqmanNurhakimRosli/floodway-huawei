@@ -1,0 +1,15 @@
+Camera: drain
+Rung | Ratio | Row 720p | Row 360p | Level
+--------------------------------------------------
+r000 |  0.00 |      676 |      337 | NORMAL (dry bed, trickle)
+r010 |  0.10 |      643 |      320 | NORMAL (legacy normal)
+r020 |  0.20 |      610 |      304 | NORMAL
+r030 |  0.30 |      577 |      288 | ADVISORY
+r040 |  0.40 |      544 |      271 | ADVISORY (legacy watch)
+r050 |  0.50 |      510 |      254 | ADVISORY
+r060 |  0.60 |      477 |      238 | ADVISORY
+r070 |  0.70 |      444 |      222 | WARNING
+r080 |  0.80 |      411 |      205 | WARNING (legacy warning)
+r090 |  0.90 |      378 |      188 | WARNING
+r100 |  1.00 |      345 |      172 | DANGER (legacy danger)
+r110 |  1.10 |      312 |      155 | DANGER (overtopping)

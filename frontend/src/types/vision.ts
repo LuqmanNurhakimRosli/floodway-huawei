@@ -3,7 +3,7 @@
 
 export type Level = 'NORMAL' | 'ADVISORY' | 'WARNING' | 'DANGER';
 export type Provider = 'public' | 'city' | 'mine';
-export type SourceType = 'snapshot' | 'stream' | 'synthetic' | 'file';
+export type SourceType = 'snapshot' | 'stream' | 'synthetic' | 'file' | 'upload';
 export type Trend = 'rising' | 'steady' | 'falling';
 
 export type Point = [number, number]; // normalised 0..1, (x, y), y = 0 is the top of the frame
@@ -68,7 +68,7 @@ export interface CameraDraft {
   provider: Provider;
   lat: number;
   lon: number;
-  source_type: 'snapshot' | 'stream';
+  source_type: 'snapshot' | 'stream' | 'upload';
   source_url: string;
   username?: string;
   password?: string;

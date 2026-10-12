@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { formatDistance } from '../../../lib/vision/geo';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import type { CameraWithDistance } from '../../../hooks/vision/useNearbyCameras';
@@ -13,8 +14,13 @@ interface Props {
 
 /** Phone: horizontal snap-scrolling camera picker. Bleeds to the screen edge, snaps with the page gutter. */
 export function CameraChips({ items, selectedId, onSelect, onAdd }: Props) {
+  const row = useRef<HTMLDivElement>(null);
+  // Keep the chosen chip in view (a new or tapped-from-elsewhere camera can sit off-screen in the row).
+  useEffect(() => {
+    row.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  }, [selectedId]);
   return (
-    <div className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] @min-[640px]/main:-mx-6 @min-[640px]/main:scroll-px-6 @min-[640px]/main:px-6" role="listbox" aria-label="Cameras" aria-orientation="horizontal">
+    <div ref={row} className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] @min-[640px]/main:-mx-6 @min-[640px]/main:scroll-px-6 @min-[640px]/main:px-6" role="listbox" aria-label="Cameras" aria-orientation="horizontal">
       {items.map(({ camera, distanceKm }) => {
         const level = camera.online ? camera.reading?.level : undefined;
         const meta = level ? LEVEL_META[level] : null;
@@ -27,7 +33,7 @@ export function CameraChips({ items, selectedId, onSelect, onAdd }: Props) {
             role="option"
             aria-selected={selected}
             onClick={() => onSelect(camera.id)}
-            className={`min-h-14 w-44 shrink-0 snap-start rounded-xl border px-3 py-2 text-left ${interactive} ${selected ? 'border-[#1677FF] bg-blue-50/50 ring-1 ring-[#1677FF]' : 'border-slate-200 bg-white'}`}
+            className={`min-h-14 w-44 shrink-0 snap-start rounded-xl border px-3 py-2 text-left ${interactive} ${selected ? 'border-[#1677FF]/70 bg-blue-50/60 shadow-sm' : 'border-slate-200/70 bg-white shadow-sm'}`}
           >
             <span className="block truncate text-sm/5 font-semibold text-slate-900">{camera.name}</span>
             <span className="mt-0.5 flex items-center gap-1.5 text-xs/4 text-slate-600">

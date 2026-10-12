@@ -12,13 +12,20 @@ from __future__ import annotations
 
 import math
 import time
-from typing import Callable, Mapping
+from typing import Callable, Mapping, Optional
 
 import numpy as np
 
 from .base import FrameSource, SourceError
 
 LEVELS = ("normal", "watch", "warning", "danger")
+RUNG_STEP = 0.10
+RUNG_COUNT = 12   # r000 .. r110: nominal ratios 0.0, 0.1 ... 1.1
+
+
+def nearest_rung(ratio: float) -> int:
+    """Index 0..11 of the ladder photo whose nominal ratio is closest to `ratio`."""
+    return min(RUNG_COUNT - 1, max(0, round(ratio / RUNG_STEP)))
 
 
 def level_for_ratio(ratio: float, normal: float, warning: float, danger: float = 0.97) -> str:
@@ -47,10 +54,14 @@ class FrameSetSource(FrameSource):
         seed: int = 0,
         noise_sigma: float = 0.8,
         clock: Callable[[], float] = time.time,
+        ladder: Optional[Mapping[int, np.ndarray]] = None,
     ):
         missing = [k for k in LEVELS if k not in frames]
         if missing:
             raise ValueError(f"frame set is missing levels: {missing}")
+        if ladder is not None and sorted(ladder) != list(range(RUNG_COUNT)):
+            raise ValueError(f"ladder must have rungs 0..{RUNG_COUNT - 1}")
+        self.ladder = {k: np.asarray(v) for k, v in ladder.items()} if ladder is not None else None
         self.frames = {k: np.asarray(v) for k, v in frames.items()}
         self.thresholds = thresholds
         self.ratio_min, self.ratio_max = ratio_min, ratio_max
@@ -77,4 +88,9 @@ class FrameSetSource(FrameSource):
         if n < 1:
             raise SourceError("no frames requested")
         t0 = self.clock()
-        return [self._noisy(self.frames[self.level_at(t0 + i * gap_s)]) for i in range(n)]
+        return [self._noisy(self._photo_at(t0 + i * gap_s)) for i in range(n)]
+
+    def _photo_at(self, t: float) -> np.ndarray:
+        if self.ladder is not None:
+            return self.ladder[nearest_rung(self.ratio_at(t))]
+        return self.frames[self.level_at(t)]

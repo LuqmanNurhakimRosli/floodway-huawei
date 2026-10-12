@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon, Waves } from 'lucide-react';
+import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon } from 'lucide-react';
+import { FloodWayLogo } from '../brand/FloodWayLogo';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { ORIGINS } from '../../data/klDemo';
@@ -19,15 +20,13 @@ export function Header() {
       {/* Left: Brand Icon on Mobile & Clean Location Selector */}
       <div className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0">
         <div className="md:hidden flex items-center gap-1.5 shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0958D9] to-[#1677FF] flex items-center justify-center text-white shadow-sm">
-            <Waves className="w-4 h-4" />
-          </div>
+          <FloodWayLogo className="h-8 w-10" />
         </div>
 
         <div className="relative min-w-0 flex-1 sm:flex-none">
           <button
             onClick={() => setShowLocationMenu(!showLocationMenu)}
-            className="flex w-full sm:w-auto min-w-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/70 transition-colors text-xs md:text-sm font-semibold text-slate-800 border border-slate-200 cursor-pointer"
+            className="flex w-full sm:w-auto min-w-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 max-md:min-h-11 rounded-xl bg-slate-100 hover:bg-slate-200/70 transition-colors text-xs md:text-sm font-semibold text-slate-800 border border-slate-200 cursor-pointer"
           >
             <MapPin className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
             <span className="sm:hidden font-bold truncate min-w-0">{shortLocation}</span>
@@ -70,7 +69,7 @@ export function Header() {
       <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
         <IoTHeaderPopover />
 
-        <button className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200/70 text-slate-600 transition-colors relative">
+        <button aria-label="Notifications" className="p-2 max-md:flex max-md:min-h-11 max-md:min-w-11 max-md:items-center max-md:justify-center rounded-xl bg-slate-100 hover:bg-slate-200/70 text-slate-600 transition-colors relative">
           <Bell className="w-4 h-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white" />
         </button>

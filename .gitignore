@@ -70,3 +70,15 @@ Thumbs.db
 .vscode/
 .idea/
 files (*)/
+
+# 1280x720 master PNGs of the sample ladder (105 MB); regenerate with export_ladder.py from these, keep them outside git
+backend/app/vision/sample_media/master/
+
+# Quarantined & Superseded Documentation (purged legacy duplicates)
+docs/_to-delete/
+**/docs/_to-delete/
+
+# Temporary scratch & candidate media
+scratch/
+**/scratch/
+docs/screenshots/candidates/

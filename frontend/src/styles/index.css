@@ -10,6 +10,8 @@
     --dark-navy: #071426;
     --surface-card: #FFFFFF;
     --border-subtle: #E2E8F0;
+    /* Bottom tab bar: 64px plus the iPhone home-indicator inset (0 elsewhere). Needs viewport-fit=cover. */
+    --nav-h: calc(4rem + env(safe-area-inset-bottom, 0px));
   }
 
   body {
@@ -21,6 +23,14 @@
 
   h1, h2, h3, h4, .font-heading {
     font-family: 'Outfit', 'Inter', sans-serif;
+  }
+
+  /* Phones use the system font (SF Pro on iPhone) so the app reads as native; desktop keeps Inter and Outfit. */
+  @media (max-width: 767px) {
+    body, h1, h2, h3, h4, .font-heading {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Inter, sans-serif;
+    }
+    h1, .font-heading { letter-spacing: -0.01em; }
   }
 }
 

@@ -9,7 +9,7 @@ export interface OverlayState {
   waterline: boolean;
 }
 
-export const DEFAULT_OVERLAYS: OverlayState = { roi: true, lines: true, mask: true, waterline: true };
+export const DEFAULT_OVERLAYS: OverlayState = { roi: false, lines: true, mask: false, waterline: true };
 const ITEMS: { key: keyof OverlayState; label: string; hint: string; icon: LucideIcon }[] = [
   { key: 'roi', label: 'Zone', hint: 'Water zone outline', icon: SquareDashed },
   { key: 'lines', label: 'Lines', hint: 'Normal, warning and danger lines', icon: Rows3 },
@@ -37,7 +37,7 @@ export function OverlayToggles({ value, onChange }: Props) {
             aria-label={label}
             title={`${on ? 'Hide' : 'Show'}: ${hint}`}
             onClick={() => onChange({ ...value, [key]: !on })}
-            className={`inline-flex min-h-9 min-w-9 items-center justify-center gap-1.5 rounded-lg px-2 text-sm/5 font-medium ${interactive} ${
+            className={`inline-flex min-h-11 min-w-11 items-center @min-[760px]/main:min-h-9 @min-[760px]/main:min-w-9 justify-center gap-1.5 rounded-lg px-2 text-sm/5 font-medium ${interactive} ${
               on ? 'bg-blue-50 text-[#0958D9]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >

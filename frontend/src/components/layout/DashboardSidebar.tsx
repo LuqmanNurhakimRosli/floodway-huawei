@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { FloodWayLogo } from '../brand/FloodWayLogo';
 import {
   LayoutDashboard,
   Map,
@@ -8,7 +9,6 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
-  Waves,
   ShieldCheck,
   ChevronRight
 } from 'lucide-react';
@@ -34,9 +34,7 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
       {/* Brand Header */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-[#1E293B]/70">
         <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] flex items-center justify-center shadow-lg shadow-[#1677FF]/30 shrink-0">
-            <Waves className="w-5 h-5 text-white" />
-          </div>
+          <FloodWayLogo tile className="h-10 w-10" />
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-heading font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">

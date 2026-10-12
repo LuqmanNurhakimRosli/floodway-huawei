@@ -8,7 +8,7 @@ from pathlib import Path
 
 import cv2
 
-from app.vision.analysis.classical import ClassicalWaterAnalyzer
+from app.vision.analysis.reference_diff import ReferenceDiffAnalyzer
 from app.vision.levels import ratio_to_level, thresholds_from_calibration
 from app.vision.schemas import Calibration
 
@@ -23,11 +23,11 @@ CAMERAS = {
 }
 
 cal_all = json.loads((HERE / "calibration.json").read_text(encoding="utf-8"))
-analyzer = ClassicalWaterAnalyzer()
 total = hits = 0
 for short, cam_id in CAMERAS.items():
     cal = Calibration(roi=[tuple(p) for p in cal_all[cam_id]["roi"]], lines=cal_all[cam_id]["lines"])
     thr = thresholds_from_calibration(cal)
+    analyzer = ReferenceDiffAnalyzer(cv2.imread(str(HERE / f"{short}-r000.jpg")))  # as in the app
     row = []
     cam_hits = 0
     for level, expected in EXPECT.items():

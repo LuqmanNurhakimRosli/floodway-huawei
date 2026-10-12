@@ -1,7 +1,8 @@
 import { AboutDemo } from '../components/common/AboutDemo';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Waves, Shield, ArrowRight, CheckCircle2, Cpu } from 'lucide-react';
+import { Shield, ArrowRight, CheckCircle2, Cpu } from 'lucide-react';
+import { FloodWayLogo } from '../components/brand/FloodWayLogo';
 import { useAuth } from '../contexts/AuthContext';
 
 export function WelcomePage() {
@@ -25,9 +26,7 @@ export function WelcomePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#071426] via-[#0B1E38] to-[#050D1A] text-white flex flex-col justify-between p-6">
       {/* Brand Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] flex items-center justify-center shadow-lg shadow-blue-500/30">
-          <Waves className="w-5 h-5 text-white" />
-        </div>
+        <FloodWayLogo tile className="h-10 w-10" />
         <div>
           <span className="font-heading font-extrabold text-xl tracking-tight text-white block">
             FloodWay

@@ -10,7 +10,7 @@ export function CaptureStrip({ camera }: { camera: Camera }) {
   const cycle = useCaptureCycle(camera);
   const reading = camera.reading;
 
-  let label = `Next capture in ${cycle.secondsLeft}s`;
+  let label = 'Capturing automatically'; // the countdown itself is the ring in the feed header
   if (cycle.phase === 'disconnected') label = 'Server unreachable. Retrying automatically.';
   else if (cycle.phase === 'offline') label = 'Camera offline. Retrying automatically.';
   else if (cycle.phase === 'stale') label = 'Waiting for a fresh frame';
@@ -31,6 +31,8 @@ export function CaptureStrip({ camera }: { camera: Camera }) {
       {/* Announce phase changes only, never the per-second countdown. */}
       <span className="sr-only" aria-live="polite">{cycle.phase === 'waiting' ? '' : label}</span>
       <p className={`${num} text-xs/4 text-slate-600`}>{detail}</p>
+      {camera.source_type === 'upload' && <p className="basis-full text-xs/4 text-slate-600">Uploaded photo. It does not change, so the reading repeats. Use a stream or snapshot URL to watch live water.</p>}
+      {camera.source_type === 'synthetic' && <p className="basis-full text-xs/4 text-slate-600">Sample footage. The water overlay is simulated, not a real camera.</p>}
     </div>
   );
 }

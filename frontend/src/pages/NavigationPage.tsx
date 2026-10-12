@@ -11,7 +11,7 @@ export function NavigationPage() {
   return (
     <div className="min-h-screen flex bg-[#F8FAFC]">
       <DashboardSidebar />
-      <div className="flex-1 flex flex-col min-w-0 pb-16 md:pb-0">
+      <div className="flex-1 flex flex-col min-w-0 pb-[var(--nav-h)] md:pb-0">
         <Header />
         <div className="flex-1 p-4 md:p-6">
           <TurnByTurnEvacuation shelterId={shelterId || 'shelter-01'} />
