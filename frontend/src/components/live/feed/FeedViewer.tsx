@@ -10,7 +10,7 @@ import { frameUrl } from '../../../services/vision/visionApi';
 import type { Camera } from '../../../types/vision';
 import { interactive, num } from '../shared/ui';
 import type { OverlayState } from './OverlayToggles';
-import { RiverScene } from './RiverScene';
+import { SampleFrame } from './SampleFrame';
 
 interface Props {
   camera: Camera;
@@ -88,7 +88,7 @@ export function FeedViewer({ camera, tag, useScene, overlays, compact = false, o
           aria-label="Sample loop of the water rising and falling. An AI-generated base photo with a synthetic water overlay, not tied to the readings."
         />
       ) : !camera.online ? null : useScene ? (
-        <RiverScene ratio={reading?.water_ratio ?? 0} />
+        <SampleFrame cameraId={camera.id} ratio={reading?.water_ratio ?? 0} />
       ) : !reading ? (
         <div className="flex h-full w-full items-center justify-center bg-slate-700 text-sm/5 text-slate-200">Waiting for the first frame…</div>
       ) : imgFailed ? (

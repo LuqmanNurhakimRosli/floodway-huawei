@@ -1,7 +1,7 @@
 import { WifiOff } from 'lucide-react';
 import { frameUrl } from '../../../services/vision/visionApi';
 import type { Camera } from '../../../types/vision';
-import { RiverScene } from './RiverScene';
+import { SampleFrame } from './SampleFrame';
 
 interface Props {
   camera: Camera;
@@ -19,7 +19,7 @@ export function FeedThumb({ camera, useScene, className = 'aspect-video w-full' 
           No signal
         </span>
       ) : useScene ? (
-        <RiverScene ratio={camera.reading?.water_ratio ?? 0} />
+        <SampleFrame cameraId={camera.id} ratio={camera.reading?.water_ratio ?? 0} className="h-full w-full object-cover" />
       ) : !camera.reading ? (
         <span className="flex h-full w-full items-center justify-center text-xs/4 font-medium text-slate-600">Waiting…</span>
       ) : (
