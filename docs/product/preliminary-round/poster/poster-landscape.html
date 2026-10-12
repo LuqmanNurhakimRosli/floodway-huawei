@@ -16,7 +16,7 @@
   html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); font-family: Inter, 'Segoe UI', system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
   h1, h2, h3, .display { font-family: Outfit, Inter, sans-serif; letter-spacing: -0.015em; }
   svg.i { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-  .poster { width: 1920px; height: 1080px; display: grid; grid-template-rows: 128px 1fr 80px; }
+  .poster { width: 1920px; height: 1080px; display: grid; grid-template-rows: 128px 1fr 92px; }
   p, li { font-size: 22px; line-height: 1.36; color: #1B3540; }
   b { font-weight: 700; color: var(--ink); }
   .small { font-size: 20px; line-height: 1.35; color: var(--muted); }
@@ -60,15 +60,15 @@
 
   /* timeline */
   .kb .kicker { color: var(--amber); }
-  .tl3 { display: grid; gap: 8px; margin-top: 10px; }
-  .tl { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: center; }
-  .tl .tm { font-family: 'JetBrains Mono'; font-weight: 700; font-size: 19px; line-height: 1.1; text-align: center; padding: 8px 4px; border-radius: 12px; background: #FFF6DD; color: #7A5A0B; }
+  .tl3 { display: grid; gap: 6px; margin-top: 8px; }
+  .tl { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: center; }
+  .tl .tm { font-family: 'JetBrains Mono'; font-weight: 700; font-size: 18px; line-height: 1.1; text-align: center; padding: 4px 2px; border-radius: 10px; background: #FFF6DD; color: #7A5A0B; }
   .tl.ok .tm { background: #E4F6EC; color: var(--green-d); }
-  .tl p { font-size: 20px; line-height: 1.25; }
-  .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-  .vs { border-radius: 16px; padding: 10px 14px; font-size: 20px; line-height: 1.28; }
+  .tl p { font-size: 19px; line-height: 1.22; }
+  .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .vs { border-radius: 14px; padding: 7px 12px; font-size: 18px; line-height: 1.22; }
   .vs.no { background: #FDF0F0; border: 1px solid #F3CFD1; color: #5B2327; } .vs.yes { background: #E9F8F1; border: 1px solid #BFE8D3; color: #0B4A31; }
-  .vs b { display: block; font-size: 20px; letter-spacing: .05em; text-transform: uppercase; }
+  .vs b { display: block; font-size: 18px; letter-spacing: .05em; text-transform: uppercase; }
   .vs.no b { color: var(--red-d); } .vs.yes b { color: var(--green-d); }
 
   /* solution (centre) */
@@ -139,10 +139,10 @@
 
   /* cloud */
   .more .kicker { color: #CF0A2C; }
-  .cloud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+  .cloud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
   .cloud div { border-radius: 14px; background: #FFF4F5; border: 1px solid #F6C9CE; padding: 4px; text-align: center; font-family: Outfit; font-weight: 800; font-size: 22px; color: #A30821; line-height: 1.1; }
   .cloud div span { display: block; font-family: Inter; font-weight: 500; font-size: 20px; color: #6A2D35; }
-  .quote { margin-top: 8px; border-radius: 14px; background: var(--sky); padding: 8px 14px; border-left: 8px solid var(--teal); }
+  .quote { margin-top: 6px; border-radius: 14px; background: var(--sky); padding: 6px 14px; border-left: 8px solid var(--teal); }
   .quote p { font-size: 20px; line-height: 1.3; font-style: italic; }
   .quote .who { margin-top: 4px; font-size: 20px; color: var(--muted); font-style: normal; }
   .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -152,7 +152,9 @@
   footer { background: var(--deep); color: #C8E2EA; padding: 0 34px; display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center; }
   footer .note { font-size: 18px; line-height: 1.28; }
   footer .note b { color: #fff; }
-  footer .end { text-align: right; font-size: 18px; color: #fff; font-weight: 600; line-height: 1.4; }
+  footer .end { display: flex; align-items: center; gap: 18px; text-align: right; font-size: 18px; color: #fff; font-weight: 600; line-height: 1.4; }
+  footer .end .qr { width: 76px; height: 76px; flex: none; background: #fff; padding: 4px; border-radius: 10px; }
+  .afford { margin-top: 6px; font-size: 18px; line-height: 1.2; color: #0B4A31; background: #E9F8F1; border-radius: 12px; padding: 5px 10px; }
   footer .end span { display: block; color: #86D3E4; font-weight: 500; }
 </style>
 </head>
@@ -183,7 +185,7 @@
   <!-- left -->
   <div class="col">
     <section class="card problem">
-      <div class="kicker"><svg class="i"><use href="#alert"/></svg> The problem</div>
+      <div class="kicker"><svg class="i"><use href="#alert"/></svg> 1 · The problem</div>
       <h2>Floods move in minutes. Warnings move in hours.</h2>
       <div class="bigstats">
         <div class="big"><b>&lt;45<small> min</small></b><span>for a Klang Valley flash flood to turn dangerous</span></div>
@@ -195,7 +197,7 @@
       </div>
       </section>
     <section class="card kb grow">
-      <div class="kicker"><svg class="i"><use href="#clock"/></svg> Kampung Baru scenario</div>
+      <div class="kicker"><svg class="i"><use href="#clock"/></svg> 3 · Impact: Kampung Baru</div>
       <h2>The 1:00 AM alert</h2>
       <div class="tl3">
         <div class="tl"><div class="tm">1:00 AM</div><p><b>Yellow alert</b> on the phone, <b>90 minutes</b> before the water turns dangerous.</p></div>
@@ -206,13 +208,14 @@
         <div class="vs no"><b>Without FloodWay</b>No warning. Roads out are already under.</div>
         <div class="vs yes"><b>With FloodWay</b>Early alert, clear route, all safe.</div>
       </div>
+      <p class="afford"><b>Affordable for society:</b> no new sensors, free for citizens, runs on cameras the city already has.</p>
     </section>
   </div>
 
   <!-- centre -->
   <div class="col">
     <section class="card solution grow">
-      <div class="kicker"><svg class="i"><use href="#shield"/></svg> Our solution</div>
+      <div class="kicker"><svg class="i"><use href="#shield"/></svg> 2 · Our solution</div>
       <h2>One glance. One tap.</h2>
       <div class="stage">
         <div class="phones">
@@ -280,7 +283,7 @@
 
 <footer>
   <div class="note"><b>Prototype.</b> Sample cameras are AI-generated simulations, not real or agency footage. The demo forecast is rule-based and its photo check uses a vision-language model (YOLOv8, GRU and LightGBM are the designed pipeline). Huawei Cloud is the deployment design, not yet called. Benchmarks: Sen1Floods11 split, simulated scenarios.</div>
-  <div class="end">FloodWay · Real data. Smarter decisions.<span>github.com/LuqmanNurhakimRosli/floodway-huawei</span></div>
+  <div class="end"><div>FloodWay · Real data. Smarter decisions.<span>Try the live demo: floodway-huawei.pages.dev</span></div><img class="qr" src="assets/qr-floodway.svg" alt="QR code to the FloodWay demo"></div>
 </footer>
 
 </div>

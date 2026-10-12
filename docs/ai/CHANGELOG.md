@@ -86,6 +86,13 @@ One-line summaries live in `docs/ai/PROGRESS.md`. Put the long write-up for a ch
 
 ## 2026-10-12
 
+### Preliminary-round pack (briefing call, poster, script)
+- Transcribed the briefing recording with Whisper `base` (English). `medium` stopped at 16% after 13 minutes, so it needs about an hour. Transcript in `docs/product/preliminary-round/transcript/`.
+- New folder `docs/product/preliminary-round/`: `MEETING_SUMMARY.md` and `.pdf`, `PITCH_SCRIPT.md` (moved from `docs/product/` and rewritten for one slide and three speakers; the old one is in `docs/_to-delete/pitch-script-old/`), `poster/` (moved from `docs/product/poster/`), `transcript/`.
+- Landscape poster: sections labelled 1 Problem, 2 Solution, 3 Impact; affordability line; QR code to `floodway-huawei.pages.dev` (decodes to that URL). Overflow check passes.
+- `scripts/render-poster.mjs` and `capture-poster-shots.mjs` point at the new poster folder.
+- The Cloudflare build is stale and has no backend (see PROGRESS.md).
+
 ### Media V2: photographic ladder, reference-diff analyser, clean feed (branch `live-ui-upgrade`)
 - Gemini produced 60 frames (5 cameras x 12 rungs, r000 to r110). `export_ladder.py` made the 640x360 JPEGs, 960x540 WebPs and the four legacy copies. The classical analyser read 0 on every frame (water texture std 13 to 54 against a cut of 4.5).
 - Tried a colour segmenter (10 of 60 rungs read right) and a dry-reference difference with the old zones (28 of 60). Re-fitted the zones from the change masks, searched each camera's bed row, then added `row_fraction` (0.25) and `gap_rows` (60, for the drain's lid) to `waterline.ratio_from_mask` (defaults 0.5 and 0, so the classical analyser is unchanged). `check_ladder` now PASSES.

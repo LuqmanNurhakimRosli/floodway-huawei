@@ -1,0 +1,13 @@
+# Keep secrets, virtualenvs, caches and the 105 MB of master PNGs out of the image.
+.env
+.env.*
+*.env
+.venv
+venv
+__pycache__
+**/__pycache__
+*.pyc
+.pytest_cache
+data
+tests
+app/vision/sample_media/master

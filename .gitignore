@@ -82,3 +82,13 @@ docs/_to-delete/
 scratch/
 **/scratch/
 docs/screenshots/candidates/
+
+# Public demo backend data (scripts/public-demo.ps1)
+backend/data-public/
+
+# Cloudflare Wrangler CLI cache
+.wrangler/
+**/.wrangler/
+
+# Large audio recordings
+*.aac

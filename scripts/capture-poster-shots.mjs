@@ -1,7 +1,7 @@
 // Captures the three phone screenshots the poster uses (390x844 at 3x) from the running app.
 // Needs the dev servers: frontend on :5173 and backend on :8080.
 // Usage: node scripts/capture-poster-shots.mjs
-// Writes docs/product/poster/assets/{home,live,map}-phone.jpg. On /live the Klang camera is selected and the Zone and
+// Writes docs/product/preliminary-round/poster/assets/{home,live,map}-phone.jpg. On /live the Klang camera is selected and the Zone and
 // Water overlays are switched off, so the photo shows clean (reference lines and waterline only).
 // Each shot uses a fresh browser context: after /home the app kept state that sent the next /live visit to /map.
 import { createRequire } from 'node:module';
@@ -10,7 +10,7 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = createRequire(path.join(root, 'frontend', 'package.json'))('playwright-core');
-const out = path.join(root, 'docs', 'product', 'poster', 'assets');
+const out = path.join(root, 'docs', 'product', 'preliminary-round', 'poster', 'assets');
 const BASE = process.env.BASE ?? 'http://localhost:5173';
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true });

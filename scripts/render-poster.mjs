@@ -1,4 +1,4 @@
-// Renders a poster from docs/product/poster/ to PNG. Needs network once for Google Fonts.
+// Renders a poster from docs/product/preliminary-round/poster/ to PNG. Needs network once for Google Fonts.
 // Re-capture the phone screenshots first if the app changed:  node scripts/capture-poster-shots.mjs
 // Usage: node scripts/render-poster.mjs [phone|landscape] [out.png]
 //   phone     poster.html            1080 px wide, height follows the content   -> FloodWay_Poster_Phone.png
@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const dir = path.join(root, 'docs', 'product', 'poster');
+const dir = path.join(root, 'docs', 'product', 'preliminary-round', 'poster');
 const { chromium } = createRequire(path.join(root, 'frontend', 'package.json'))('playwright-core');
 const VARIANTS = {
   phone: { html: 'poster.html', png: 'FloodWay_Poster_Phone.png', w: 1080, h: 1600, full: true, minText: 22 },
