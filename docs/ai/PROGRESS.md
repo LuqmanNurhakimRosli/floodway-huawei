@@ -74,6 +74,7 @@ Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, 
 
 ## Change log (newest first; one line each)
 
+- 2026-10-17 · System documentation (published artifact, not a repo file): problem, architecture, AI/ML map, IPO, workflows, API, honesty ledger, claims to correct. Checked against code: no A* or Firestore code, GRU not imported, report POST has no write token, skew limit not enforced. Repo checks not re-run (no backend venv here).
 - 2026-10-12 · Public demo & preliminary pack: scripts/public-demo.ps1 (laptop backend via Cloudflare tunnel, wrangler pages deploy), preliminary-round pack, booth motion film, Dockerfile. Check: frontend 120 tests + build, backend 130 passed.
 - 2026-10-12 · Media V2 wired (Claude, Part 2): `nearest_rung` ladder source; `ReferenceDiffAnalyzer` per sample camera (`waterline.py` gained `row_fraction` and `gap_rows`, defaults unchanged); zones re-fitted in `calibration.json`; overlays off by default; `make_water.py` moved to `docs/_to-delete/retired-code/`; `check.ps1` prefers the backend venv; master PNGs gitignored. Backend +10 tests, frontend +1.
 - 2026-10-12 · Live Vision Media V2 Part 1 (Gemini): 60 photorealistic master PNGs (1280x720), 80 JPEGs, 81 WebPs, klang-rise.mp4 loop (353 KB), check_realism 0/15 flagged, verification contact sheets and screenshots. Ready for Claude Part 2.
