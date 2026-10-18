@@ -28,7 +28,7 @@ export function NearbyFilters({ places, placeId, onPlace, radiusKm, onRadius, ta
     <div className="space-y-3">
       <label className="relative block">
         <span className="sr-only">Your location</span>
-        <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#0E7C7B]" aria-hidden="true" />
+        <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1677FF]" aria-hidden="true" />
         <select value={placeId} onChange={(e) => onPlace(e.target.value)} className={`min-h-11 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-9 text-sm font-semibold text-slate-900 ${focusRing}`}>
           {places.map((p) => (
             <option key={p.id} value={p.id}>

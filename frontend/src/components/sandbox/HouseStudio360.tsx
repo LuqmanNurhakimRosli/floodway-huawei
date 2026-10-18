@@ -640,11 +640,11 @@ export function HouseStudio360() {
   };
 
   return (
-    <div className="w-full h-screen bg-[#062B2B] flex flex-col overflow-hidden select-none">
+    <div className="w-full h-screen bg-[#071426] flex flex-col overflow-hidden select-none">
       {/* Top Studio Control Bar */}
       <header className="h-16 bg-[#0B1528] border-b border-slate-800 px-6 flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-teal-600/20 border border-teal-500/30 flex items-center justify-center text-teal-400">
+          <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
             <Home className="w-5 h-5" />
           </div>
           <div>
@@ -680,7 +680,7 @@ export function HouseStudio360() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/simulation')}
-            className="px-4 py-2 rounded-xl bg-[#0E7C7B] hover:bg-[#0B5F60] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-teal-500/25 transition-transform hover:scale-105 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#1677FF] hover:bg-[#0958D9] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-500/25 transition-transform hover:scale-105 cursor-pointer"
           >
             <span>Return to Simulation</span>
             <ArrowRight className="w-4 h-4" />
@@ -729,7 +729,7 @@ export function HouseStudio360() {
 
         {/* Bottom Orbiting Guide */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-700/80 text-white text-xs font-semibold shadow-xl pointer-events-none flex items-center gap-2">
-          <RotateCcw className="w-3.5 h-3.5 text-teal-400 animate-spin" />
+          <RotateCcw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
           <span>Click & Drag to Rotate 360° · Scroll to Zoom · Right Click to Pan</span>
         </div>
       </div>

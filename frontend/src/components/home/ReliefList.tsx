@@ -14,7 +14,7 @@ export function ReliefList() {
     <section aria-labelledby="relief-title" className="min-w-0">
       <div className="flex items-center justify-between gap-3">
         <h2 id="relief-title" className="font-heading text-lg/7 font-bold text-slate-900">Relief centres</h2>
-        <Link to="/map" className="text-sm font-semibold text-[#0B5F60] hover:underline">View all</Link>
+        <Link to="/map" className="text-sm font-semibold text-[#0958D9] hover:underline">View all</Link>
       </div>
       <ul className="mt-2 space-y-2.5">
         {rows.map((s) => {
@@ -22,8 +22,8 @@ export function ReliefList() {
           const full = s.status === 'FULL';
           return (
             <li key={s.id}>
-              <Link to={`/navigation/${s.id}`} className={`${card} flex items-center gap-3 p-3 hover:border-[#0E7C7B] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]`}>
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0E7C7B] to-[#062B2B] text-white">
+              <Link to={`/navigation/${s.id}`} className={`${card} flex items-center gap-3 p-3 hover:border-[#1677FF] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]`}>
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1677FF] to-[#071426] text-white">
                   <Building2 className="h-7 w-7" aria-hidden="true" />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -37,7 +37,7 @@ export function ReliefList() {
                   </span>
                   <span className="mt-1.5 flex items-center gap-2">
                     <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                      <span className={`block h-full rounded-full ${pct >= 100 ? 'bg-red-600' : pct > 80 ? 'bg-amber-500' : 'bg-[#0E7C7B]'}`} style={{ width: `${Math.min(100, pct)}%` }} />
+                      <span className={`block h-full rounded-full ${pct >= 100 ? 'bg-red-600' : pct > 80 ? 'bg-amber-500' : 'bg-[#1677FF]'}`} style={{ width: `${Math.min(100, pct)}%` }} />
                     </span>
                     <span className="shrink-0 text-xs font-bold tabular-nums text-slate-900">{pct}%</span>
                   </span>

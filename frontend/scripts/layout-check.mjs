@@ -15,7 +15,10 @@ const ROUTES = (process.env.ROUTES ?? '/home,/map,/reports,/live,/profile').spli
 const SIZES = (process.env.SIZES ?? '360x740,390x844,768x1024,1024x768,1440x900').split(',').map((s) => s.split('x').map(Number));
 const MAX_SMALL_TEXT = Number(process.env.MAX_SMALL_TEXT ?? 0); // nothing under 12px
 
-const browser = await chromium.launch({ channel: process.env.CHROME_CHANNEL ?? 'chrome', headless: true });
+// CHROME_PATH points at a browser binary instead of an installed Chrome (cloud sandboxes, CI).
+const browser = await chromium.launch(
+  process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH, headless: true } : { channel: process.env.CHROME_CHANNEL ?? 'chrome', headless: true },
+);
 let failures = 0;
 const rows = [];
 

@@ -4,6 +4,7 @@ import { BottomNav } from '../components/layout/BottomNav';
 import { FamilySafetyBanner } from '../components/dashboard/FamilySafetyBanner';
 import { SystemStatusStrip } from '../components/dashboard/SystemStatusStrip';
 import { DistrictRiskBars } from '../components/home/DistrictRiskBars';
+import { FamilyCard } from '../components/home/FamilyCard';
 import { ForecastTimeline } from '../components/home/ForecastTimeline';
 import { HeroStatus } from '../components/home/HeroStatus';
 import { HomeGreeting } from '../components/home/HomeGreeting';
@@ -17,7 +18,7 @@ import { useVisionStore } from '../hooks/vision/useVisionStore';
 import { allSampleCameras, cameraCounts, highestRisk, newestReadingAt, overallLevel } from '../lib/home';
 
 /**
- * The first screen. A greeting and one search, the overall level, the one primary action, then what is near you and the
+ * The first screen. A greeting and one search, the overall level, your family, the one primary action, then what is near you and the
  * evidence behind it. Everything is computed from data (sample cameras, the shelter list, the forecast endpoint) or
  * labelled simulated; see config/demoScenario.ts.
  */
@@ -27,7 +28,7 @@ export function HomePage() {
   const sample = vision.usingMock || (vision.cameras.length > 0 && allSampleCameras(vision.cameras));
 
   return (
-    <div className="flex min-h-screen bg-[#F3F6F5]">
+    <div className="flex min-h-screen bg-[#F4F7FB]">
       <DashboardSidebar />
 
       <div className="flex min-w-0 flex-1 flex-col pb-[calc(var(--nav-h)+1rem)] md:pb-6">
@@ -45,6 +46,8 @@ export function HomePage() {
             sample={sample}
             counts={cameraCounts(vision.cameras)}
           />
+
+          <FamilyCard />
 
           {/* Phones: action, then what is near you, then the map. Desktop: action beside the map, near-you row below. */}
           <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12">

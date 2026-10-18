@@ -40,7 +40,7 @@ export function CameraCard({ camera, distanceKm, history, selected, useScene, on
       onClick={onSelect}
       aria-pressed={selected}
       className={`block w-full rounded-2xl border p-3 text-left ${interactive} ${
-        selected ? 'border-[#0E7C7B] bg-teal-50/50 ring-1 ring-[#0E7C7B]' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
+        selected ? 'border-[#1677FF] bg-blue-50/50 ring-1 ring-[#1677FF]' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
       }`}
     >
       <span className="flex items-baseline justify-between gap-2">

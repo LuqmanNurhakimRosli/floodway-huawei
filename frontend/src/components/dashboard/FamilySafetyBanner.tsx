@@ -12,13 +12,13 @@ export function FamilySafetyBanner() {
       className={`rounded-2xl p-4 text-xs md:text-sm font-medium flex items-center justify-between shadow-xs mb-4 ${
         familySafetyStatus === 'ARRIVED_SAFE'
           ? 'bg-emerald-50 border border-emerald-300 text-emerald-900'
-          : 'bg-teal-50 border border-teal-300 text-teal-900'
+          : 'bg-blue-50 border border-blue-300 text-blue-900'
       }`}
     >
       <div className="flex items-center gap-3">
         <div
           className={`p-2 rounded-xl text-white ${
-            familySafetyStatus === 'ARRIVED_SAFE' ? 'bg-emerald-600' : 'bg-[#0E7C7B]'
+            familySafetyStatus === 'ARRIVED_SAFE' ? 'bg-emerald-600' : 'bg-[#1677FF]'
           }`}
         >
           {familySafetyStatus === 'ARRIVED_SAFE' ? (

@@ -15,7 +15,7 @@ export function ReportsSummary() {
         <h2 id="reports-sum-title" className={`${cardTitle} flex items-center gap-2`}>
           <FileText className="h-5 w-5 text-slate-600" aria-hidden="true" /> Citizen reports
         </h2>
-        <Link to="/reports" className={`inline-flex min-h-11 items-center gap-1 rounded-xl px-2 text-sm font-semibold text-[#0B5F60] hover:bg-teal-50 ${interactive}`}>
+        <Link to="/reports" className={`inline-flex min-h-11 items-center gap-1 rounded-xl px-2 text-sm font-semibold text-[#0958D9] hover:bg-blue-50 ${interactive}`}>
           Open <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>

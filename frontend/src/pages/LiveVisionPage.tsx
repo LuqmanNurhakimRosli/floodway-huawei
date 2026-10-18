@@ -95,7 +95,7 @@ export default function LiveVisionPage() {
   );
 
   return (
-    <div className="flex min-h-dvh bg-[#F3F6F5]">
+    <div className="flex min-h-dvh bg-[#F4F7FB]">
       <DashboardSidebar defaultCollapsed={compactSidebar} />
       <div className="flex h-dvh min-w-0 flex-1 flex-col overflow-hidden pb-[var(--nav-h)] md:pb-0">
         <Header />
@@ -104,7 +104,7 @@ export default function LiveVisionPage() {
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
               <div className="min-w-0">
                 <h1 className={`${pageTitle} flex items-center gap-2`}>
-                  <Video className="h-5 w-5 shrink-0 text-[#0E7C7B] @min-[640px]/main:h-6 @min-[640px]/main:w-6" aria-hidden="true" />
+                  <Video className="h-5 w-5 shrink-0 text-[#1677FF] @min-[640px]/main:h-6 @min-[640px]/main:w-6" aria-hidden="true" />
                   Live Vision
                 </h1>
                 <p className="mt-0.5 hidden text-sm/5 text-slate-600 @min-[640px]/main:block">AI reads the water level from nearby river cameras every few seconds.</p>

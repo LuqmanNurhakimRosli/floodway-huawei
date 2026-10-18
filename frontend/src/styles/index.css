@@ -2,12 +2,12 @@
 
 @layer base {
   :root {
-    --primary: #0E7C7B;
-    --primary-hover: #0B5F60;
+    --primary: #1677FF;
+    --primary-hover: #0958D9;
     --danger: #DC2626;
     --warning: #F59E0B;
     --success: #10B981;
-    --dark-navy: #062B2B;
+    --dark-navy: #071426;
     --surface-card: #FFFFFF;
     --border-subtle: #E2E8F0;
     /* Bottom tab bar: 64px plus the iPhone home-indicator inset (0 elsewhere). Needs viewport-fit=cover. */
@@ -17,7 +17,7 @@
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #0F172A;
-    background-color: #F3F6F5;
+    background-color: #F4F7FB;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
@@ -38,7 +38,7 @@
 }
 
 .glass-dark {
-  background: rgba(6, 43, 43, 0.88);
+  background: rgba(7, 20, 38, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -73,7 +73,7 @@
   height: 36px;
   left: -6px;
   top: -6px;
-  background: rgba(14, 124, 123, 0.35);
+  background: rgba(22, 119, 255, 0.35);
   border-radius: 50%;
   animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
@@ -84,7 +84,7 @@
   height: 16px;
   left: 4px;
   top: 4px;
-  background: #0E7C7B;
+  background: #1677FF;
   border: 3px solid #FFFFFF;
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -126,13 +126,13 @@
   right: -6px;
   bottom: -6px;
   border-radius: 50%;
-  border: 2px solid #0E7C7B;
+  border: 2px solid #1677FF;
   animation: pulse-ring 2s infinite;
 }
 
 /* 3D Callout Badges in Three.js Canvas */
 .callout-badge {
-  background: rgba(6, 43, 43, 0.85);
+  background: rgba(7, 20, 38, 0.85);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
@@ -154,4 +154,217 @@
 .callout-badge--warning {
   border-color: #F59E0B;
   background: rgba(120, 53, 15, 0.85);
+}
+
+/* Family map pins: an initials bubble with a tail, a status ring and a battery chip (components/family/memberIcon.ts). */
+.fw-member {
+  position: relative;
+  width: 56px;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 10px rgba(7, 20, 38, 0.35));
+  transition: transform 0.2s ease;
+}
+.fw-member--selected { transform: scale(1.12); z-index: 2; }
+.fw-member-bubble {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font: 800 15px/1 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.02em;
+}
+.fw-member-tail {
+  width: 14px;
+  height: 14px;
+  margin-top: -9px;
+  background: #fff;
+  transform: rotate(45deg);
+  border-radius: 0 0 4px 0;
+}
+.fw-member--near .fw-member-bubble { border-color: #FBBF24; }
+.fw-member--near .fw-member-tail { background: #FBBF24; }
+.fw-member--flooded .fw-member-bubble,
+.fw-member--sos .fw-member-bubble { border-color: #EF4444; }
+.fw-member--flooded .fw-member-tail,
+.fw-member--sos .fw-member-tail { background: #EF4444; }
+.fw-member--selected .fw-member-bubble { box-shadow: 0 0 0 4px rgba(22, 119, 255, 0.45); }
+.fw-member-batt {
+  position: absolute;
+  top: 34px;
+  right: -6px;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  background: #fff;
+  color: #0F172A;
+  font: 700 10px/1.4 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 1px 4px rgba(7, 20, 38, 0.3);
+}
+.fw-member-batt--low { background: #DC2626; color: #fff; }
+.fw-member-moving {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #0958D9;
+  color: #fff;
+  border: 2px solid #fff;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fw-member-pulse {
+  position: absolute;
+  left: 2px;
+  top: -2px;
+  width: 52px;
+  height: 52px;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.45);
+  animation: pulse-ring 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+.leaflet-tooltip.fw-member-tip {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: #fff;
+  color: #0F172A;
+  font: 700 13px/1.3 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 8px 24px -8px rgba(7, 20, 38, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fw-member, .fw-member-pulse { transition: none; animation: none; }
+}
+
+/* Family map pins: an initials bubble with a tail, a status ring and a battery chip (components/family/memberIcon.ts). */
+.fw-member {
+  position: relative;
+  width: 56px;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 10px rgba(7, 20, 38, 0.35));
+  transition: transform 0.2s ease;
+}
+.fw-member--selected { transform: scale(1.12); z-index: 2; }
+.fw-member-bubble {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font: 800 15px/1 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.02em;
+}
+.fw-member-tail {
+  width: 14px;
+  height: 14px;
+  margin-top: -9px;
+  background: #fff;
+  transform: rotate(45deg);
+  border-radius: 0 0 4px 0;
+}
+.fw-member--near .fw-member-bubble { border-color: #FBBF24; }
+.fw-member--near .fw-member-tail { background: #FBBF24; }
+.fw-member--flooded .fw-member-bubble,
+.fw-member--sos .fw-member-bubble { border-color: #EF4444; }
+.fw-member--flooded .fw-member-tail,
+.fw-member--sos .fw-member-tail { background: #EF4444; }
+.fw-member--selected .fw-member-bubble { box-shadow: 0 0 0 4px rgba(22, 119, 255, 0.45); }
+.fw-member-batt {
+  position: absolute;
+  top: 34px;
+  right: -6px;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  background: #fff;
+  color: #0F172A;
+  font: 700 10px/1.4 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 1px 4px rgba(7, 20, 38, 0.3);
+}
+.fw-member-batt--low { background: #DC2626; color: #fff; }
+.fw-member-moving {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #0958D9;
+  color: #fff;
+  border: 2px solid #fff;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fw-member-pulse {
+  position: absolute;
+  left: 2px;
+  top: -2px;
+  width: 52px;
+  height: 52px;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.45);
+  animation: pulse-ring 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+.leaflet-tooltip.fw-member-tip {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: #fff;
+  color: #0F172A;
+  font: 700 13px/1.3 'Plus Jakarta Sans', sans-serif;
+  box-shadow: 0 8px 24px -8px rgba(7, 20, 38, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fw-member, .fw-member-pulse { transition: none; animation: none; }
+}
+
+/* Welcome animation (components/brand/EvacuationLoop.tsx): ambient loops. The walk itself runs on the SVG timeline. */
+.fw-loop .fw-rain { animation: fw-rain 1.2s linear infinite; }
+.fw-loop .fw-cloud--a { animation: fw-cloud 38s linear infinite; }
+.fw-loop .fw-cloud--b { animation: fw-cloud 52s linear -26s infinite; }
+.fw-loop .fw-wave--back { animation: fw-wave 9s linear infinite; }
+.fw-loop .fw-wave--front { animation: fw-wave 6s linear infinite; }
+.fw-loop .fw-tide { animation: fw-tide 8s ease-in-out infinite; }
+.fw-loop .fw-flag { transform-box: fill-box; transform-origin: left center; animation: fw-flag 1.6s ease-in-out infinite; }
+.fw-loop .fw-toast { opacity: 0; animation: fw-toast 8s ease-out infinite; }
+.fw-loop .fw-safe { opacity: 0; animation: fw-safe 8s ease-out infinite; }
+
+@keyframes fw-rain { from { transform: translate(0, 0); } to { transform: translate(-16px, 320px); } }
+@keyframes fw-cloud { from { transform: translateX(-140px); } to { transform: translateX(420px); } }
+@keyframes fw-wave { from { transform: translateX(0); } to { transform: translateX(-360px); } }
+@keyframes fw-tide { 0%, 100% { transform: translateY(8px); } 45% { transform: translateY(-6px); } }
+@keyframes fw-flag { 0%, 100% { transform: skewY(0deg) scaleX(1); } 50% { transform: skewY(-6deg) scaleX(0.9); } }
+@keyframes fw-toast {
+  0% { opacity: 0; transform: translateY(-10px) scale(0.96); }
+  5%, 58% { opacity: 1; transform: translateY(0) scale(1); }
+  66%, 100% { opacity: 0; transform: translateY(-6px) scale(0.98); }
+}
+@keyframes fw-safe {
+  0%, 72% { opacity: 0; transform: translateY(8px) scale(0.92); }
+  78%, 90% { opacity: 1; transform: translateY(0) scale(1); }
+  97%, 100% { opacity: 0; transform: translateY(4px) scale(0.96); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-loop *, .fw-loop { animation: none !important; }
+  .fw-loop .fw-toast { display: none; }
+  .fw-loop .fw-safe { opacity: 1; }
 }

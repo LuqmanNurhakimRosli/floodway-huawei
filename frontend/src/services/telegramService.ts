@@ -85,6 +85,38 @@ export async function dispatchArrivalCheckin(payload: {
   return sendTelegramMessage(message);
 }
 
+/** Family circle SOS from the map. States only the position and the nearest open centre; no depth is claimed. */
+export async function dispatchFamilySos(payload: {
+  userName: string;
+  lat: number;
+  lon: number;
+  positionSource: 'gps' | 'demo';
+  nearestCentre?: string;
+  nearestCentreM?: number;
+}): Promise<TelegramResult> {
+  const mapLink = `https://maps.google.com/?q=${payload.lat.toFixed(5)},${payload.lon.toFixed(5)}`;
+  const centre = payload.nearestCentre
+    ? `🏛 <b>Nearest open relief centre:</b> ${escapeHtml(payload.nearestCentre)}${payload.nearestCentreM ? ` (${(payload.nearestCentreM / 1000).toFixed(1)} km straight line)` : ''}\n`
+    : '';
+  const message =
+    `🆘 <b>FLOODWAY DEMO · FAMILY SOS</b>\n\n` +
+    `👤 <b>From:</b> ${escapeHtml(payload.userName)}\n` +
+    `📍 <b>Position:</b> <a href="${mapLink}">${payload.lat.toFixed(4)}, ${payload.lon.toFixed(4)}</a> (${payload.positionSource === 'gps' ? 'phone GPS' : 'demo position'})\n` +
+    centre +
+    `\n<i>Demo message from the FloodWay family map. For a real emergency call 999.</i>`;
+  return sendTelegramMessage(message);
+}
+
+/** Family circle check-in ("I'm here and safe"). */
+export async function dispatchFamilyCheckin(payload: { userName: string; placeName: string; lat: number; lon: number }): Promise<TelegramResult> {
+  const mapLink = `https://maps.google.com/?q=${payload.lat.toFixed(5)},${payload.lon.toFixed(5)}`;
+  const message =
+    `📍 <b>FLOODWAY DEMO · CHECK-IN</b>\n\n` +
+    `👤 ${escapeHtml(payload.userName)} checked in at <b>${escapeHtml(payload.placeName)}</b>.\n` +
+    `<a href="${mapLink}">Open on a map</a>\n\n<i>Demo message from the FloodWay family map.</i>`;
+  return sendTelegramMessage(message);
+}
+
 /** Citizen flood report. Sent as unverified: the app does not verify reports. */
 export async function dispatchFloodIncidentReportAlert(payload: {
   title: string;

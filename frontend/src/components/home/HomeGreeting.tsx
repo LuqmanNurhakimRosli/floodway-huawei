@@ -20,12 +20,12 @@ export function HomeGreeting() {
     <section aria-labelledby="hello" className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
         <p className="flex items-center gap-1 text-xs font-semibold text-slate-600">
-          <MapPin className="h-3.5 w-3.5 text-[#0E7C7B]" aria-hidden="true" /> Watching around <span className="text-[#0B5F60]">{place}</span>
+          <MapPin className="h-3.5 w-3.5 text-[#1677FF]" aria-hidden="true" /> Watching around <span className="text-[#0958D9]">{place}</span>
         </p>
         <h1 id="hello" className="mt-1 font-heading text-[28px]/9 font-bold text-slate-900 md:text-3xl/10">
           {greeting(new Date().getHours())}, {first}
           <span className="block text-slate-900">
-            Stay ahead of the <span className="text-[#0E7C7B]">water</span>.
+            Stay ahead of the <span className="text-[#1677FF]">water</span>.
           </span>
         </h1>
       </div>
@@ -33,7 +33,7 @@ export function HomeGreeting() {
       <div className="flex w-full gap-2 md:max-w-md">
         <Link
           to="/map"
-          className="flex min-h-12 min-w-0 flex-1 items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-500 shadow-[0_8px_24px_-18px_rgba(6,43,43,0.35)] hover:border-[#0E7C7B] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]"
+          className="flex min-h-12 min-w-0 flex-1 items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-500 shadow-[0_8px_24px_-18px_rgba(7,20,38,0.35)] hover:border-[#1677FF] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
         >
           <Search className="h-5 w-5 shrink-0 text-slate-500" aria-hidden="true" />
           <span className="truncate">Where do you need to go safely?</span>
@@ -41,7 +41,7 @@ export function HomeGreeting() {
         <Link
           to="/map"
           aria-label="Open the map with route options"
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#0B5F60] text-white shadow-sm shadow-teal-900/20 hover:bg-[#084647] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] focus-visible:ring-offset-2"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#0958D9] text-white shadow-sm shadow-blue-900/20 hover:bg-[#003EB3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2"
         >
           <SlidersHorizontal className="h-5 w-5" aria-hidden="true" />
         </Link>

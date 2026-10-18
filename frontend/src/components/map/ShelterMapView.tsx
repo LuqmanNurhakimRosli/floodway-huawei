@@ -1,38 +1,45 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Popup, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation } from 'lucide-react';
+import { Navigation, Siren } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { dispatchArrivalCheckin, type TelegramResult } from '../../services/telegramService';
-import { InPageActionDock } from './InPageActionDock';
 import { VisionHazardLayer } from './VisionHazardLayer';
-import { MapLegend } from './MapLegend';
-import { FloodProneLayer, SCENARIO_COLOR, floodedZones, type Scenario } from './FloodProneLayer';
+import { FloodProneLayer, floodedZones } from './FloodProneLayer';
 import { BottomSheet, type Snap } from './BottomSheet';
 import { MapPanel, type ShelterFilter } from './MapPanel';
 import { NavigationHud } from './NavigationHud';
 import { ArrivalDialog } from './ArrivalDialog';
-import { createShelterIcon, gpsNavIcon, userIcon } from './mapIcons';
+import { createShelterIcon, gpsNavIcon } from './mapIcons';
+import { BarrierLayer } from './BarrierLayer';
 import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
-import { ORIGINS, originForLocation } from '../../data/klDemo';
+import { ORIGINS } from '../../data/klDemo';
+import { YOU_ID } from '../../data/familyDemo';
 import { formatCapacity, formatMin } from '../../lib/format';
 import type { TravelMode } from '../../lib/mappers';
-import { etaMin, lineLengthM, pointAtDistance, rankRoutes, stepAt, toRoadRoute, type LatLon, type RoadRoute, type ScoredRoute, type Zone } from '../../lib/routing';
+import { nearestOriginId, placeAt, riskAt, sinceText, type Place } from '../../lib/family';
+import { etaMin, lineLengthM, pointAtDistance, rankRoutes, stepAt, toRoadRoute, type LatLon, type ScoredRoute } from '../../lib/routing';
 import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
 import { useVisionStore } from '../../hooks/vision/useVisionStore';
+import { circleMembers, familyActions, useFamily, useFloodZones } from '../../hooks/useFamily';
 import { closedBarrierZones } from '../../lib/vision/barriers';
-import { BarrierLayer } from './BarrierLayer';
 import { useDriveSim } from '../../hooks/useDriveSim';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useNow } from '../../hooks/useNow';
+import { FamilyBody, FamilyHeader, type FamilyTab } from '../family/FamilyPanel';
+import { memberIcon } from '../family/memberIcon';
+import { CheckInDialog, SosDialog } from '../family/FamilyDialogs';
+import { LayersDialog, MapActionPills, MapSideButtons, MapTopBar, SharingDialog } from '../family/MapChrome';
 
 type RoutesDb = Record<string, Parameters<typeof toRoadRoute>[0][]>;
 
 /** Length of the simulated drive on screen, whatever the real route length. */
 const DRIVE_MS = 30000;
 const KL_CENTER: LatLon = [3.155, 101.69];
+const PEEK_PX = 150;
 
 /** Fits the chosen route in the visible part of the map (the phone sheet covers the bottom). */
 function FitRoute({ line, bottomPad, enabled }: { line: LatLon[] | null; bottomPad: number; enabled: boolean }) {
@@ -40,14 +47,38 @@ function FitRoute({ line, bottomPad, enabled }: { line: LatLon[] | null; bottomP
   const key = line ? `${line[0]}|${line[line.length - 1]}|${line.length}` : '';
   useEffect(() => {
     if (!line || !enabled) return;
-    map.fitBounds(L.latLngBounds(line), { paddingTopLeft: [32, 72], paddingBottomRight: [32, bottomPad + 24], maxZoom: 16, animate: true });
+    map.fitBounds(L.latLngBounds(line), { paddingTopLeft: [32, 120], paddingBottomRight: [32, bottomPad + 24], maxZoom: 16, animate: true });
     // refit when the route changes or the sheet height settles, not on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, bottomPad, enabled, map]);
   return null;
 }
 
-/** Follows the simulated car. */
+/** Moves the map when a member, place or "centre on me" is picked. `key` changes on every request. */
+function FlyTo({ target, bottomPad }: { target: { pos: LatLon; zoom: number; key: number } | null; bottomPad: number }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!target) return;
+    // keep the point in the visible band above the sheet
+    const p = map.project(target.pos, target.zoom).add([0, bottomPad / 2 - 40]);
+    map.flyTo(map.unproject(p, target.zoom), target.zoom, { duration: 0.6 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target?.key, map]);
+  return null;
+}
+
+/** Fits everyone in the circle once, when the circle changes. */
+function FitCircle({ points, circleId, bottomPad, ready }: { points: LatLon[]; circleId: string; bottomPad: number; ready: boolean }) {
+  const map = useMap();
+  const done = useRef('');
+  useEffect(() => {
+    if (!ready || done.current === circleId || points.length === 0) return;
+    done.current = circleId;
+    map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [36, 150], paddingBottomRight: [72, bottomPad + 80], maxZoom: 14, animate: false });
+  }, [ready, circleId, points, bottomPad, map]);
+  return null;
+}
+
 function FollowCar({ pos, active }: { pos: LatLon | null; active: boolean }) {
   const map = useMap();
   useEffect(() => {
@@ -56,22 +87,47 @@ function FollowCar({ pos, active }: { pos: LatLon | null; active: boolean }) {
   return null;
 }
 
+/**
+ * The map: a family-locator view (where your circle is, who is near flooding, check in, SOS) with the evacuation route
+ * planner as one of its tabs. Phones get a full-screen map with a three-height sheet; wider screens a side panel.
+ */
 export function ShelterMapView() {
   const navigate = useNavigate();
-  const { shelters, selectedLocation, setSelectedLocation, setFamilySafetyStatus } = useApp();
+  const { shelters, floodScenario } = useApp();
   const { user } = useAuth();
+  const family = useFamily();
+  const zones = useFloodZones();
+  const now = useNow(15000);
 
   const desktop = useMediaQuery('(min-width: 768px)');
-  const origin = originForLocation(selectedLocation);
+  const [tab, setTab] = useState<FamilyTab>('people');
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [routeFor, setRouteFor] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<'sos' | 'checkin' | 'sharing' | 'layers' | null>(null);
+  const [seenAt, setSeenAt] = useState(() => Date.now());
+  const [fly, setFly] = useState<{ pos: LatLon; zoom: number; key: number } | null>(null);
+
   const [selectedId, setSelectedId] = useState('shelter-01');
-  const [scenario, setScenario] = useState<Scenario>('warning');
   const [filter, setFilter] = useState<ShelterFilter>('all');
   const [mode, setMode] = useState<TravelMode>('car');
   const [chosen, setChosen] = useState(0);
-  const [snap, setSnap] = useState<Snap>('peek');
+  const [snap, setSnap] = useState<Snap>('half');
   const [sheetH, setSheetH] = useState(0);
   const [routesDb, setRoutesDb] = useState<RoutesDb | null>(null);
   const [arrival, setArrival] = useState<{ when: string; telegram: TelegramResult | null } | null>(null);
+
+  const members = circleMembers(family);
+  const you = family.members[YOU_ID];
+  const circle = family.circles.find((c) => c.id === family.circleId) ?? family.circles[0];
+  const unread = family.events.filter((e) => e.at > seenAt).length;
+  const bottomPad = desktop ? 0 : sheetH;
+
+  const flyTo = (pos: LatLon, zoom = 15) => setFly({ pos, zoom, key: Date.now() });
+  const openTab = (t: FamilyTab) => {
+    setTab(t);
+    if (t === 'activity') setSeenAt(Date.now());
+    if (!desktop && snap === 'peek') setSnap('half');
+  };
 
   // The road routes are a 170 kB data file: load it after the first paint.
   useEffect(() => {
@@ -83,47 +139,43 @@ export function ShelterMapView() {
   }, []);
 
   const selected = shelters.find((s) => s.id === selectedId) ?? shelters[0];
+  const routeMember = (routeFor && family.members[routeFor]) || you;
+  const originId = nearestOriginId([routeMember.lat, routeMember.lon]);
+  const origin = ORIGINS.find((o) => o.id === originId)!;
 
-  // Zones routes must avoid: the flooded demo areas for this scenario plus any sample-camera zones at WARNING/DANGER.
   const cameraHazards = useVisionHazards();
-  const zones = useMemo<Zone[]>(
-    () => [...floodedZones(scenario), ...cameraHazards.map((h) => ({ id: `cam-${h.cameraId}`, lat: h.lat, lon: h.lon, radiusM: h.radiusM }))],
-    [scenario, cameraHazards],
-  );
-
-  // Closed underpass barriers (simulated) are not "wet roads to avoid if possible": a route through one is blocked.
   const { barriers } = useVisionStore();
   const closures = useMemo(() => closedBarrierZones(barriers), [barriers]);
   const closedBarriers = useMemo(() => barriers.filter((b) => b.state === 'CLOSED'), [barriers]);
 
   const rankedFor = useCallback(
     (shelterId: string): ScoredRoute[] => {
-      const raw = routesDb?.[`${origin.id}|${shelterId}`];
+      const raw = routesDb?.[`${originId}|${shelterId}`];
       return raw ? rankRoutes(raw.map(toRoadRoute), zones, closures) : [];
     },
-    [routesDb, origin.id, zones, closures],
+    [routesDb, originId, zones, closures],
   );
   const alternatives = useMemo(() => (selected ? rankedFor(selected.id) : []), [rankedFor, selected]);
   const best = useMemo(() => Object.fromEntries(shelters.map((s) => [s.id, rankedFor(s.id)[0] ?? null])), [shelters, rankedFor]);
 
-  // A different centre, start point or scenario starts again from the suggested route.
-  useEffect(() => setChosen(0), [selectedId, origin.id, scenario]);
+  useEffect(() => setChosen(0), [selectedId, originId, floodScenario]);
   const route: ScoredRoute | null = alternatives[Math.min(chosen, alternatives.length - 1)] ?? null;
+  const showRoute = tab === 'route';
 
-  // Simulated drive along the chosen road route.
   const lineLen = useMemo(() => (route ? lineLengthM(route.line) : 0), [route]);
   const speedup = route ? route.durationS / (DRIVE_MS / 1000) : 1;
   const onArrive = useCallback(() => {
     if (!route || !selected) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setFamilySafetyStatus('ARRIVED_SAFE');
+    const d = new Date();
+    const date = d.toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const name = selected.name.replace('Demo relief centre: ', '');
+    if (!routeFor) familyActions.checkIn(`${name} (end of the demo drive)`);
     setArrival({ when: `${date} · ${time}`, telegram: null });
     dispatchArrivalCheckin({ userName: user?.name || 'Demo user', shelterName: selected.name, dateStr: date, timeStr: time })
       .then((telegram) => setArrival((a) => (a ? { ...a, telegram } : a)))
       .catch(() => setArrival((a) => (a ? { ...a, telegram: { success: false } } : a)));
-  }, [route, selected, setFamilySafetyStatus, user?.name]);
+  }, [route, selected, routeFor, user?.name]);
   const sim = useDriveSim(DRIVE_MS, onArrive);
 
   const travelled = route ? sim.progress * route.distanceM : 0;
@@ -133,26 +185,31 @@ export function ShelterMapView() {
 
   const start = () => {
     if (!route || route.blockedBy.length > 0 || !selected || selected.status === 'FULL' || selected.status === 'CLOSED') return;
-    setSnap('peek'); // on a phone the sheet must get out of the way, so the map with the route is what you see
+    setSnap('peek');
     setArrival(null);
     sim.start();
   };
-  const cancel = () => sim.stop();
+
+  const planRoute = (memberId: string) => {
+    sim.stop();
+    setRouteFor(memberId === YOU_ID ? null : memberId);
+    openTab('route');
+  };
+
+  const selectMember = (id: string) => {
+    const m = family.members[id];
+    setSelectedMember((cur) => (cur === id ? null : id));
+    if (m) flyTo([m.lat, m.lon]);
+  };
+
+  const focusPlace = (p: Place) => flyTo([p.lat, p.lon], 16);
 
   const panel = (
     <MapPanel
-      originId={origin.id}
-      onOrigin={(id) => {
-        sim.stop();
-        const o = ORIGINS.find((x) => x.id === id);
-        if (o) setSelectedLocation(o.location);
-      }}
-      scenario={scenario}
-      onScenario={(s) => {
-        sim.stop();
-        setScenario(s);
-      }}
-      floodedCount={floodedZones(scenario).length}
+      fromLabel={routeFor ? `Route for ${routeMember.name}` : 'Your route'}
+      originLabel={origin.label}
+      onClearFrom={routeFor ? () => setRouteFor(null) : undefined}
+      floodedCount={floodedZones(floodScenario).length}
       cameraZoneCount={cameraHazards.length}
       closedBarriers={closedBarriers}
       shelters={shelters}
@@ -178,88 +235,68 @@ export function ShelterMapView() {
     />
   );
 
-  const peekHeader = selected && (
-    <div className="flex items-center gap-2">
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-heading text-sm font-extrabold text-slate-900">{selected.name.replace('Demo relief centre: ', '')}</p>
-        <p className="truncate text-xs text-slate-700">
-          {route ? (
-            <>
-              {(route.distanceM / 1000).toFixed(1)} km · ~{formatMin(etaMin(route, mode))} ·{' '}
-              <span className={route.crossings === 0 && route.blockedBy.length === 0 ? 'font-bold text-emerald-700' : 'font-bold text-red-700'}>
-                {route.blockedBy.length > 0 ? 'blocked by a closed barrier' : route.crossings === 0 ? 'avoids flood' : `crosses ${route.crossings} flooded`}
-              </span>
-            </>
-          ) : routesDb ? (
-            'No stored road route'
-          ) : (
-            'Loading routes…'
-          )}
-        </p>
-      </div>
-      {sim.active ? (
-        <button type="button" onClick={cancel} className="min-h-11 shrink-0 rounded-xl bg-red-600 px-3.5 text-xs font-bold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700">
-          Stop
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={start}
-          disabled={!route || route.blockedBy.length > 0 || selected.status === 'FULL' || selected.status === 'CLOSED'}
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[#0E7C7B] px-3.5 text-xs font-bold text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] focus-visible:ring-offset-2 disabled:opacity-50"
-        >
-          <Navigation className="h-4 w-4" aria-hidden="true" /> Start
-        </button>
-      )}
-    </div>
+  const header = <FamilyHeader circleName={circle.name} members={members} zones={zones} tab={tab} onTab={openTab} />;
+  const body = (
+    <FamilyBody
+      tab={tab}
+      members={members}
+      allMembers={family.members}
+      places={family.places}
+      events={family.events}
+      zones={zones}
+      shelters={shelters}
+      selectedId={selectedMember}
+      onSelect={selectMember}
+      onPlanRoute={planRoute}
+      onFocusPlace={focusPlace}
+      now={now}
+      route={panel}
+    />
   );
 
+  const memberPoints = useMemo<LatLon[]>(() => members.map((m) => [m.lat, m.lon]), [members]);
+  const sosOn = you.status === 'sos';
+  const sosOthers = members.filter((m) => !m.isYou && m.status === 'sos');
+
   return (
-    <div className="relative flex h-[calc(100dvh-8rem)] w-full flex-col overflow-hidden bg-slate-100 md:h-[calc(100vh-64px)] md:flex-row">
+    <div className="relative flex h-[calc(100dvh-var(--nav-h))] w-full flex-col overflow-hidden bg-slate-100 md:h-[calc(100vh-64px)] md:flex-row">
       <div className="relative min-h-[350px] flex-1">
-        <InPageActionDock />
-        <MapContainer center={KL_CENTER} zoom={12} scrollWheelZoom preferCanvas className="z-0 h-full w-full">
+        <MapContainer center={KL_CENTER} zoom={12} scrollWheelZoom preferCanvas zoomControl={false} className="z-0 h-full w-full">
           <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
           <VisionHazardLayer />
-          <FloodProneLayer scenario={scenario} />
+          <FloodProneLayer scenario={floodScenario} />
           <BarrierLayer />
-          <FitRoute line={route?.line ?? null} bottomPad={desktop ? 0 : sheetH} enabled={!sim.active} />
+          <FitCircle points={memberPoints} circleId={circle.id} bottomPad={bottomPad} ready={desktop || sheetH > 0} />
+          <FitRoute line={showRoute ? (route?.line ?? null) : null} bottomPad={bottomPad} enabled={showRoute && !sim.active} />
+          <FlyTo target={fly} bottomPad={bottomPad} />
           <FollowCar pos={car} active={sim.active} />
 
-          {/* Other routes first (dashed, tap to choose), then the chosen one on top with a white casing */}
-          {alternatives.map((r, i) =>
-            i === chosen ? null : (
-              <Polyline
-                key={`alt-${r.index}`}
-                positions={r.line}
-                pathOptions={{ color: '#64748B', weight: 5, opacity: 0.8, dashArray: '8 8' }}
-                eventHandlers={{ click: () => !sim.active && setChosen(i) }}
-              />
-            ),
-          )}
-          {route && (
+          {showRoute &&
+            alternatives.map((r, i) =>
+              i === chosen ? null : (
+                <Polyline key={`alt-${r.index}`} positions={r.line} pathOptions={{ color: '#64748B', weight: 5, opacity: 0.8, dashArray: '8 8' }} eventHandlers={{ click: () => !sim.active && setChosen(i) }} />
+              ),
+            )}
+          {showRoute && route && (
             <>
               <Polyline positions={route.line} pathOptions={{ color: '#FFFFFF', weight: 10, opacity: 0.9 }} />
-              <Polyline positions={route.line} pathOptions={{ color: '#0E7C7B', weight: 6, opacity: 0.95 }} />
+              <Polyline positions={route.line} pathOptions={{ color: '#1677FF', weight: 6, opacity: 0.95 }} />
             </>
           )}
-
-          {car ? (
-            <Marker position={car} icon={gpsNavIcon} />
-          ) : (
-            <Marker position={[origin.lat, origin.lon]} icon={userIcon}>
-              <Popup>
-                <span className="text-xs font-semibold">Your position (demo): {origin.label}</span>
-              </Popup>
-            </Marker>
-          )}
+          {car && <Marker position={car} icon={gpsNavIcon} />}
 
           {shelters.map((s) => (
             <Marker
               key={s.id}
               position={[s.lat, s.lon]}
-              icon={createShelterIcon(s.id === selected?.id, s.status)}
-              eventHandlers={{ click: () => !sim.active && setSelectedId(s.id) }}
+              icon={createShelterIcon(showRoute && s.id === selected?.id, s.status)}
+              eventHandlers={{
+                click: () => {
+                  if (sim.active) return;
+                  setSelectedId(s.id);
+                  openTab('route');
+                },
+              }}
             >
               <Popup>
                 <div className="p-1 text-xs">
@@ -267,13 +304,61 @@ export function ShelterMapView() {
                   <span className="block font-semibold text-slate-700">
                     {s.status} · {formatCapacity(s.currentCapacity, s.maxCapacity)}
                   </span>
-                  <span className="block text-slate-600">{s.address}</span>
                   <span className="mt-1 block font-semibold text-slate-600">Demo relief centre, not an official register.</span>
                 </div>
               </Popup>
             </Marker>
           ))}
+
+          {!car &&
+            members.map((m) => {
+              const risk = riskAt([m.lat, m.lon], zones).risk;
+              const sel = m.id === selectedMember;
+              const where = placeAt([m.lat, m.lon], family.places);
+              const tip = (m.speedKmh ?? 0) > 3 ? `Driving · ${m.speedKmh} km/h` : `${where ? `At ${where.name} · ` : ''}${m.since ? sinceText(m.since, now) : 'Just now'}`;
+              return (
+                <Marker key={m.id} position={[m.lat, m.lon]} icon={memberIcon(m, risk, sel)} zIndexOffset={m.status === 'sos' ? 1000 : sel ? 900 : m.isYou ? 500 : 0} eventHandlers={{ click: () => selectMember(m.id) }} keyboard>
+                  {sel && (
+                    <Tooltip permanent direction="top" offset={[0, -4]} className="fw-member-tip">
+                      {tip}
+                    </Tooltip>
+                  )}
+                </Marker>
+              );
+            })}
         </MapContainer>
+
+        {!sim.active && (
+          <MapTopBar circles={family.circles} circleId={family.circleId} unread={unread} onSettings={() => setDialog('sharing')} onActivity={() => openTab('activity')} onLayers={() => setDialog('layers')} />
+        )}
+
+        {(sosOn || sosOthers.length > 0) && !sim.active && (
+          <div role="alert" className="absolute inset-x-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+6.5rem)] z-[690] mx-auto flex max-w-md items-center gap-3 rounded-2xl bg-red-600 p-3 text-white shadow-xl md:top-28">
+            <Siren className="h-6 w-6 shrink-0 animate-pulse motion-reduce:animate-none" aria-hidden="true" />
+            <p className="min-w-0 flex-1 text-sm/5 font-semibold">
+              {sosOn ? 'Your SOS is on. Your circle can see where you are.' : `${sosOthers.map((m) => m.name).join(', ')} sent an SOS.`}
+            </p>
+            {sosOn && (
+              <button type="button" onClick={() => setDialog('sos')} className="min-h-11 shrink-0 rounded-xl bg-white px-3 text-xs font-bold text-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-600">
+                Manage
+              </button>
+            )}
+          </div>
+        )}
+
+        {!sim.active && (desktop || snap !== 'full') && (
+          <>
+            <MapActionPills bottom={bottomPad} sosOn={sosOn} onCheckIn={() => setDialog('checkin')} onSos={() => setDialog('sos')} />
+            <MapSideButtons
+              bottom={bottomPad + 60}
+              onLocate={() => {
+                flyTo([you.lat, you.lon], 15);
+                setSelectedMember(YOU_ID);
+              }}
+              onLayers={() => setDialog('layers')}
+            />
+          </>
+        )}
 
         {sim.active && step && route && (
           <NavigationHud
@@ -283,7 +368,7 @@ export function ShelterMapView() {
             remainingMin={Math.max(0, etaMin(route, mode) * (1 - sim.progress))}
             progress={sim.progress}
             speedup={speedup}
-            onCancel={cancel}
+            onCancel={sim.stop}
           />
         )}
 
@@ -298,21 +383,38 @@ export function ShelterMapView() {
           />
         )}
 
-        {(desktop || snap !== 'full') && <MapLegend floodColor={SCENARIO_COLOR[scenario]} bottomOffset={desktop ? 0 : sheetH} />}
-
-        {/* Phones: three-height bottom sheet over the map. Desktop uses the side panel below. */}
         {!desktop && (
-          <BottomSheet snap={snap} onSnapChange={setSnap} header={peekHeader} onHeight={setSheetH}>
-            {panel}
+          <BottomSheet snap={snap} onSnapChange={setSnap} header={sim.active && route ? <DrivingHeader name={selected?.name ?? ''} onStop={sim.stop} min={etaMin(route, mode) * (1 - sim.progress)} /> : header} onHeight={setSheetH} peekPx={sim.active ? 92 : PEEK_PX} label={`${circle.name} circle`}>
+            {body}
           </BottomSheet>
         )}
       </div>
 
       {desktop && (
-        <aside aria-label="Route planner" className="z-20 h-full w-[410px] shrink-0 overflow-y-auto border-l border-slate-200 bg-white shadow-2xl lg:w-[450px]">
-          {panel}
+        <aside aria-label={`${circle.name} circle`} className="z-20 flex h-full w-[360px] shrink-0 flex-col border-l border-slate-200 bg-[#F7F9FC] shadow-2xl lg:w-[420px] xl:w-[460px]">
+          <div className="shrink-0 border-b border-slate-200/70 p-4">{header}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto">{body}</div>
         </aside>
       )}
+
+      {dialog === 'sos' && <SosDialog you={you} shelters={shelters} onClose={() => setDialog(null)} />}
+      {dialog === 'checkin' && <CheckInDialog you={you} places={family.places} onClose={() => setDialog(null)} />}
+      {dialog === 'sharing' && <SharingDialog state={family} onClose={() => setDialog(null)} />}
+      {dialog === 'layers' && <LayersDialog onClose={() => setDialog(null)} />}
+    </div>
+  );
+}
+
+function DrivingHeader({ name, min, onStop }: { name: string; min: number; onStop: () => void }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Navigation className="h-5 w-5 shrink-0 text-[#0958D9]" aria-hidden="true" />
+      <p className="min-w-0 flex-1 truncate text-sm font-bold text-slate-900">
+        {name.replace('Demo relief centre: ', '')} · ~{formatMin(Math.max(0, min))}
+      </p>
+      <button type="button" onClick={onStop} className="min-h-11 shrink-0 rounded-xl bg-red-600 px-3.5 text-xs font-bold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700">
+        Stop
+      </button>
     </div>
   );
 }

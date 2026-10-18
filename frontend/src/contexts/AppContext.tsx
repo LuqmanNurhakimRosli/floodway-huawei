@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { FloodPhase, Shelter, CitizenReport, SosEvent, IoTStationTelemetry } from '../types';
 import { fetchShelters, fetchReports } from '../services/api';
+import type { Scenario } from '../components/map/FloodProneLayer';
 
 interface AppContextType {
   waterLevelM: number;
@@ -17,6 +18,9 @@ interface AppContextType {
   telemetry: IoTStationTelemetry;
   selectedLocation: string;
   setSelectedLocation: (loc: string) => void;
+  /** Simulated flood scenario for the demo map, shared so Home, the family circle and the map agree. */
+  floodScenario: Scenario;
+  setFloodScenario: (s: Scenario) => void;
   addReport: (r: CitizenReport) => void;
   upvoteReport: (id: string) => void;
   approveReport: (id: string, reviewerName: string, role: string, notes?: string) => void;
@@ -28,6 +32,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [waterLevelM, setWaterLevelM] = useState(1.20);
   const [selectedLocation, setSelectedLocation] = useState('Kampung Baru, Kuala Lumpur');
+  const [floodScenario, setFloodScenario] = useState<Scenario>('warning');
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [sheltersReady, setSheltersReady] = useState(false);
   const [reports, setReports] = useState<CitizenReport[]>([]);
@@ -120,6 +125,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         telemetry,
         selectedLocation,
         setSelectedLocation,
+        floodScenario,
+        setFloodScenario,
         addReport,
         upvoteReport,
         approveReport,

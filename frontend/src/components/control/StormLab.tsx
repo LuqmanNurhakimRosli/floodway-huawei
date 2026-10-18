@@ -68,7 +68,7 @@ export function StormLab({ serverAvailable }: Props) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 id="lab-title" className={`${cardTitle} flex items-center gap-2`}>
-            <FlaskConical className="h-5 w-5 text-[#0E7C7B]" aria-hidden="true" /> Storm lab
+            <FlaskConical className="h-5 w-5 text-[#1677FF]" aria-hidden="true" /> Storm lab
           </h2>
           <p className="mt-0.5 max-w-prose text-sm/5 text-slate-600">
             Replays a scripted storm through the same analyser, fault filter and level rules as the live cameras, and measures

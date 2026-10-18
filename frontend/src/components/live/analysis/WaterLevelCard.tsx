@@ -23,7 +23,7 @@ const TREND = {
 function Title() {
   return (
     <h3 className={`${cardTitle} flex items-center gap-2`}>
-      <Waves className="h-5 w-5 text-[#0E7C7B]" aria-hidden="true" /> Water level
+      <Waves className="h-5 w-5 text-[#1677FF]" aria-hidden="true" /> Water level
     </h3>
   );
 }
@@ -101,7 +101,7 @@ export function WaterLevelCard({ camera, history }: { camera: Camera; history: R
           <span className={`${num} font-semibold text-slate-900`}>{conf}%</span>
         </div>
         <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={conf} aria-label="AI confidence">
-          <div className="h-full rounded-full bg-[#0E7C7B]" style={{ width: `${conf}%` }} />
+          <div className="h-full rounded-full bg-[#1677FF]" style={{ width: `${conf}%` }} />
         </div>
         {reading.low_confidence && (
           <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2 py-1 text-xs/4 font-semibold text-amber-900">

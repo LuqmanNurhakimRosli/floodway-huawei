@@ -19,7 +19,7 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'centres', label: 'Relief centres' },
 ];
 
-const tile = 'relative flex w-[232px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-slate-200/80 bg-white shadow-[0_12px_32px_-22px_rgba(6,43,43,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] md:w-[260px]';
+const tile = 'relative flex w-[232px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-slate-200/80 bg-white shadow-[0_12px_32px_-22px_rgba(7,20,38,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] md:w-[260px]';
 
 function photoFor(c: Camera, live: boolean): string | null {
   const ratio = c.reading?.water_ratio ?? 0;
@@ -46,7 +46,7 @@ export function NearYou() {
     <section aria-labelledby="near-title" className="min-w-0">
       <div className="flex items-center justify-between gap-3">
         <h2 id="near-title" className="font-heading text-lg/7 font-bold text-slate-900">Near you</h2>
-        <Link to="/live" className="text-sm font-semibold text-[#0B5F60] hover:underline">View all</Link>
+        <Link to="/live" className="text-sm font-semibold text-[#0958D9] hover:underline">View all</Link>
       </div>
 
       <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:px-0" role="group" aria-label="Show">
@@ -56,8 +56,8 @@ export function NearYou() {
             type="button"
             aria-pressed={filter === f.id}
             onClick={() => setFilter(f.id)}
-            className={`min-h-10 shrink-0 rounded-full border px-4 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] motion-reduce:transition-none ${
-              filter === f.id ? 'border-[#0B5F60] bg-[#0B5F60] text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+            className={`min-h-10 shrink-0 rounded-full border px-4 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] motion-reduce:transition-none ${
+              filter === f.id ? 'border-[#0958D9] bg-[#0958D9] text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
             }`}
           >
             {f.label}
@@ -72,7 +72,7 @@ export function NearYou() {
             const r = c.reading!;
             return (
               <Link key={c.id} to={`/live?camera=${encodeURIComponent(c.id)}`} className={tile} aria-label={`${c.name}, ${r.level}, water at ${Math.round(r.water_ratio * 100)}% of bank height`}>
-                <div className="relative h-36 bg-gradient-to-br from-teal-700 to-teal-900">
+                <div className="relative h-36 bg-gradient-to-br from-blue-700 to-blue-900">
                   {src ? <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" /> : <CameraIcon className="absolute inset-0 m-auto h-8 w-8 text-white/70" aria-hidden="true" />}
                   <span className="absolute right-2 top-2"><StatusChip level={r.level} /></span>
                   {isSampleCamera(c) && <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/70 px-2 py-0.5 text-xs font-semibold text-white">Sample</span>}
@@ -80,7 +80,7 @@ export function NearYou() {
                 <div className="flex flex-1 flex-col gap-1 p-3">
                   <p className="truncate font-heading text-base/6 font-semibold text-slate-900">{c.name}</p>
                   <div className="flex items-center justify-between gap-2 text-xs text-slate-600">
-                    <span className="flex items-center gap-1"><Waves className="h-3.5 w-3.5 text-[#0E7C7B]" aria-hidden="true" /> River camera</span>
+                    <span className="flex items-center gap-1"><Waves className="h-3.5 w-3.5 text-[#1677FF]" aria-hidden="true" /> River camera</span>
                     <span className="font-bold tabular-nums text-slate-900">{Math.round(r.water_ratio * 100)}% <span className="font-medium text-slate-600">of bank</span></span>
                   </div>
                 </div>
@@ -93,7 +93,7 @@ export function NearYou() {
             const closed = b.state === 'CLOSED';
             return (
               <Link key={b.id} to="/control" className={tile} aria-label={`${b.name}, ${closed ? 'closed' : 'open'}`}>
-                <div className={`relative flex h-36 items-center justify-center ${closed ? 'bg-gradient-to-br from-red-600 to-red-800' : 'bg-gradient-to-br from-teal-600 to-teal-800'}`}>
+                <div className={`relative flex h-36 items-center justify-center ${closed ? 'bg-gradient-to-br from-red-600 to-red-800' : 'bg-gradient-to-br from-blue-600 to-blue-800'}`}>
                   {closed ? <Ban className="h-12 w-12 text-white/90" aria-hidden="true" /> : <CircleCheck className="h-12 w-12 text-white/90" aria-hidden="true" />}
                   <span className={`absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-extrabold ${closed ? 'bg-white text-red-800' : 'bg-white text-emerald-800'}`}>{closed ? 'CLOSED' : 'OPEN'}</span>
                   <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/60 px-2 py-0.5 text-xs font-semibold text-white">Simulated barrier</span>
@@ -111,7 +111,7 @@ export function NearYou() {
             const pct = percentOf(s.currentCapacity, s.maxCapacity) ?? 0;
             return (
               <Link key={s.id} to={`/navigation/${s.id}`} className={tile} aria-label={`${s.name}, ${s.status}, ${formatKm(s.distanceKm)} away`}>
-                <div className="relative flex h-36 items-center justify-center bg-gradient-to-br from-[#0E7C7B] to-[#062B2B]">
+                <div className="relative flex h-36 items-center justify-center bg-gradient-to-br from-[#1677FF] to-[#071426]">
                   <Building2 className="h-12 w-12 text-white/90" aria-hidden="true" />
                   <span className={`absolute right-2 top-2 rounded-full bg-white px-2.5 py-0.5 text-xs font-extrabold ${s.status === 'OPEN' ? 'text-emerald-800' : 'text-amber-900'}`}>{s.status}</span>
                   <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/60 px-2 py-0.5 text-xs font-semibold text-white">Demo centre</span>
@@ -119,11 +119,11 @@ export function NearYou() {
                 <div className="flex flex-1 flex-col gap-1.5 p-3">
                   <p className="truncate font-heading text-base/6 font-semibold text-slate-900">{s.name.replace('Demo relief centre: ', '')}</p>
                   <div className="flex items-center justify-between text-xs text-slate-600">
-                    <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-[#0E7C7B]" aria-hidden="true" />{formatKm(s.distanceKm)}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-[#1677FF]" aria-hidden="true" />{formatKm(s.distanceKm)}</span>
                     <span className="font-bold tabular-nums text-slate-900">{pct}% full</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                    <div className={`h-full rounded-full ${pct >= 100 ? 'bg-red-600' : pct > 80 ? 'bg-amber-500' : 'bg-[#0E7C7B]'}`} style={{ width: `${Math.min(100, pct)}%` }} />
+                    <div className={`h-full rounded-full ${pct >= 100 ? 'bg-red-600' : pct > 80 ? 'bg-amber-500' : 'bg-[#1677FF]'}`} style={{ width: `${Math.min(100, pct)}%` }} />
                   </div>
                 </div>
               </Link>

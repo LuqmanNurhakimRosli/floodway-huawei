@@ -9,7 +9,7 @@ export function NavigationPage() {
   const { shelterId } = useParams<{ shelterId: string }>();
 
   return (
-    <div className="min-h-screen flex bg-[#F3F6F5]">
+    <div className="min-h-screen flex bg-[#F4F7FB]">
       <DashboardSidebar />
       <div className="flex-1 flex flex-col min-w-0 pb-[var(--nav-h)] md:pb-0">
         <Header />

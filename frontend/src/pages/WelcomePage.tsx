@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Bell, Navigation, ShieldCheck, Waves } from 'lucide-react';
+import { ArrowRight, Bell, Navigation, ShieldCheck, Users } from 'lucide-react';
 import { AboutDemo } from '../components/common/AboutDemo';
+import { EvacuationLoop } from '../components/brand/EvacuationLoop';
 import { FloodWayLogo } from '../components/brand/FloodWayLogo';
 import { useAuth } from '../contexts/AuthContext';
 
-// Collage tiles: the sample cameras' AI-generated frames (labelled as sample imagery below), at different water heights.
-const TILES = [
-  { src: '/media/live/klang-r090.webp', cls: 'col-start-1 row-start-1 rounded-[999px_999px_36px_36px]' },
-  { src: '/media/live/gombak-r060.webp', cls: 'col-start-2 row-start-2 rounded-[36px]' },
-  { src: '/media/live/drain-r070.webp', cls: 'col-start-1 row-start-3 rounded-[36px_36px_999px_999px]' },
-  { src: '/media/live/smart-r040.webp', cls: 'col-start-2 row-start-4 rounded-[999px]' },
-];
-
 const POINTS = [
-  { icon: Waves, text: 'Cameras read the water level every few seconds' },
-  { icon: Bell, text: 'An alert before the road floods, not after' },
-  { icon: Navigation, text: 'A route that avoids flooded roads and closed underpasses' },
+  { icon: Bell, title: 'Flood alerts', text: 'Before the road floods, not after' },
+  { icon: Navigation, title: 'Safe routes', text: 'Around flooded roads and closed underpasses' },
+  { icon: Users, title: 'Family circle', text: 'See where your family is and who needs help' },
 ];
 
 export function WelcomePage() {
@@ -37,60 +30,62 @@ export function WelcomePage() {
     navigate('/home');
   };
 
-  const input = 'block min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:border-[#0E7C7B] focus:outline-none focus:ring-2 focus:ring-[#0E7C7B]/30';
+  const input = 'block min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:border-[#1677FF] focus:outline-none focus:ring-2 focus:ring-[#1677FF]/30';
 
   return (
-    <div className="min-h-dvh bg-[#F3F6F5] md:grid md:grid-cols-2">
-      {/* Collage: full-bleed teal panel on desktop, top of the screen on phones */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-[#E6F2F1] to-[#F3F6F5] px-6 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))] md:flex md:flex-col md:justify-between md:bg-gradient-to-br md:from-[#0B5F60] md:to-[#062B2B] md:p-10">
-        <div className="flex items-center gap-2.5">
-          <FloodWayLogo tile className="h-10 w-10" />
-          <span className="font-heading text-xl font-extrabold tracking-tight text-slate-900 md:text-white">FloodWay</span>
+    <div className="min-h-dvh bg-[#F4F7FB] md:grid md:grid-cols-[1.1fr_1fr]">
+      {/* Animation: top of the screen on phones, a full-height blue panel on wider screens */}
+      <div className="relative overflow-hidden px-5 pt-[max(1.25rem,env(safe-area-inset-top))] md:flex md:flex-col md:justify-between md:bg-gradient-to-br md:from-[#1677FF] md:via-[#0958D9] md:to-[#071426] md:p-10">
+        <div className="pointer-events-none absolute -right-24 -top-24 hidden h-80 w-80 rounded-full bg-white/10 md:block" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-32 -left-20 hidden h-96 w-96 rounded-full bg-white/5 md:block" aria-hidden="true" />
+
+        <div className="relative flex items-center gap-2.5">
+          <FloodWayLogo tile className="h-11 w-11" />
+          <div>
+            <span className="block font-heading text-2xl/7 font-extrabold tracking-tight text-[#0958D9] md:text-white">FloodWay</span>
+            <span className="block text-xs font-semibold text-slate-600 md:text-blue-100">Safer communities · Smarter response</span>
+          </div>
         </div>
 
-        <div className="relative mx-auto mt-6 grid w-full max-w-[340px] grid-cols-2 grid-rows-[repeat(5,52px)] gap-3 md:mt-10 md:max-w-[400px] md:grid-rows-[repeat(5,104px)]" aria-hidden="true">
-          {TILES.map((t) => (
-            <div key={t.src} className={`row-span-2 overflow-hidden bg-teal-900/20 shadow-[0_16px_40px_-20px_rgba(6,43,43,0.6)] md:h-[100px] ${t.cls}`}>
-              <img src={t.src} alt="" className="h-full w-full object-cover" />
-            </div>
-          ))}
-          <span className="absolute -left-1 top-2 h-3 w-3 rotate-45 rounded-sm bg-[#0E7C7B]" />
-          <span className="absolute -right-2 bottom-10 h-4 w-4 rotate-45 rounded-sm bg-[#0E7C7B]" />
-        </div>
-        <p className="mt-3 text-center text-xs font-medium text-slate-600 md:text-teal-100/80">Sample imagery from the demo cameras (AI-generated, not real footage)</p>
+        <EvacuationLoop className="relative mx-auto mt-5 aspect-[6/5] w-full max-w-[420px] rounded-[28px] shadow-[0_24px_60px_-28px_rgba(7,20,38,0.55)] ring-1 ring-blue-100 md:mt-8 md:max-w-[520px] md:ring-white/20" />
 
-        <ul className="mt-8 hidden space-y-3 md:block">
+        <ul className="relative mt-8 hidden space-y-3 md:block">
           {POINTS.map((p) => (
-            <li key={p.text} className="flex items-center gap-3 text-sm font-medium text-teal-50">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10"><p.icon className="h-5 w-5" aria-hidden="true" /></span>
-              {p.text}
+            <li key={p.title} className="flex items-center gap-3 text-sm text-blue-50">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/15"><p.icon className="h-5 w-5" aria-hidden="true" /></span>
+              <span><b className="font-bold text-white">{p.title}.</b> {p.text}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Copy and actions */}
-      <main className="mx-auto flex w-full max-w-md flex-col justify-center px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 md:py-12">
-        <p className="inline-flex w-fit items-center gap-1.5 rounded-full bg-teal-100/70 px-3 py-1 text-xs font-semibold text-[#0B5F60]">
+      <main className="mx-auto flex w-full max-w-md flex-col justify-center px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 md:py-12">
+        <p className="inline-flex w-fit items-center gap-1.5 rounded-full bg-blue-100/70 px-3 py-1 text-xs font-semibold text-[#0958D9]">
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Prototype for the Huawei ICT Competition 2026
         </p>
-        <h1 className="mt-3 font-heading text-[32px]/10 font-bold text-slate-900 md:text-4xl/[44px]">
-          Know before the <span className="text-[#0E7C7B]">water</span> rises
+        <h1 className="mt-3 font-heading text-[34px]/[40px] font-extrabold tracking-tight text-slate-900 md:text-[44px]/[50px]">
+          Know before the <span className="text-[#1677FF]">water</span> rises
         </h1>
-        <p className="mt-2 text-base/6 text-slate-600">One glance to know if your street is safe. One tap to reach a relief centre.</p>
+        <p className="mt-2 text-base/6 text-slate-600">Flood alerts, safe routes and your loved ones close, in one app.</p>
 
-        <div className="mt-7 space-y-3">
+        <ul className="mt-5 grid grid-cols-3 gap-2 md:hidden">
+          {POINTS.map((p) => (
+            <li key={p.title} className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-3 text-center shadow-[0_10px_28px_-22px_rgba(7,20,38,0.5)] ring-1 ring-slate-200/70">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-[#0958D9]"><p.icon className="h-5 w-5" aria-hidden="true" /></span>
+              <span className="text-xs font-bold text-slate-900">{p.title}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-6 space-y-3">
           <button
             type="button"
             onClick={handleDemo}
-            className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#0B5F60] px-6 font-heading text-base font-bold text-white shadow-lg shadow-teal-900/25 hover:bg-[#084647] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] focus-visible:ring-offset-2"
+            className="flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0958D9] px-6 font-heading text-base font-bold text-white shadow-lg shadow-blue-900/25 hover:bg-[#003EB3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2"
           >
             Continue as demo user <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </button>
-
-          <div className="flex items-center gap-3 py-1 text-xs font-medium text-slate-500" aria-hidden="true">
-            <span className="h-px flex-1 bg-slate-200" /> or use your name <span className="h-px flex-1 bg-slate-200" />
-          </div>
 
           {signIn ? (
             <form onSubmit={handleCustomLogin} className="space-y-2.5">
@@ -98,12 +93,12 @@ export function WelcomePage() {
               <input id="welcome-name" type="text" required autoComplete="name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} className={input} />
               <label className="sr-only" htmlFor="welcome-email">Email</label>
               <input id="welcome-email" type="email" required autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={input} />
-              <button type="submit" className="flex min-h-12 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white text-sm font-bold text-slate-900 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]">
+              <button type="submit" className="flex min-h-12 w-full items-center justify-center rounded-full border border-slate-300 bg-white text-sm font-bold text-slate-900 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]">
                 Sign in
               </button>
             </form>
           ) : (
-            <button type="button" onClick={() => setSignIn(true)} className="flex min-h-12 w-full items-center justify-center rounded-2xl border border-slate-300 bg-white text-sm font-bold text-slate-900 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]">
+            <button type="button" onClick={() => setSignIn(true)} className="flex min-h-12 w-full items-center justify-center rounded-full border border-slate-300 bg-white text-sm font-bold text-slate-900 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]">
               Sign in with name and email
             </button>
           )}
