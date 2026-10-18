@@ -11,7 +11,6 @@ import {
   PanelLeftOpen,
   ShieldCheck,
   ShieldHalf,
-  Bot,
   ChevronRight
 } from 'lucide-react';
 
@@ -25,7 +24,6 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
     { label: 'Reports', icon: FileText, path: '/reports' },
     { label: 'Live Vision', icon: Video, path: '/live' },
     { label: 'Control room', icon: ShieldHalf, path: '/control' },
-    { label: 'Robot concept', icon: Bot, path: '/robot' },
     { label: 'Profile', icon: User, path: '/profile' },
   ];
 

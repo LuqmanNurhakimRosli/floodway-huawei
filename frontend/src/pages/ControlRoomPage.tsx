@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, Eye, Map as MapIcon, ShieldCheck, ShieldHalf, Waves } from 'lucide-react';
+import { Eye, Map as MapIcon, ShieldCheck, ShieldHalf, Waves } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BarrierCard } from '../components/control/BarrierCard';
@@ -121,16 +121,6 @@ export default function ControlRoomPage() {
               </div>
             </div>
 
-            <Link to="/robot" className={`${card} group flex items-center gap-3 p-4 hover:border-[#1677FF]`}>
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
-                <Bot className="h-6 w-6" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm/5 font-bold text-slate-900">Next: a field robot that checks the underpass before the barrier opens</span>
-                <span className="block text-xs/4 text-slate-600">Concept design, not built. See what it does, how it is powered, and what it is made of.</span>
-              </span>
-              <ArrowRight className="h-5 w-5 shrink-0 text-slate-500 group-hover:text-[#1677FF]" aria-hidden="true" />
-            </Link>
           </div>
         </main>
         <BottomNav />
