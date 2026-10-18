@@ -92,6 +92,9 @@ class Reading(BaseModel):
     model: str
     latency_ms: int
     action: Literal["none", "show_on_map"]
+    # Fault filter: a held reading is shown but not fed to the level tracker (see fault_filter.py).
+    accepted: bool = True
+    fault: Optional[str] = None
 
 
 class CameraPublic(BaseModel):
@@ -118,3 +121,16 @@ class AlertEvent(BaseModel):
     water_ratio: float
     timestamp: str
     message: str
+    # Lead-time log: when the reading first crossed this level, and how long confirmation took.
+    first_crossed_at: Optional[str] = None
+    detection_delay_s: Optional[float] = None
+
+
+class LeadTimeEntry(BaseModel):
+    camera_id: str
+    camera_name: str
+    level: Level
+    crossed_at: str
+    alerted_at: str
+    detection_delay_s: float
+    source: Literal["live", "storm-lab"] = "live"

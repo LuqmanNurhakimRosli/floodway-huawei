@@ -125,3 +125,19 @@ def seed_samples(engine: VisionEngine, media_dir: Path = MEDIA_DIR) -> dict[str,
     engine.register_offline_placeholder("sample-backyard-stream", "Backyard Stream", 3.1700, 101.7100,
                                         sample_calibration(), "https://backyard-camera.invalid/frame.jpg", interval)
     return kinds
+
+
+def seed_barriers(engine: VisionEngine) -> None:
+    """Two SIMULATED underpass barriers for the demo. Sites are illustrative points on stored demo routes, not surveyed
+    underpasses, and no real barrier is connected. B-01 follows the Klang sample camera, the one sample that reaches
+    DANGER on its own cycle. B-02 follows depth node fw-node-03, which a bench ESP32 can drive (firmware/)."""
+    from .barriers import Barrier
+
+    engine.barriers.register(Barrier(
+        id="B-01", name="Underpass B-01, west of Masjid Jamek (demo)", lat=3.1517, lon=101.6931, radius_m=120,
+        trigger="camera:sample-klang-jamek", trigger_name="Sg. Klang @ Masjid Jamek (sample camera)",
+    ))
+    engine.barriers.register(Barrier(
+        id="B-02", name="Jalan Kuching underpass B-02 (demo)", lat=3.1832, lon=101.6798, radius_m=120,
+        trigger="node:fw-node-03", trigger_name="Underpass depth node fw-node-03",
+    ))

@@ -38,6 +38,19 @@ DEFAULT_DEVICES = {
         "lon": 101.5372,
         "warning_threshold_m": 1.30,
         "danger_threshold_m": 1.65
+    },
+    # Street-level depth node for the demo underpass barrier B-02. Mounted on a pole 3 m above the road, so the
+    # level is road water depth. 0.15 m and 0.30 m are working thresholds for cars, not an official standard.
+    "fw-node-03": {
+        "id": "fw-node-03",
+        "name": "Jalan Kuching underpass depth node (demo)",
+        "secret": "fw-secret-underpass",
+        "mount_height_cm": 300.0,
+        "lat": 3.1832,
+        "lon": 101.6798,
+        "warning_threshold_m": 0.15,
+        "danger_threshold_m": 0.30,
+        "initial_level_m": 0.0
     }
 }
 

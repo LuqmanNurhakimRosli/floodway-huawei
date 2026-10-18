@@ -10,18 +10,29 @@
     GET    /cameras/{id}/readings        recent readings
     GET    /cameras/{id}/frame.jpg       latest captured frame
     GET    /alerts                       recent alerts
-    WS     /ws                           push: snapshot, reading, alert, status, camera, camera_removed
+    GET    /lead-times                   live alerts with the time from first crossing to the alert
+    GET    /barriers                     simulated underpass barriers and their state (a bench ESP32 polls this)
+    GET    /barriers/events              barrier change log
+    GET    /barriers/{id}                one barrier
+    POST   /barriers/{id}/command        operator close / open / resume auto
+    GET    /storm-lab/scenarios          synthetic storm scenarios
+    POST   /storm-lab/run                replay one scenario through the pipeline (filter on and off)
+    GET    /storm-lab/runs               recent replays
+    WS     /ws                           push: snapshot, reading, alert, status, camera, camera_removed, barrier
 """
 from __future__ import annotations
 
 import asyncio
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel
 
-from app.security import require_write_token
+from app.security import RateLimiter, require_write_token
 
+from .barriers import Barrier, BarrierCommand, BarrierEvent
 from .engine import VisionEngine
-from .schemas import AlertEvent, CameraCreate, CameraPublic, Reading, SourceDraft
+from .schemas import AlertEvent, CameraCreate, CameraPublic, LeadTimeEntry, Reading, SourceDraft
+from .storm_lab import SCENARIOS, ScenarioInfo, StormRun, list_scenarios, run_storm, summarise
 from .sources import SourceError
 from .url_guard import UnsafeURL
 
@@ -132,6 +143,70 @@ async def latest_frame(camera_id: str, request: Request):
 @router.get("/alerts", response_model=list[AlertEvent])
 def list_alerts(request: Request, limit: int = Query(20, ge=1, le=100)):
     return list(_engine(request).alerts)[:limit]
+
+
+@router.get("/lead-times", response_model=list[LeadTimeEntry])
+def lead_times(request: Request, limit: int = Query(50, ge=1, le=200)):
+    return list(_engine(request).lead_log)[:limit]
+
+
+# ───────────── underpass barriers (SIMULATED) ─────────────
+@router.get("/barriers", response_model=list[Barrier])
+def list_barriers(request: Request):
+    return _engine(request).barriers.list()
+
+
+@router.get("/barriers/events", response_model=list[BarrierEvent])
+def barrier_events(request: Request, limit: int = Query(30, ge=1, le=200)):
+    return _engine(request).barriers.recent_events(limit)
+
+
+@router.get("/barriers/{barrier_id}", response_model=Barrier)
+def get_barrier(barrier_id: str, request: Request):
+    try:
+        return _engine(request).barriers.get(barrier_id)
+    except KeyError as exc:
+        raise HTTPException(404, "barrier not found") from exc
+
+
+@router.post("/barriers/{barrier_id}/command", response_model=BarrierEvent, dependencies=[Depends(require_write_token)])
+async def command_barrier(barrier_id: str, cmd: BarrierCommand, request: Request):
+    engine = _engine(request)
+    try:
+        event = engine.barriers.command(barrier_id, cmd)
+    except KeyError as exc:
+        raise HTTPException(404, "barrier not found") from exc
+    await engine.publish_barrier(event)
+    return event
+
+
+# ───────────── storm lab (synthetic replay) ─────────────
+_lab_limiter = RateLimiter(limit=10, window_s=60.0)
+
+
+@router.get("/storm-lab/scenarios", response_model=list[ScenarioInfo])
+def storm_scenarios():
+    return list_scenarios()
+
+
+class StormRequest(BaseModel):
+    scenario: str
+
+
+@router.post("/storm-lab/run", response_model=StormRun, dependencies=[Depends(require_write_token)])
+async def storm_run(body: StormRequest, request: Request):
+    if body.scenario not in SCENARIOS:
+        raise HTTPException(404, "unknown scenario")
+    _lab_limiter.check(request.client.host if request.client else "unknown")
+    engine = _engine(request)
+    run = await asyncio.to_thread(run_storm, body.scenario)  # a few seconds of CPU: keep the loop free
+    engine.storm_runs.appendleft(run)
+    return run
+
+
+@router.get("/storm-lab/runs")
+def storm_runs(request: Request):
+    return [summarise(r) for r in _engine(request).storm_runs]
 
 
 @router.websocket("/ws")

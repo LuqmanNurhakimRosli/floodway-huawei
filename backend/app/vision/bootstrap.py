@@ -10,7 +10,7 @@ from .alerts import AlertDispatcher, LogChannel, TelegramChannel
 from .analysis import get_analyzer
 from .config import VisionSettings
 from .engine import VisionEngine
-from .seed import seed_samples
+from .seed import seed_barriers, seed_samples
 
 
 def build_default_engine(settings: Optional[VisionSettings] = None) -> VisionEngine:
@@ -21,6 +21,7 @@ def build_default_engine(settings: Optional[VisionSettings] = None) -> VisionEng
     engine = VisionEngine(settings, get_analyzer(settings), AlertDispatcher(channels, settings.alert_cooldown_s))
     if settings.seed_samples:
         seed_samples(engine)
+        seed_barriers(engine)
     return engine
 
 

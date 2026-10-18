@@ -22,15 +22,18 @@ import cv2
 import numpy as np
 
 from .alerts import AlertDispatcher
+from .barriers import BarrierController, BarrierEvent
 from .analysis import WaterAnalyzer
 from .analysis.temporal import aggregate
 from .config import VisionSettings
+from .fault_filter import JumpFilter
 from .levels import LevelTracker, compute_trend, lines_crossed, rank, ratio_to_level, thresholds_from_calibration
 from .schemas import (
     AlertEvent,
     CameraCreate,
     CameraPublic,
     Calibration,
+    LeadTimeEntry,
     Level,
     Reading,
     SourceDraft,
@@ -44,11 +47,16 @@ log = logging.getLogger("floodway.vision.engine")
 
 HISTORY_LIMIT = 200
 ALERT_LIMIT = 100
+LEAD_LOG_LIMIT = 200
 OFFLINE_AFTER_FAILURES = 3
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+
+def _iso(ts: float) -> str:
+    return datetime.fromtimestamp(ts, timezone.utc).astimezone().isoformat(timespec="seconds")
 
 
 JPEG_MAGIC = bytes([0xFF, 0xD8, 0xFF])
@@ -84,6 +92,8 @@ class CameraRecord:
     last_frame_hash: Optional[str] = None
     last_jpeg: Optional[bytes] = None
     tracker: LevelTracker = field(default_factory=LevelTracker)
+    jump_filter: JumpFilter = field(default_factory=JumpFilter)
+    crossed_at: dict = field(default_factory=dict)  # Level -> epoch seconds of the first accepted reading at or above it
     readings: deque = field(default_factory=lambda: deque(maxlen=HISTORY_LIMIT))
     lock: threading.Lock = field(default_factory=threading.Lock)
     task: Optional[asyncio.Task] = None
@@ -97,6 +107,9 @@ class VisionEngine:
         self.dispatcher = dispatcher
         self.cameras: dict[str, CameraRecord] = {}
         self.alerts: deque[AlertEvent] = deque(maxlen=ALERT_LIMIT)
+        self.barriers = BarrierController()
+        self.lead_log: deque[LeadTimeEntry] = deque(maxlen=LEAD_LOG_LIMIT)
+        self.storm_runs: deque = deque(maxlen=20)
         self._subscribers: set[asyncio.Queue] = set()
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._running = False
@@ -242,8 +255,18 @@ class VisionEngine:
             thr = thresholds_from_calibration(rec.calibration)
             observed = ratio_to_level(window.ratio, thr)
             previous = rec.tracker.current
-            level, changed = rec.tracker.update(observed, window.confidence)
-            history = [r.water_ratio for r in rec.readings] + [window.ratio]
+            now = time.time()
+            verdict = rec.jump_filter.check(window.ratio, now)
+            if verdict.accepted:
+                level, changed = rec.tracker.update(observed, window.confidence)
+                for lvl in (Level.WARNING, Level.DANGER):
+                    if rank(observed) >= rank(lvl):
+                        rec.crossed_at.setdefault(lvl, verdict.first_seen_at)
+                    else:
+                        rec.crossed_at.pop(lvl, None)
+            else:  # held as suspect: shown, but the level does not move on it
+                level, changed = previous, False
+            history = [r.water_ratio for r in rec.readings if r.accepted] + ([window.ratio] if verdict.accepted else [])
             elapsed = time.perf_counter() - started
 
             reading = Reading(
@@ -257,17 +280,25 @@ class VisionEngine:
                 trend=compute_trend(history),  # type: ignore[arg-type]
                 model=(rec.analyzer or self.analyzer).name, latency_ms=int(elapsed * 1000),
                 action="show_on_map" if rank(level) >= rank(Level.ADVISORY) else "none",
+                accepted=verdict.accepted, fault=verdict.reason,
             )
             rec.readings.append(reading)
 
             alert = None
             if changed and rank(level) > rank(previous) and rank(level) >= rank(Level.WARNING):
+                crossed = rec.crossed_at.get(level, now)
+                delay = round(max(0.0, now - crossed), 1)
                 alert = AlertEvent(
                     id=f"alt-{uuid.uuid4().hex[:8]}", camera_id=rec.id, camera_name=rec.name, level=level,
                     water_ratio=reading.water_ratio, timestamp=reading.timestamp,
                     message=f"{rec.name} reached {level.value} ({round(reading.water_ratio * 100)}% of bank height)",
+                    first_crossed_at=_iso(crossed), detection_delay_s=delay,
                 )
                 self.alerts.appendleft(alert)
+                self.lead_log.appendleft(LeadTimeEntry(
+                    camera_id=rec.id, camera_name=rec.name, level=level, crossed_at=_iso(crossed),
+                    alerted_at=reading.timestamp, detection_delay_s=delay,
+                ))
             return reading, alert
 
     def test_draft(self, draft: CameraCreate) -> Reading:
@@ -340,6 +371,18 @@ class VisionEngine:
         if alert:
             await self.publish({"type": "alert", "alert": alert.model_dump(mode="json")})
             await self.dispatcher.dispatch(alert)
+        if reading.accepted:
+            for event in self.barriers.on_reading(f"camera:{reading.camera_id}", reading.level, reading.water_ratio, reading.timestamp):
+                await self.publish_barrier(event)
+
+    async def publish_barrier(self, event: BarrierEvent) -> None:
+        barrier = self.barriers.get(event.barrier_id)
+        await self.publish({"type": "barrier", "barrier": barrier.model_dump(mode="json"), "event": event.model_dump(mode="json")})
+
+    def publish_barrier_threadsafe(self, event: BarrierEvent) -> None:
+        """For sync routes (telemetry ingest, manual commands) that run outside the event loop."""
+        barrier = self.barriers.get(event.barrier_id)
+        self._publish_threadsafe({"type": "barrier", "barrier": barrier.model_dump(mode="json"), "event": event.model_dump(mode="json")})
 
     async def _camera_loop(self, camera_id: str) -> None:
         rec = self.cameras[camera_id]

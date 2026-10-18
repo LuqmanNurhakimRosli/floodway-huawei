@@ -1,7 +1,9 @@
 import time
 import random
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+
+from app.security import require_write_token
 
 router = APIRouter(prefix="/api/v1/reports", tags=["Community Reports"])
 
@@ -49,7 +51,7 @@ class NewReport(BaseModel):
 def get_reports():
     return DEMO_REPORTS
 
-@router.post("")
+@router.post("", dependencies=[Depends(require_write_token)])
 def submit_report(r: NewReport):
     # Nothing verifies a submission here: it is stored as UNDER_REVIEW and says so. (It used to be auto-marked
     # VERIFIED with a made-up 'Huawei ModelArts CV (97.2% confidence)' for any depth over 10 cm.)

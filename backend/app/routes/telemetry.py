@@ -3,23 +3,30 @@ import hmac
 import hashlib
 from collections import defaultdict, deque
 from statistics import median
-from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field
 from app.config import DEVICES, MAX_SKEW_SECONDS
 from app.services.phase_machine import PhaseMachine
+from app.vision.fault_filter import JumpFilter
+from app.vision.schemas import Level
 
 router = APIRouter(prefix="/api/v1", tags=["Telemetry"])
 
 readings: dict[str, deque] = defaultdict(lambda: deque(maxlen=2000))
 raw_buffer: dict[str, deque] = defaultdict(lambda: deque(maxlen=5))
-machines: dict[str, PhaseMachine] = defaultdict(PhaseMachine)
+# Each device escalates on its own thresholds (a river station and a street underpass are very different scales).
+machines: dict[str, PhaseMachine] = {
+    dev_id: PhaseMachine(dev.get("warning_threshold_m", 1.20), dev.get("danger_threshold_m", 1.50)) for dev_id, dev in DEVICES.items()
+}
+filters: dict[str, JumpFilter] = defaultdict(lambda: JumpFilter(base_step=0.30, step_per_s=0.005))  # metres
+held: dict[str, int] = defaultdict(int)
 
-# Seed initial normal reading for demo devices
+# Seed one starting reading per demo device, so the status page is not empty before a node reports
 for dev_id, dev_cfg in DEVICES.items():
     init_ts = int(time.time()) - 60
-    # Mount height 400cm, distance 280cm -> water level 1.20m
-    readings[dev_id].append((init_ts, 1.20))
-    machines[dev_id].update(1.20)
+    start_m = dev_cfg.get("initial_level_m", 1.20)
+    readings[dev_id].append((init_ts, start_m))
+    machines[dev_id].update(start_m)
 
 class IngestPayload(BaseModel):
     device_id: str
@@ -28,7 +35,7 @@ class IngestPayload(BaseModel):
     sig: str = ""
 
 @router.post("/ingest")
-def ingest_sensor_reading(p: IngestPayload):
+def ingest_sensor_reading(p: IngestPayload, request: Request):
     dev = DEVICES.get(p.device_id)
     if not dev:
         raise HTTPException(404, f"Unknown device {p.device_id}")
@@ -45,8 +52,25 @@ def ingest_sensor_reading(p: IngestPayload):
     mount_h = dev.get("mount_height_cm", 400.0)
     level_m = max(0.0, (mount_h - filtered_dist) / 100.0)
 
+    verdict = filters[p.device_id].check(level_m, time.time())
+    if not verdict.accepted:  # implausible jump: keep it out of the history and the phase until a second reading agrees
+        held[p.device_id] += 1
+        return {
+            "status": "HELD",
+            "device_id": p.device_id,
+            "level_m": round(level_m, 3),
+            "phase": machines[p.device_id].phase,
+            "timestamp": p.ts,
+            "reason": verdict.reason,
+        }
+
     readings[p.device_id].append((p.ts, level_m))
     phase = machines[p.device_id].update(level_m)
+
+    engine = getattr(request.app.state, "vision_engine", None)
+    if engine is not None:  # depth nodes can drive underpass barriers too
+        for event in engine.barriers.on_reading(f"node:{p.device_id}", Level(phase), level_m, unit="m"):
+            engine.publish_barrier_threadsafe(event)
 
     return {
         "status": "ACCEPTED",
@@ -70,7 +94,10 @@ def list_devices():
             "lon": dev.get("lon"),
             "current_level_m": round(last_val, 3),
             "status": "ONLINE" if (now - last_ts) < 600 else "STALE",
-            "phase": machines[dev_id].phase
+            "phase": machines[dev_id].phase,
+            "warning_threshold_m": dev.get("warning_threshold_m"),
+            "danger_threshold_m": dev.get("danger_threshold_m"),
+            "held_readings": held[dev_id],
         })
     return {"devices": out}
 
