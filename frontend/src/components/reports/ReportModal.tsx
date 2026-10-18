@@ -158,12 +158,12 @@ export function ReportModal({ isOpen, onClose }: Props) {
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={(e) => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files?.[0]) pickFile(e.dataTransfer.files[0]); }}
-              className={`flex w-full items-center gap-3 rounded-2xl border-2 border-dashed p-3 text-left ${focusRing} ${dragging ? 'border-[#0958D9] bg-blue-50' : 'border-slate-300 hover:border-[#0958D9] hover:bg-slate-50'}`}
+              className={`flex w-full items-center gap-3 rounded-2xl border-2 border-dashed p-3 text-left ${focusRing} ${dragging ? 'border-[#0B5F60] bg-teal-50' : 'border-slate-300 hover:border-[#0B5F60] hover:bg-slate-50'}`}
             >
               <img src={image} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
               <span className="min-w-0">
                 <span className="block truncate text-sm/5 font-semibold text-slate-900">{fileName}</span>
-                <span className="mt-1 inline-flex items-center gap-1.5 text-sm/5 font-semibold text-[#0958D9]">
+                <span className="mt-1 inline-flex items-center gap-1.5 text-sm/5 font-semibold text-[#0B5F60]">
                   <UploadCloud className="h-4 w-4" aria-hidden="true" /> Take or choose a photo
                 </span>
                 <span className="block text-xs/4 text-slate-600">or drop one here · JPG, PNG, WebP up to 10 MB</span>
@@ -180,7 +180,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
                     aria-pressed={image === s.src}
                     aria-label={`Sample photo: ${s.name}`}
                     onClick={() => { setImage(s.src); setFileName(`Sample: ${s.name.toLowerCase()}`); setTitle(s.title); setLocation(s.location); setAi(null); setFileError(null); }}
-                    className={`overflow-hidden rounded-xl border-2 ${focusRing} ${image === s.src ? 'border-[#0958D9]' : 'border-transparent'}`}
+                    className={`overflow-hidden rounded-xl border-2 ${focusRing} ${image === s.src ? 'border-[#0B5F60]' : 'border-transparent'}`}
                   >
                     <img src={s.src} alt="" className="aspect-square w-full object-cover" />
                   </button>
@@ -214,7 +214,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
               {analyzing ? (
                 <><span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700 motion-reduce:animate-none" aria-hidden="true" /> Asking the model…</>
               ) : (
-                <><Sparkles className="h-4 w-4 text-[#0958D9]" aria-hidden="true" /> Ask the AI about this photo</>
+                <><Sparkles className="h-4 w-4 text-[#0B5F60]" aria-hidden="true" /> Ask the AI about this photo</>
               )}
             </button>
             {ai && (
@@ -242,8 +242,8 @@ export function ReportModal({ isOpen, onClose }: Props) {
             <EvidenceCheck range={estimate?.range ?? null} method={estimate?.label ?? null} ai={ai} camera={sensors.camera} node={sensors.node} positionLabel={position.label} />
           </Step>
 
-          <p className="flex items-start gap-2 rounded-xl bg-blue-50 p-3 text-xs/4 text-slate-700">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#0958D9]" aria-hidden="true" />
+          <p className="flex items-start gap-2 rounded-xl bg-teal-50 p-3 text-xs/4 text-slate-700">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#0B5F60]" aria-hidden="true" />
             Your report is saved as unverified. It shows as AI assessed only if you ran the AI check and the model judged it flooding. No agency reviews reports in this demo.
           </p>
         </div>

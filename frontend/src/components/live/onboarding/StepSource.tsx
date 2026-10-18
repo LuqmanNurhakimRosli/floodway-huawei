@@ -61,7 +61,7 @@ export function StepSource({ form, onChange, error, onUseMyLocation }: Props) {
               aria-checked={form.source_type === t.id}
               onClick={() => onChange({ ...form, source_type: t.id, feed_refresh_s: t.id === 'upload' ? 0 : form.feed_refresh_s })}
               className={`flex min-h-12 items-center justify-center gap-1.5 rounded-xl border-2 px-3 text-sm font-bold ${focusRing} ${
-                form.source_type === t.id ? 'border-[#1677FF] bg-blue-50 text-[#0958D9]' : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                form.source_type === t.id ? 'border-[#0E7C7B] bg-teal-50 text-[#0B5F60]' : 'border-slate-200 text-slate-700 hover:border-slate-300'
               }`}
             >
               {t.text}
@@ -78,12 +78,12 @@ export function StepSource({ form, onChange, error, onUseMyLocation }: Props) {
       {isUpload ? (
         <div>
           <span className={label} id="cam-photo-label">Photo of the water</span>
-          <label htmlFor="cam-photo" className={`flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-center text-sm font-semibold text-slate-700 hover:border-[#1677FF] hover:bg-blue-50/40 focus-within:ring-2 focus-within:ring-[#1677FF] ${photoUrl ? 'p-0' : ''}`}>
+          <label htmlFor="cam-photo" className={`flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-3 text-center text-sm font-semibold text-slate-700 hover:border-[#0E7C7B] hover:bg-teal-50/40 focus-within:ring-2 focus-within:ring-[#0E7C7B] ${photoUrl ? 'p-0' : ''}`}>
             {photoUrl ? (
               <img src={photoUrl} alt="The photo you chose" className="max-h-56 w-full object-contain" />
             ) : (
               <>
-                <ImagePlus className="h-6 w-6 text-[#0958D9]" aria-hidden="true" />
+                <ImagePlus className="h-6 w-6 text-[#0B5F60]" aria-hidden="true" />
                 Choose a photo or take one
                 <span className="text-xs font-normal text-slate-600">JPEG or PNG, up to 5 MB</span>
               </>
@@ -125,7 +125,7 @@ export function StepSource({ form, onChange, error, onUseMyLocation }: Props) {
         </div>
       </div>
       {onUseMyLocation && (
-        <button type="button" onClick={onUseMyLocation} className={`-mt-1 min-h-10 rounded-lg px-2 text-sm font-bold text-[#0958D9] hover:bg-blue-50 ${focusRing}`}>
+        <button type="button" onClick={onUseMyLocation} className={`-mt-1 min-h-10 rounded-lg px-2 text-sm font-bold text-[#0B5F60] hover:bg-teal-50 ${focusRing}`}>
           Use my current location
         </button>
       )}

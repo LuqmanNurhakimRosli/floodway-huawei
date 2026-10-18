@@ -36,7 +36,7 @@ export function AlertToast({ alert, onOpen, onDismiss }: Props) {
           <span className="block truncate text-sm/5 font-semibold text-slate-900">{alert.camera_name}</span>
           <span className="mt-0.5 block text-sm/5 text-slate-600">
             Reached <span className={num}>{Math.round(alert.water_ratio * 100)}%</span> of bank.{' '}
-            <span className="inline-flex items-center whitespace-nowrap font-semibold text-[#0958D9]">
+            <span className="inline-flex items-center whitespace-nowrap font-semibold text-[#0B5F60]">
               Open routes
               <ChevronRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
             </span>

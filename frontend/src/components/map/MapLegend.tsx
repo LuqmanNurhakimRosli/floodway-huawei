@@ -32,7 +32,7 @@ interface Props {
 export function MapLegend({ floodColor, bottomOffset = 0 }: Props) {
   const [open, setOpen] = useState(false);
   const items: LegendItem[] = [
-    { key: 'route', swatch: <Line color="#1677FF" />, label: 'Road route', source: 'OpenStreetMap roads' },
+    { key: 'route', swatch: <Line color="#0E7C7B" />, label: 'Road route', source: 'OpenStreetMap roads' },
     { key: 'alt', swatch: <Line color="#64748B" dashed />, label: 'Other route', source: '' },
     { key: 'flood', swatch: <Dot color={floodColor} />, label: 'Flooded area', source: '' },
     { key: 'watch', swatch: <Dot color="#0284C7" dashed />, label: 'Low-lying, on watch', source: '' },

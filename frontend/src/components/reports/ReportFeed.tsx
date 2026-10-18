@@ -70,7 +70,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
               isOfficial
                 ? 'border-emerald-300 ring-2 ring-emerald-500/15 shadow-sm'
                 : isAiVerified
-                ? 'border-blue-300 ring-2 ring-blue-500/10'
+                ? 'border-teal-300 ring-2 ring-teal-500/10'
                 : 'border-slate-200'
             }`}
           >
@@ -78,7 +78,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
               {/* Card Header: Author info & Verification Badges */}
               <div className="p-4 pb-3 flex items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0E7C7B] to-[#0B5F60] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                     {report.author.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
@@ -111,7 +111,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
               {/* Location Bar with Clear Icon */}
               <div className="px-4 py-2 bg-slate-50/40 border-b border-slate-100 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5 text-slate-700 font-semibold truncate">
-                  <MapPin className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
+                  <MapPin className="w-3.5 h-3.5 text-[#0E7C7B] shrink-0" />
                   <span className="truncate">{shortLocation}</span>
                 </div>
                 <span className={`px-2 py-0.5 rounded text-xs font-bold ${
@@ -192,7 +192,7 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 <>
                   <button
                     onClick={() => upvoteReport(report.id)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#1677FF] transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#0E7C7B] transition-colors cursor-pointer"
                   >
                     <ThumbsUp className="w-3.5 h-3.5" />
                     <span>{report.upvotes} Confirmations</span>

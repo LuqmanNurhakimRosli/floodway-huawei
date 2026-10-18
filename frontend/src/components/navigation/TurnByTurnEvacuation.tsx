@@ -74,10 +74,10 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
       </div>
 
       {/* Main Guidance Card */}
-      <div className="rounded-3xl bg-[#071426] border border-slate-800 text-white p-6 shadow-2xl overflow-hidden relative">
+      <div className="rounded-3xl bg-[#062B2B] border border-slate-800 text-white p-6 shadow-2xl overflow-hidden relative">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#1677FF] flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+            <div className="w-12 h-12 rounded-2xl bg-[#0E7C7B] flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
               <Navigation className="w-6 h-6" />
             </div>
             <div>
@@ -119,7 +119,7 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
           </div>
           <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#1677FF] to-emerald-500 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-[#0E7C7B] to-emerald-500 transition-all duration-700"
               style={{ width: `${progressPct}%` }}
             />
           </div>

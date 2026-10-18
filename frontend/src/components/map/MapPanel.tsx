@@ -11,7 +11,7 @@ import type { Scenario } from './FloodProneLayer';
 export type ShelterFilter = 'all' | 'open' | 'recommended';
 
 export const SCENARIO_INFO: Record<Scenario, { label: string; sub: string; active: string }> = {
-  normal: { label: 'Normal', sub: 'Dry', active: 'bg-[#1677FF] text-white' },
+  normal: { label: 'Normal', sub: 'Dry', active: 'bg-[#0E7C7B] text-white' },
   warning: { label: 'Warning', sub: 'Rising', active: 'bg-amber-600 text-white' },
   danger: { label: 'Danger', sub: 'Peak', active: 'bg-red-600 text-white' },
 };
@@ -64,7 +64,7 @@ export function MapPanel(p: Props) {
           id="origin-select"
           value={p.originId}
           onChange={(e) => p.onOrigin(e.target.value)}
-          className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+          className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]"
         >
           {ORIGINS.map((o) => (
             <option key={o.id} value={o.id}>
@@ -86,7 +86,7 @@ export function MapPanel(p: Props) {
               type="button"
               aria-pressed={p.scenario === k}
               onClick={() => p.onScenario(k)}
-              className={`flex min-h-11 flex-col items-center justify-center rounded-lg text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] ${
+              className={`flex min-h-11 flex-col items-center justify-center rounded-lg text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] ${
                 p.scenario === k ? `${SCENARIO_INFO[k].active} shadow-md` : 'text-slate-700 hover:bg-white'
               }`}
             >
@@ -138,8 +138,8 @@ export function MapPanel(p: Props) {
                   type="button"
                   aria-pressed={p.chosen === i}
                   onClick={() => p.onChoose(i)}
-                  className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl border px-3 text-left text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] ${
-                    p.chosen === i ? 'border-[#1677FF] bg-blue-50 ring-1 ring-[#1677FF]/30' : 'border-slate-200 bg-white hover:border-slate-300'
+                  className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl border px-3 text-left text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] ${
+                    p.chosen === i ? 'border-[#0E7C7B] bg-teal-50 ring-1 ring-[#0E7C7B]/30' : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
                   <span className="font-bold text-slate-900">
@@ -181,8 +181,8 @@ export function MapPanel(p: Props) {
               type="button"
               aria-pressed={p.mode === id}
               onClick={() => p.onMode(id)}
-              className={`flex min-h-11 items-center justify-center gap-1.5 rounded-lg text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] ${
-                p.mode === id ? 'bg-[#1677FF] text-white' : 'text-slate-700 hover:bg-slate-50'
+              className={`flex min-h-11 items-center justify-center gap-1.5 rounded-lg text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] ${
+                p.mode === id ? 'bg-[#0E7C7B] text-white' : 'text-slate-700 hover:bg-slate-50'
               }`}
             >
               <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {label}
@@ -205,7 +205,7 @@ export function MapPanel(p: Props) {
               type="button"
               aria-pressed={p.filter === f}
               onClick={() => p.onFilter(f)}
-              className={`min-h-9 rounded-lg text-xs font-bold capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] ${
+              className={`min-h-9 rounded-lg text-xs font-bold capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] ${
                 p.filter === f ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-700 hover:text-slate-900'
               }`}
             >
@@ -221,12 +221,12 @@ export function MapPanel(p: Props) {
             const unavailable = s.status === 'FULL' || s.status === 'CLOSED';
             return (
               <li key={s.id}>
-                <div className={`rounded-2xl border p-3 ${sel ? 'border-[#1677FF] bg-blue-50/40 ring-1 ring-[#1677FF]/30' : 'border-slate-200 bg-white'}`}>
+                <div className={`rounded-2xl border p-3 ${sel ? 'border-[#0E7C7B] bg-teal-50/40 ring-1 ring-[#0E7C7B]/30' : 'border-slate-200 bg-white'}`}>
                   <button
                     type="button"
                     aria-pressed={sel}
                     onClick={() => p.onSelect(s.id)}
-                    className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+                    className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
@@ -246,7 +246,7 @@ export function MapPanel(p: Props) {
                       {b ? (
                         <>
                           <span className="font-bold text-slate-900">{fmtKm(b.distanceM)}</span>
-                          <span className="font-semibold text-[#0958D9]">~{formatMin(etaMin(b, p.mode))}</span>
+                          <span className="font-semibold text-[#0B5F60]">~{formatMin(etaMin(b, p.mode))}</span>
                           <span className={`font-semibold ${b.crossings === 0 && b.blockedBy.length === 0 ? 'text-emerald-700' : 'text-red-700'}`}>
                             {b.blockedBy.length > 0 ? 'Blocked by a closed barrier' : b.crossings === 0 ? 'Avoids flood' : `Crosses ${b.crossings} flooded`}
                           </span>
@@ -271,7 +271,7 @@ export function MapPanel(p: Props) {
                       type="button"
                       onClick={p.onStart}
                       disabled={p.navigating || !p.alternatives.length || (p.alternatives[p.chosen]?.blockedBy.length ?? 0) > 0}
-                      className="mt-3 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[#1677FF] text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-[#0958D9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2 disabled:opacity-50"
+                      className="mt-3 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[#0E7C7B] text-xs font-bold text-white shadow-md shadow-teal-500/20 hover:bg-[#0B5F60] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] focus-visible:ring-offset-2 disabled:opacity-50"
                     >
                       <Navigation className="h-4 w-4" aria-hidden="true" />{' '}
                       {p.navigating ? 'Navigating…' : (p.alternatives[p.chosen]?.blockedBy.length ?? 0) > 0 ? 'Route blocked: pick another' : 'Start turn-by-turn'}

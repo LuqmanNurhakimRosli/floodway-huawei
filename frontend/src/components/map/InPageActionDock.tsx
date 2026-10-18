@@ -13,7 +13,7 @@ export function InPageActionDock() {
         className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
         title="Return to Home Dashboard"
       >
-        <Home className="w-3.5 h-3.5 text-[#1677FF]" />
+        <Home className="w-3.5 h-3.5 text-[#0E7C7B]" />
         <span>Home</span>
       </button>
 
@@ -31,7 +31,7 @@ export function InPageActionDock() {
         className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
         title="Open Live Vision CCTV"
       >
-        <Video className="w-3.5 h-3.5 text-blue-600" />
+        <Video className="w-3.5 h-3.5 text-teal-600" />
         <span>Live Vision</span>
       </button>
     </div>

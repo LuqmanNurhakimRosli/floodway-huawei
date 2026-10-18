@@ -206,7 +206,7 @@ export function ShelterMapView() {
           type="button"
           onClick={start}
           disabled={!route || route.blockedBy.length > 0 || selected.status === 'FULL' || selected.status === 'CLOSED'}
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[#1677FF] px-3.5 text-xs font-bold text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2 disabled:opacity-50"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[#0E7C7B] px-3.5 text-xs font-bold text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] focus-visible:ring-offset-2 disabled:opacity-50"
         >
           <Navigation className="h-4 w-4" aria-hidden="true" /> Start
         </button>
@@ -240,7 +240,7 @@ export function ShelterMapView() {
           {route && (
             <>
               <Polyline positions={route.line} pathOptions={{ color: '#FFFFFF', weight: 10, opacity: 0.9 }} />
-              <Polyline positions={route.line} pathOptions={{ color: '#1677FF', weight: 6, opacity: 0.95 }} />
+              <Polyline positions={route.line} pathOptions={{ color: '#0E7C7B', weight: 6, opacity: 0.95 }} />
             </>
           )}
 

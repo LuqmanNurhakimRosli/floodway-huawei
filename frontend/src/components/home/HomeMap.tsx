@@ -17,7 +17,7 @@ import { card, cardTitle, interactive } from '../../styles/tokens';
 
 const userDot = new L.DivIcon({
   className: 'user-mini-icon',
-  html: '<div style="width:18px;height:18px;border-radius:50%;background:#1677FF;border:3px solid #fff;box-shadow:0 0 0 4px rgba(22,119,255,.35)"></div>',
+  html: '<div style="width:18px;height:18px;border-radius:50%;background:#0E7C7B;border:3px solid #fff;box-shadow:0 0 0 4px rgba(14, 124, 123,.35)"></div>',
   iconSize: [18, 18],
   iconAnchor: [9, 9],
 });

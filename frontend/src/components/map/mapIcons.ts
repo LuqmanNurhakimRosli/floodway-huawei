@@ -18,8 +18,8 @@ export const gpsNavIcon = new L.DivIcon({
   className: 'gps-nav-icon',
   html: `
     <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-      <div style="position: absolute; inset: -4px; border-radius: 50%; background: #1677FF; opacity: 0.4; animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-      <div style="width: 28px; height: 28px; border-radius: 50%; background: #1677FF; border: 3px solid white; box-shadow: 0 4px 14px rgba(22,119,255,0.7); display: flex; align-items: center; justify-content: center; color: white;">
+      <div style="position: absolute; inset: -4px; border-radius: 50%; background: #0E7C7B; opacity: 0.4; animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+      <div style="width: 28px; height: 28px; border-radius: 50%; background: #0E7C7B; border: 3px solid white; box-shadow: 0 4px 14px rgba(14, 124, 123,0.7); display: flex; align-items: center; justify-content: center; color: white;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
         </svg>
@@ -48,7 +48,7 @@ export const createShelterIcon = (isSelected: boolean, status: string) => {
     bgColor = '#F59E0B'; // Amber
     symbol = `<span style="font-size: 16px; font-weight: 900; line-height: 1;">!</span>`;
   } else if (isSelected) {
-    bgColor = '#1677FF'; // Blue
+    bgColor = '#0E7C7B'; // Blue
   }
 
   return new L.DivIcon({

@@ -52,7 +52,7 @@ export default function ControlRoomPage() {
   const loading = state.status === 'idle' || state.status === 'loading';
 
   return (
-    <div className="flex min-h-dvh bg-[#F8FAFC]">
+    <div className="flex min-h-dvh bg-[#F3F6F5]">
       <DashboardSidebar />
       <div className="flex h-dvh min-w-0 flex-1 flex-col overflow-hidden pb-[var(--nav-h)] md:pb-0">
         <Header />
@@ -61,7 +61,7 @@ export default function ControlRoomPage() {
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
               <div className="min-w-0">
                 <h1 className={`${pageTitle} flex items-center gap-2`}>
-                  <ShieldHalf className="h-5 w-5 shrink-0 text-[#1677FF] @min-[640px]/main:h-6 @min-[640px]/main:w-6" aria-hidden="true" />
+                  <ShieldHalf className="h-5 w-5 shrink-0 text-[#0E7C7B] @min-[640px]/main:h-6 @min-[640px]/main:w-6" aria-hidden="true" />
                   Control room
                 </h1>
                 <p className="mt-0.5 text-sm/5 text-slate-600">Underpass barriers, the sensor fault filter and how fast each warning goes out.</p>
@@ -73,7 +73,7 @@ export default function ControlRoomPage() {
             <ol className="grid grid-cols-4 gap-2" aria-label="How the loop works">
               {LOOP.map((s, i) => (
                 <li key={s.title} className={`${card} flex flex-col items-center gap-1.5 p-2 text-center @min-[760px]/main:flex-row @min-[760px]/main:items-start @min-[760px]/main:gap-3 @min-[760px]/main:p-3 @min-[760px]/main:text-left`}>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#0958D9]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-[#0B5F60]">
                     <s.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <div className="min-w-0">

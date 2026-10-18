@@ -1,34 +1,48 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Map, FileText, Video, User } from 'lucide-react';
+import { FileText, LayoutDashboard, Map, User, Video } from 'lucide-react';
 
+const TABS = [
+  { label: 'Home', icon: LayoutDashboard, path: '/home' },
+  { label: 'Map', icon: Map, path: '/map' },
+  { label: 'Reports', icon: FileText, path: '/reports' },
+  { label: 'Live', icon: Video, path: '/live' },
+  { label: 'Profile', icon: User, path: '/profile' },
+];
+
+/** Phone tab bar. The active tab gets a teal pill behind its icon, so the current place reads at a glance. */
 export function BottomNav() {
-  const tabs = [
-    { label: 'Home', icon: LayoutDashboard, path: '/home' },
-    { label: 'Map', icon: Map, path: '/map' },
-    { label: 'Reports', icon: FileText, path: '/reports' },
-    { label: 'Live Vision', icon: Video, path: '/live' },
-    { label: 'Profile', icon: User, path: '/profile' },
-  ];
-
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[var(--nav-h)] pb-[env(safe-area-inset-bottom)] bg-white/80 backdrop-blur-xl border-t border-slate-200/70 px-2 flex items-center justify-around z-40">
-      {tabs.map((tab) => (
-        <NavLink
-          key={tab.path}
-          to={tab.path}
-          className={({ isActive }) =>
-            `flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 rounded-xl transition-all ${
-              isActive
-                ? 'text-[#1677FF] font-semibold scale-105'
-                : 'text-slate-500 hover:text-slate-800'
-            }`
-          }
-        >
-          <tab.icon className="w-5 h-5 mb-0.5" />
-          <span className="text-xs tracking-tight">{tab.label}</span>
-        </NavLink>
-      ))}
+    <nav
+      aria-label="Main"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/70 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_30px_-20px_rgba(6,43,43,0.35)] backdrop-blur-xl md:hidden"
+    >
+      <ul className="mx-auto flex h-16 max-w-md items-stretch justify-around px-1">
+        {TABS.map((tab) => (
+          <li key={tab.path} className="flex flex-1">
+            <NavLink
+              to={tab.path}
+              className={({ isActive }) =>
+                `group flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] ${
+                  isActive ? 'font-bold text-[#0B5F60]' : 'font-medium text-slate-500 hover:text-slate-800'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors duration-200 motion-reduce:transition-none ${
+                      isActive ? 'bg-teal-100/80' : 'bg-transparent'
+                    }`}
+                  >
+                    <tab.icon className="h-5 w-5" strokeWidth={isActive ? 2.4 : 2} aria-hidden="true" />
+                  </span>
+                  <span>{tab.label}</span>
+                </>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

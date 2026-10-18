@@ -17,7 +17,7 @@ export function StepTest({ loading, error, reading, offlineSample, onRetry }: Pr
   if (loading) {
     return (
       <div className="flex flex-col items-center gap-3 py-10 text-center" role="status">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1677FF] motion-reduce:animate-none" aria-hidden="true" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#0E7C7B] motion-reduce:animate-none" aria-hidden="true" />
         <p className="font-semibold text-slate-900">Analysing a short burst of frames…</p>
         <p className="text-sm text-slate-600">This takes a few seconds.</p>
       </div>

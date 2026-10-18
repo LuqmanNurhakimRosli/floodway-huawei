@@ -28,7 +28,7 @@ export function CameraGrid({ cameras, allCameras, useScene, overlays, selectedId
                 type="button"
                 onClick={() => onSelect(camera.id)}
                 aria-label={`Open ${camera.name}`}
-                className={`${card} flex w-full flex-col p-2 text-left ${interactive} ${selectedId === camera.id ? 'border-[#1677FF] ring-1 ring-[#1677FF]' : 'hover:border-slate-300'}`}
+                className={`${card} flex w-full flex-col p-2 text-left ${interactive} ${selectedId === camera.id ? 'border-[#0E7C7B] ring-1 ring-[#0E7C7B]' : 'hover:border-slate-300'}`}
               >
                 <FeedViewer camera={camera} tag={camTag(allCameras, camera.id)} useScene={useScene} overlays={overlays} compact />
                 <span className="flex flex-1 flex-col gap-2 px-2 pb-1 pt-3">

@@ -21,12 +21,12 @@ interface Props {
 type Pt = { x: number; y: number }; // normalised 0..1 on the displayed photo
 
 const STEP_LABEL = ['Tap the upper mark', 'Tap the lower mark', 'Tap where the water meets the object'];
-const DOT = ['bg-[#0958D9]', 'bg-violet-700', 'bg-sky-600'];
+const DOT = ['bg-[#0B5F60]', 'bg-violet-700', 'bg-sky-600'];
 
 function Result({ range }: { range: DepthRange }) {
   const levels = levelsInRange(range);
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 p-3" role="status">
+    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 p-3" role="status">
       <span className="text-xs/4 font-semibold text-slate-700">Depth from your photo</span>
       <span className={`${num} text-lg/6 font-bold text-slate-900`}>{formatRange(range)}</span>
       <span className="flex flex-wrap gap-1">{levels.map((l) => <StatusChip key={l} level={l} />)}</span>
@@ -110,7 +110,7 @@ export function DepthFromPhoto({ imageUrl, onChange }: Props) {
                   type="button"
                   aria-pressed={objectId === o.id}
                   onClick={() => { setObjectId(o.id); setLandmarkId(o.landmarks[Math.min(1, o.landmarks.length - 1)].id); }}
-                  className={`min-h-11 rounded-xl border px-2 text-sm font-semibold ${focusRing} ${objectId === o.id ? 'border-[#0958D9] bg-blue-50 text-[#0958D9]' : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'}`}
+                  className={`min-h-11 rounded-xl border px-2 text-sm font-semibold ${focusRing} ${objectId === o.id ? 'border-[#0B5F60] bg-teal-50 text-[#0B5F60]' : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'}`}
                 >
                   {o.label}
                 </button>
@@ -122,9 +122,9 @@ export function DepthFromPhoto({ imageUrl, onChange }: Props) {
             <legend className="mb-1.5 text-xs/4 font-semibold text-slate-700">Where does the water reach?</legend>
             <div className="space-y-1.5">
               {obj.landmarks.map((l) => (
-                <label key={l.id} className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 text-sm ${landmarkId === l.id ? 'border-[#0958D9] bg-blue-50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                <label key={l.id} className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 text-sm ${landmarkId === l.id ? 'border-[#0B5F60] bg-teal-50' : 'border-slate-200 hover:bg-slate-50'}`}>
                   <span className="flex items-center gap-2.5">
-                    <input type="radio" name="landmark" value={l.id} checked={landmarkId === l.id} onChange={() => setLandmarkId(l.id)} className="h-4 w-4 accent-[#0958D9]" />
+                    <input type="radio" name="landmark" value={l.id} checked={landmarkId === l.id} onChange={() => setLandmarkId(l.id)} className="h-4 w-4 accent-[#0B5F60]" />
                     <span className="font-medium text-slate-900">{l.label}</span>
                   </span>
                   <span className={`${num} text-xs text-slate-600`}>{formatRange(l.range)}</span>
@@ -155,7 +155,7 @@ export function DepthFromPhoto({ imageUrl, onChange }: Props) {
 
           <div className="flex items-center justify-between gap-2">
             <p className="flex items-center gap-1.5 text-sm/5 font-semibold text-slate-900" aria-live="polite">
-              <Ruler className="h-4 w-4 text-[#0958D9]" aria-hidden="true" />
+              <Ruler className="h-4 w-4 text-[#0B5F60]" aria-hidden="true" />
               {points.length < 3 ? `${points.length + 1} of 3. ${STEP_LABEL[points.length]}${points.length === 0 ? ` (${ref.upper.label.toLowerCase()})` : points.length === 1 ? ` (${ref.lower.label.toLowerCase()})` : ''}.` : 'Done. Undo a point to adjust it.'}
             </p>
             <button type="button" disabled={points.length === 0} onClick={() => setPoints(points.slice(0, -1))} className={`inline-flex min-h-10 shrink-0 items-center gap-1 rounded-lg border border-slate-300 px-2.5 text-xs font-semibold text-slate-700 disabled:opacity-40 ${focusRing}`}>

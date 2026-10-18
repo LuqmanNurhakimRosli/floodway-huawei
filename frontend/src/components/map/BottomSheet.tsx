@@ -110,7 +110,7 @@ export function BottomSheet({ snap, onSnapChange, header, children, onHeight }: 
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
-        className="flex h-7 w-full shrink-0 touch-none cursor-grab items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+        className="flex h-7 w-full shrink-0 touch-none cursor-grab items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B]"
       >
         <span className="h-1.5 w-11 rounded-full bg-slate-300" aria-hidden="true" />
       </button>

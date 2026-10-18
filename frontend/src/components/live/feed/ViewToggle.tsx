@@ -23,7 +23,7 @@ export function ViewToggle({ value, onChange }: Props) {
           type="button"
           aria-pressed={value === mode}
           onClick={() => onChange(mode)}
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 @min-[760px]/main:min-h-9 text-sm/5 font-semibold ${interactive} ${value === mode ? 'bg-[#0958D9] text-white' : 'text-slate-700 hover:bg-slate-100'}`}
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 @min-[760px]/main:min-h-9 text-sm/5 font-semibold ${interactive} ${value === mode ? 'bg-[#0B5F60] text-white' : 'text-slate-700 hover:bg-slate-100'}`}
         >
           <Icon className="h-4 w-4" aria-hidden="true" />
           {label}

@@ -6,17 +6,17 @@
 // Spacing scale: 4 8 12 16 20 24 32. Cards: 16px padding on narrow layouts, 20px on wide ones; 16px between cards,
 // 12px inside a card. Type: nothing below 12px. Status colours live in lib/vision/levels.ts.
 
-// Brand: #1677FF for accents, focus rings and progress. Filled controls with white text use the next step, #0958D9,
-// because white on #1677FF is only 4.1:1 (below WCAG AA 4.5:1 for normal text).
+// Brand: #0E7C7B for accents, focus rings and progress. Filled controls with white text use the next step, #0B5F60,
+// because white on #0E7C7B is only 4.1:1 (below WCAG AA 4.5:1 for normal text).
 
 const motion = 'transition-[color,background-color,border-color,box-shadow,opacity] duration-150 ease-out motion-reduce:transition-none';
 
-export const card = 'rounded-2xl border border-slate-200 bg-white shadow-sm';
+export const card = 'rounded-[20px] border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-20px_rgba(6,43,43,0.25)]';
 export const cardPad = 'p-4 @min-[760px]/main:p-5';
-export const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+export const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7C7B] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 export const interactive = `${motion} ${focusRing}`;
 
-export const btnPrimary = `inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#0958D9] px-4 text-sm font-semibold text-white hover:bg-[#003EB3] disabled:cursor-not-allowed disabled:opacity-50 ${interactive}`;
+export const btnPrimary = `inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#0B5F60] px-4 shadow-sm shadow-teal-900/20 text-sm font-semibold text-white hover:bg-[#084647] disabled:cursor-not-allowed disabled:opacity-50 ${interactive}`;
 export const btnSecondary = `inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 ${interactive}`;
 
 // Type scale

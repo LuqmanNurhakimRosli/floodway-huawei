@@ -49,13 +49,13 @@ export function ProfileSettings() {
     <div className="w-full min-w-0 max-w-4xl mx-auto p-4 md:p-6 space-y-6">
       {/* Profile Overview */}
       <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-xs flex items-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] text-white font-heading font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0E7C7B] to-[#0B5F60] text-white font-heading font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-teal-500/20">
           {user?.name ? user.name.slice(0, 2).toUpperCase() : 'LN'}
         </div>
         <div>
           <h2 className="font-heading font-extrabold text-xl text-slate-900">{user?.name || 'Luqman Nurhakim'}</h2>
           <p className="text-xs text-slate-500">{user?.email || 'luqman@floodway.my'} · {user?.phone || '+60 12-345 6789'}</p>
-          <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-blue-50 text-[#1677FF] text-xs font-bold border border-blue-200">
+          <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-teal-50 text-[#0E7C7B] text-xs font-bold border border-teal-200">
             Registered Citizen Responder
           </span>
         </div>
@@ -64,7 +64,7 @@ export function ProfileSettings() {
       {/* Telegram Family SOS Gateway */}
       <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-          <Send className="w-5 h-5 text-[#1677FF]" />
+          <Send className="w-5 h-5 text-[#0E7C7B]" />
           <h3 className="font-heading font-bold text-lg text-slate-900">Telegram Bot Family SOS Gateway</h3>
         </div>
 
@@ -80,7 +80,7 @@ export function ProfileSettings() {
               placeholder="e.g. @your_channel or -10012345678 (optional)"
               value={tgChatId}
               onChange={(e) => setTgChatId(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#1677FF]"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#0E7C7B]"
             />
           </div>
         </div>
@@ -88,7 +88,7 @@ export function ProfileSettings() {
         <div className="flex items-center gap-2 pt-2">
           <button
             onClick={handleSaveTelegram}
-            className="px-4 py-2 rounded-xl bg-[#1677FF] hover:bg-[#0958D9] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs"
+            className="px-4 py-2 rounded-xl bg-[#0E7C7B] hover:bg-[#0B5F60] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs"
           >
             <Save className="w-4 h-4" />
             <span>Save Configuration</span>
@@ -123,12 +123,12 @@ export function ProfileSettings() {
             placeholder="Operator token"
             value={operatorToken}
             onChange={(e) => setOperatorToken(e.target.value)}
-            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:border-[#1677FF]"
+            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:border-[#0E7C7B]"
           />
           <button
             type="button"
             onClick={() => { setWriteToken(operatorToken); setOperatorSet(hasWriteToken()); setOperatorToken(''); }}
-            className="min-h-11 px-4 rounded-xl bg-[#0958D9] text-white text-sm font-semibold"
+            className="min-h-11 px-4 rounded-xl bg-[#0B5F60] text-white text-sm font-semibold"
           >
             Use token
           </button>
@@ -174,7 +174,7 @@ export function ProfileSettings() {
             aria-label="Contact name and relationship"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#1677FF]"
+            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#0E7C7B]"
           />
           <input
             type="text"
@@ -182,7 +182,7 @@ export function ProfileSettings() {
             aria-label="Contact phone number"
             value={newPhone}
             onChange={(e) => setNewPhone(e.target.value)}
-            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#1677FF]"
+            className="min-w-0 min-h-11 flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-[#0E7C7B]"
           />
           <button
             type="submit"

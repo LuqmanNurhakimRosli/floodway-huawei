@@ -20,10 +20,10 @@ export function NavigationHud({ instruction, toNextM, remainingM, remainingMin, 
     <div
       role="status"
       aria-live="polite"
-      className="absolute left-1/2 top-3 z-[700] w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 rounded-2xl border border-[#1677FF] bg-slate-950/95 p-3 text-white shadow-2xl"
+      className="absolute left-1/2 top-3 z-[700] w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 rounded-2xl border border-[#0E7C7B] bg-slate-950/95 p-3 text-white shadow-2xl"
     >
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1677FF]">
+        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0E7C7B]">
           <Navigation className="h-5 w-5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
@@ -39,7 +39,7 @@ export function NavigationHud({ instruction, toNextM, remainingM, remainingMin, 
         </button>
       </div>
       <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-slate-800" aria-hidden="true">
-        <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400" style={{ width: `${Math.round(progress * 100)}%` }} />
+        <div className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-400" style={{ width: `${Math.round(progress * 100)}%` }} />
       </div>
       <div className="mt-1.5 flex items-center justify-between gap-2 text-xs text-slate-300">
         <span className="font-semibold text-emerald-300">

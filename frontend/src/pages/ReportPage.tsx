@@ -38,7 +38,7 @@ export function ReportPage() {
   const activeCount = reports.filter((r) => r.waterDepthCm >= 30).length;
 
   return (
-    <div className="min-h-screen flex bg-[#F8FAFC]">
+    <div className="min-h-screen flex bg-[#F3F6F5]">
       <DashboardSidebar />
       <div className="flex-1 flex flex-col min-w-0 pb-20 md:pb-6">
         <Header />
@@ -69,7 +69,7 @@ export function ReportPage() {
                 onClick={() => setIsCctvModalOpen(true)}
                 className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <Video className="w-4 h-4 text-[#1677FF]" />
+                <Video className="w-4 h-4 text-[#0E7C7B]" />
                 <span>Sample cameras</span>
               </button>
 
@@ -89,11 +89,11 @@ export function ReportPage() {
               <span className="font-heading font-extrabold text-2xl text-slate-900 block">{counts.total}</span>
               <span className="text-xs font-semibold text-slate-600 uppercase">Total reports</span>
             </div>
-            <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-center">
-              <span className="font-heading font-extrabold text-2xl text-[#1677FF] block">
+            <div className="p-3 rounded-xl bg-teal-50 border border-teal-100 text-center">
+              <span className="font-heading font-extrabold text-2xl text-[#0E7C7B] block">
                 {counts.aiAssessed}
               </span>
-              <span className="text-xs font-semibold text-blue-900 uppercase">AI assessed</span>
+              <span className="text-xs font-semibold text-teal-900 uppercase">AI assessed</span>
             </div>
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-100 text-center">
               <span className="font-heading font-extrabold text-2xl text-amber-700 block">{pendingCount}</span>
@@ -151,7 +151,7 @@ export function ReportPage() {
                     onClick={() => setFilter(tab.id as any)}
                     className={`py-1.5 px-3 rounded-lg transition-colors cursor-pointer ${
                       filter === tab.id
-                        ? 'bg-[#1677FF] text-white shadow-xs'
+                        ? 'bg-[#0E7C7B] text-white shadow-xs'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >

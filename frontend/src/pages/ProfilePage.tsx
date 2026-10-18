@@ -7,7 +7,7 @@ import { AboutDemo } from '../components/common/AboutDemo';
 
 export function ProfilePage() {
   return (
-    <div className="min-h-screen flex bg-[#F8FAFC]">
+    <div className="min-h-screen flex bg-[#F3F6F5]">
       <DashboardSidebar />
       <div className="flex-1 flex flex-col min-w-0 pb-20 md:pb-6">
         <Header />

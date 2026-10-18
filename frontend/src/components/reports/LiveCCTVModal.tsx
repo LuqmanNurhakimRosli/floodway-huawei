@@ -21,7 +21,7 @@ export function LiveCCTVModal({ isOpen, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="cctv-title">
       <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
-        <div className="p-4 bg-[#071426] text-white flex items-center justify-between">
+        <div className="p-4 bg-[#062B2B] text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Video className="w-5 h-5 text-sky-300" aria-hidden="true" />
             <h3 id="cctv-title" className="font-heading font-bold text-base">Sample cameras (simulated)</h3>
@@ -49,7 +49,7 @@ export function LiveCCTVModal({ isOpen, onClose }: Props) {
                 onClose();
                 navigate('/live');
               }}
-              className="min-h-11 px-4 rounded-xl bg-[#0958D9] text-white font-semibold text-xs"
+              className="min-h-11 px-4 rounded-xl bg-[#0B5F60] text-white font-semibold text-xs"
             >
               Open Live Vision
             </button>

@@ -65,7 +65,7 @@ export function ArrivalDialog({ shelterName, capacity, when, telegram, onClose, 
           <button
             type="button"
             onClick={onReports}
-            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-xs font-extrabold hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-indigo-600 text-xs font-extrabold hover:from-teal-500 hover:to-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             Flood reports <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
