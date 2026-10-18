@@ -138,12 +138,19 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 <h3 className="font-heading font-extrabold text-sm text-slate-900 leading-snug">
                   {report.title}
                 </h3>
+                {report.evidenceSummary && (
+                  <p className="rounded-lg bg-slate-50 px-2.5 py-1.5 text-xs text-slate-700">
+                    <span className="font-semibold text-slate-900">Evidence check:</span> {report.evidenceSummary}
+                  </p>
+                )}
 
                 {/* EXACT MAXIMUM 3 FACTOR CHIPS (Clean & Readable) */}
                 <div className="grid grid-cols-3 gap-1.5 pt-1">
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                    <span className="text-xs font-semibold text-slate-400 block uppercase">Water Depth</span>
-                    <span className="font-mono text-xs font-bold text-slate-900">{formatCm(report.waterDepthCm)}</span>
+                    <span className="text-xs font-semibold text-slate-600 block uppercase">Water Depth</span>
+                    <span className="font-mono text-xs font-bold text-slate-900">
+                      {report.depthRangeCm ? `${report.depthRangeCm.lo}–${report.depthRangeCm.hi} cm` : formatCm(report.waterDepthCm)}
+                    </span>
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">

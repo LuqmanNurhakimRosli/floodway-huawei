@@ -1,6 +1,7 @@
 // Single source of truth for Live Vision. Module-level so the Live page AND the Map page share one connection.
 // React reads it through hooks/vision/useVisionStore (useSyncExternalStore).
-import type { AlertEvent, Camera, CameraDraft, Reading, ServerMessage } from '../../types/vision';
+import type { AlertEvent, Barrier, BarrierAction, BarrierEvent, Camera, CameraDraft, Reading, ServerMessage } from '../../types/vision';
+import { evaluateBarrier, SEED_BARRIERS } from '../../lib/vision/barriers';
 import { FORCE_MOCK } from './config';
 import { mockCameras, startMockFeed } from './mockVision';
 import * as api from './visionApi';
@@ -11,6 +12,9 @@ export interface VisionState {
   history: Record<string, Reading[]>;
   alerts: AlertEvent[];
   unseen: AlertEvent[]; // alerts not yet shown as a toast
+  /** Simulated underpass barriers and their change log (newest first). */
+  barriers: Barrier[];
+  barrierEvents: BarrierEvent[];
   status: 'idle' | 'loading' | 'ready' | 'error';
   usingMock: boolean;
   connected: boolean;
@@ -21,7 +25,11 @@ const HISTORY_MAX = 60;
 const POLL_MS = 5000;
 const PROBE_MS = 8000; // while on sample data, keep checking whether the server came up
 
-let state: VisionState = { cameras: [], history: {}, alerts: [], unseen: [], status: 'idle', usingMock: false, connected: false, error: null };
+const BARRIER_LOG_MAX = 50;
+
+let state: VisionState = {
+  cameras: [], history: {}, alerts: [], unseen: [], barriers: [], barrierEvents: [], status: 'idle', usingMock: false, connected: false, error: null,
+};
 const listeners = new Set<() => void>();
 
 let refs = 0;
@@ -72,8 +80,28 @@ export function applyMessage(msg: ServerMessage): void {
         cameras: state.cameras.map((c) => (c.id === r.camera_id ? { ...c, reading: r, online: true, last_frame_at: r.timestamp } : c)),
         history: pushHistory(state.history, r),
       });
+      // On sample data there is no server to decide, so run the same barrier rule here.
+      if (state.usingMock && r.accepted !== false) {
+        const events: BarrierEvent[] = [];
+        const barriers = state.barriers.map((b) => {
+          const out = evaluateBarrier(b, `camera:${r.camera_id}`, r.level, r.water_ratio, r.timestamp);
+          if (out.event) events.push(out.event);
+          return out.barrier;
+        });
+        setState({ barriers, barrierEvents: events.length ? [...events, ...state.barrierEvents].slice(0, BARRIER_LOG_MAX) : state.barrierEvents });
+      }
       break;
     }
+    case 'barrier':
+      setState({
+        barriers: state.barriers.some((b) => b.id === msg.barrier.id)
+          ? state.barriers.map((b) => (b.id === msg.barrier.id ? msg.barrier : b))
+          : [...state.barriers, msg.barrier],
+        barrierEvents: state.barrierEvents.some((e) => e.id === msg.event.id)
+          ? state.barrierEvents
+          : [msg.event, ...state.barrierEvents].slice(0, BARRIER_LOG_MAX),
+      });
+      break;
     case 'alert':
       if (!state.alerts.some((a) => a.id === msg.alert.id)) {
         setState({ alerts: [msg.alert, ...state.alerts].slice(0, 50), unseen: [msg.alert, ...state.unseen] });
@@ -120,7 +148,10 @@ function startMockMode(reason: string | null): void {
   cameras.forEach((c) => {
     if (c.reading) history = pushHistory(history, c.reading);
   });
-  setState({ cameras, history, alerts: [], unseen: [], usingMock: true, status: 'ready', connected: false, error: reason });
+  setState({
+    cameras, history, alerts: [], unseen: [], barriers: SEED_BARRIERS.map((b) => ({ ...b })), barrierEvents: [],
+    usingMock: true, status: 'ready', connected: false, error: reason,
+  });
   stopMock = startMockFeed(applyMessage, (id) => state.cameras.find((c) => c.id === id)?.reading?.level);
   // Sample data is a fallback, not a mode to get stuck in: switch to the real server as soon as it answers.
   if (!FORCE_MOCK && !probeTimer) probeTimer = setInterval(() => void connectLive().catch(() => undefined), PROBE_MS);
@@ -128,7 +159,12 @@ function startMockMode(reason: string | null): void {
 
 /** Load from the server and open the push channel. Throws when the server cannot be reached. */
 async function connectLive(): Promise<void> {
-  const [cameras, alerts] = await Promise.all([api.listCameras(), api.listAlerts().catch(() => [] as AlertEvent[])]);
+  const [cameras, alerts, barriers, barrierEvents] = await Promise.all([
+    api.listCameras(),
+    api.listAlerts().catch(() => [] as AlertEvent[]),
+    api.listBarriers().catch(() => [] as Barrier[]), // an older server has no barriers: the page simply shows none
+    api.listBarrierEvents().catch(() => [] as BarrierEvent[]),
+  ]);
   if (probeTimer) clearInterval(probeTimer);
   probeTimer = null;
   stopMock?.();
@@ -137,7 +173,7 @@ async function connectLive(): Promise<void> {
   cameras.forEach((c) => {
     if (c.reading) history = pushHistory(history, c.reading);
   });
-  setState({ cameras, alerts, unseen: [], history, status: 'ready', usingMock: false, error: null });
+  setState({ cameras, alerts, unseen: [], history, barriers, barrierEvents, status: 'ready', usingMock: false, error: null });
   closeSocket?.();
   closeSocket = openVisionSocket({
     onMessage: applyMessage,
@@ -221,6 +257,29 @@ export async function addCamera(draft: CameraDraft): Promise<Camera> {
 export async function removeCamera(cameraId: string): Promise<void> {
   if (!state.usingMock) await api.deleteCamera(cameraId);
   setState({ cameras: state.cameras.filter((c) => c.id !== cameraId) });
+}
+
+/** Operator override for a barrier. On sample data it changes only this page; with a server it needs the operator token. */
+export async function commandBarrier(barrierId: string, action: BarrierAction): Promise<void> {
+  if (state.usingMock) {
+    const now = new Date().toISOString();
+    const b = state.barriers.find((x) => x.id === barrierId);
+    if (!b) return;
+    const next: Barrier =
+      action === 'auto' ? { ...b, mode: 'auto' } : { ...b, mode: 'manual', state: action === 'close' ? 'CLOSED' : 'OPEN', changed_at: now };
+    const reason = action === 'auto' ? 'Operator resumed automatic control.' : `Operator ${action === 'close' ? 'closed' : 'opened'} the barrier.`;
+    if (action !== 'auto') next.reason = reason;
+    const event: BarrierEvent = {
+      id: `local-${barrierId}-${now}`, barrier_id: b.id, barrier_name: b.name, state: next.state, cause: action === 'auto' ? 'resume' : 'manual',
+      reason, timestamp: now, trigger: b.trigger, level: b.last_level, value: null,
+    };
+    applyMessage({ type: 'barrier', barrier: next, event });
+    return;
+  }
+  const event = await api.commandBarrier(barrierId, action);
+  // The socket also pushes this; refetching the list keeps the page right if the socket is down.
+  const barriers = await api.listBarriers().catch(() => state.barriers);
+  setState({ barriers, barrierEvents: state.barrierEvents.some((e) => e.id === event.id) ? state.barrierEvents : [event, ...state.barrierEvents].slice(0, BARRIER_LOG_MAX) });
 }
 
 export function ackAlert(alertId: string): void {

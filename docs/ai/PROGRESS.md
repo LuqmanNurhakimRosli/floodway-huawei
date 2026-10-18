@@ -2,13 +2,19 @@
 
 Read this before you change anything. Update it before you stop (rules in `/AGENTS.md`). Keep it short: detail goes in `docs/ai/CHANGELOG.md`.
 
-**Last updated:** 2026-10-12 · **Branch:** `live-ui-upgrade` · **Checks:** frontend 120 tests + build, backend 130 passed (via scripts/check.ps1)
+**Last updated:** 2026-10-18 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 144 tests + tsc + build, backend 148 passed (npm run check; pytest -q)
 
 ## Status board
 
 | Area | State | Notes |
 |---|---|---|
 | Live Vision page `/live` | Done | iPhone-style phone UI, one countdown, photo upload (`POST /cameras/upload`), 11-viewport check clean |
+| Underpass barrier loop | Done 2026-10-18 (simulated barriers) | `vision/barriers.py`: DANGER from a linked camera or depth node closes, ADVISORY or below reopens, operator override, event log, WebSocket push. B-01 follows the Klang sample camera, B-02 follows street depth node fw-node-03. Routing lists blocked routes last (`lib/routing.ts`). Bench servo: `firmware/floodway_barrier.ino`. No real barrier is connected |
+| Sensor fault filter + lead-time log | Done 2026-10-18 | `vision/fault_filter.py` holds a jump larger than water can rise until the next reading agrees (also on `/ingest`). Alerts carry `detection_delay_s`; `GET /lead-times`. No threshold in `levels.py` changed |
+| Storm lab | Done 2026-10-18 | `vision/storm_lab.py`: scripted synthetic storms replayed in simulated time through the live analyser, filter, tracker and barrier rules, filter on and off. Recorded copy for offline use: `frontend/src/data/stormLabRecorded.json`. Timing behaviour only, not field accuracy |
+| Depth from photo + evidence check | Done 2026-10-18 | Report flow rebuilt (`ReportModal.tsx`): landmark or tap-to-measure depth gives a range (`lib/depthFromPhoto.ts`), compared with the nearest camera, depth node and the AI opinion. No verdict; a person still reviews |
+| Control room `/control`, robot concept `/robot` | Done 2026-10-18 | Control room: barriers, log, fault filter health, storm lab, live alert timing. PENYU robot: three.js concept, labelled CONCEPT · NOT BUILT, targets are design targets |
+| Live AI photo check | Blocked here | The cloud sandbox network policy refuses openrouter.ai, so the AI check could not be exercised end to end in this session. The no-key and failure paths were exercised and say so honestly |
 | Map and evacuation | Done | KL only: 8 demo relief centres, 16 flood-prone areas, stored OSM routes (`node frontend/scripts/build_kl_routes.mjs` to rebuild) |
 | Sample media | Done 2026-10-12 | 60 photographic frames (5 cameras x 12-rung ladder); the page shows the rung matching the reading. Read by `ReferenceDiffAnalyzer` against each camera's dry frame; `check_ladder` PASS (4 cameras 12 of 12, drain 11 of 12). Details and limits: `backend/app/vision/sample_media/README.md` |
 | Feed overlays | Done | Photo shows clean by default (lines and waterline); the Zone and Water toggles remain |
@@ -35,10 +41,12 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 ```
 AGENTS.md  CLAUDE.md            agent rules (CLAUDE.md just imports AGENTS.md)
 README.md                       public readme
-backend/app/vision/             Live Vision: engine, analysis/ (classical, waterline), levels.py, seed.py, sources/, sample_media/
+backend/app/vision/             Live Vision: engine, analysis/ (classical, waterline), levels.py, seed.py, sources/, sample_media/,
+                                fault_filter.py, barriers.py, storm_lab.py
 backend/app/routes, services/   reports, alerts, SOS, forecast (rule-based), twin
 backend/tests/                  pytest
-frontend/src/pages, components/ React pages; components/live/ is Live Vision; components/brand/ is the logo
+frontend/src/pages, components/ React pages; components/live/ is Live Vision; components/control/ is the control room;
+                                components/robot/ is the PENYU concept; components/brand/ is the logo
 frontend/public/media/live/     webp copies of the sample frames, klang-rise.mp4
 frontend/scripts/               layout-check.mjs, map-fps.mjs, build_kl_routes.mjs
 models/ml_pipeline/             GRU forecaster code, notebooks nb1-nb4, trained weights (synthetic), ModelArts package
@@ -52,7 +60,7 @@ docs/plans/                     active plans only
 docs/reference/                 competition rules and forms, 3D house reference
 docs/screenshots/               evidence (after-c = latest, media-check = media plan)
 booth/                          film project (floodway-live-film/), MATA48 booth assets
-firmware/                       ESP32 sensor sketch
+firmware/                       ESP32 depth node sketch, ESP32 bench barrier sketch (floodway_barrier.ino)
 docs/_to-delete/                quarantine, safe to remove
 ```
 
@@ -74,6 +82,7 @@ Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, 
 
 ## Change log (newest first; one line each)
 
+- 2026-10-18 · Upgrade: underpass barrier loop (barriers.py, BarrierLayer, routing blocks closed barriers, /control), sensor fault filter + lead-time log (fault_filter.py, /lead-times), storm lab (storm_lab.py, recorded JSON), depth from photo + evidence check (ReportModal, DepthFromPhoto, EvidenceCheck, depthFromPhoto.ts), PENYU robot concept (/robot), bench barrier firmware, POST /reports guarded by the write token. Check: frontend 144 tests + build, backend 148 passed; layout check clean on /control /robot /reports /live /map /home at 5 sizes.
 - 2026-10-17 · System documentation (published artifact, not a repo file): problem, architecture, AI/ML map, IPO, workflows, API, honesty ledger, claims to correct. Checked against code: no A* or Firestore code, GRU not imported, report POST has no write token, skew limit not enforced. Repo checks not re-run (no backend venv here).
 - 2026-10-12 · Public demo & preliminary pack: scripts/public-demo.ps1 (laptop backend via Cloudflare tunnel, wrangler pages deploy), preliminary-round pack, booth motion film, Dockerfile. Check: frontend 120 tests + build, backend 130 passed.
 - 2026-10-12 · Media V2 wired (Claude, Part 2): `nearest_rung` ladder source; `ReferenceDiffAnalyzer` per sample camera (`waterline.py` gained `row_fraction` and `gap_rows`, defaults unchanged); zones re-fitted in `calibration.json`; overlays off by default; `make_water.py` moved to `docs/_to-delete/retired-code/`; `check.ps1` prefers the backend venv; master PNGs gitignored. Backend +10 tests, frontend +1.

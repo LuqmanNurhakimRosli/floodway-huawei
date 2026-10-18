@@ -1,27 +1,46 @@
-import React, { useState, useRef } from 'react';
-import {
-  X,
-  UploadCloud,
-  CheckCircle2,
-  ShieldCheck,
-  Camera,
-  MapPin,
-  Sparkles,
-  Send,
-  Radio,
-  FileImage,
-  Trash2,
-  AlertTriangle,
-} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { AlertTriangle, Camera, Info, MapPin, Send, ShieldCheck, Sparkles, UploadCloud, X } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { originForLocation } from '../../data/klDemo';
+import { useNearbySensors } from '../../hooks/useNearbySensors';
+import { compareAi, compareSensor, formatRange, midpoint, summarise } from '../../lib/depthFromPhoto';
 import { analyzeFloodImage } from '../../services/geminiVisionService';
 import { dispatchFloodIncidentReportAlert } from '../../services/telegramService';
-import { AiVerificationResult } from '../../types';
+import type { AiVerificationResult } from '../../types';
+import { btnPrimary, btnSecondary, focusRing } from '../../styles/tokens';
+import { DepthFromPhoto, type DepthEstimate } from './DepthFromPhoto';
+import { EvidenceCheck } from './EvidenceCheck';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+}
+
+// Sample photos to try the flow without a camera. Not linked to any agency.
+const SAMPLES = [
+  { src: '/banjir_drain.jpg', name: 'Drain overflow', title: 'Monsoon drain overflowing into a residential road', location: 'Seksyen 13, Shah Alam' },
+  { src: '/banjir_underpass.jpg', name: 'Underpass', title: 'Water collecting in an underpass', location: 'Sungai Rasau, Klang' },
+  { src: '/banjir2.jpg', name: 'Road spillover', title: 'Water spilling onto Jalan Raja Muda Musa', location: 'Kampung Baru, Kuala Lumpur' },
+  { src: '/banjir3.jfif', name: 'Submerged road', title: 'Road and drain under water', location: 'Taman Sri Muda, Seksyen 25' },
+];
+
+const MAX_BYTES = 10 * 1024 * 1024;
+const input = `block min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-500 ${focusRing}`;
+
+function Step({ n, title, hint, children }: { n: number; title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <section aria-labelledby={`step-${n}`} className="space-y-2.5">
+      <div>
+        <h3 id={`step-${n}`} className="flex items-center gap-2 font-heading text-base/6 font-bold text-slate-900">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">{n}</span>
+          {title}
+        </h3>
+        {hint && <p className="mt-0.5 pl-8 text-xs/4 text-slate-600">{hint}</p>}
+      </div>
+      <div className="pl-0 sm:pl-8">{children}</div>
+    </section>
+  );
 }
 
 export function ReportModal({ isOpen, onClose }: Props) {
@@ -29,430 +48,219 @@ export function ReportModal({ isOpen, onClose }: Props) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [title, setTitle] = useState('Monsoon Drain Overflowing into Residential Road');
-  const [location, setLocation] = useState(selectedLocation || 'Kampung Baru, Kuala Lumpur');
-  const [depthCm, setDepthCm] = useState(38);
-  const [selectedImage, setSelectedImage] = useState('/banjir_drain.jpg');
-  const [customFileName, setCustomFileName] = useState<string | null>('banjir_drain_overflow.jpg');
-  const [isDragging, setIsDragging] = useState(false);
-
+  const [title, setTitle] = useState(SAMPLES[0].title);
+  const [location, setLocation] = useState(SAMPLES[0].location);
+  const [image, setImage] = useState(SAMPLES[0].src);
+  const [fileName, setFileName] = useState<string>('Sample: drain overflow');
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [estimate, setEstimate] = useState<DepthEstimate | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
-  const [aiResult, setAiResult] = useState<AiVerificationResult | null>(null);
+  const [ai, setAi] = useState<AiVerificationResult | null>(null);
+
+  // The report is placed at the demo position chosen in the header; the free-text location is what people read.
+  const position = originForLocation(selectedLocation);
+  const sensors = useNearbySensors(position.lat, position.lon);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  // Real File Upload Handler (File Input & Drag & Drop)
-  const handleFile = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload a valid image file (JPG, PNG, WebP).');
-      return;
-    }
+  const pickFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return setFileError('That file is not a photo. Choose a JPG, PNG or WebP image.');
+    if (file.size > MAX_BYTES) return setFileError('That photo is larger than 10 MB. Choose a smaller one.');
     const reader = new FileReader();
     reader.onload = (e) => {
-      if (e.target?.result) {
-        setSelectedImage(e.target.result as string);
-        setCustomFileName(file.name);
-        setAiResult(null); // Reset analysis on new image
-      }
+      if (typeof e.target?.result !== 'string') return;
+      setImage(e.target.result);
+      setFileName(file.name);
+      setFileError(null);
+      setAi(null);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleRunAiVerification = async () => {
+  const runAi = async () => {
     setAnalyzing(true);
-    const result = await analyzeFloodImage({
-      imageUrl: selectedImage,
-      userDescription: title,
-      reportedDepthCm: depthCm,
-    });
-    setAiResult(result);
+    setAi(await analyzeFloodImage({ imageUrl: image, userDescription: title, reportedDepthCm: estimate ? midpoint(estimate.range) : undefined }));
     setAnalyzing(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Only claim what actually happened: a report is AI-assessed only if the check ran and judged it flooding.
-    const aiAssessed = Boolean(aiResult?.ran && aiResult.verified);
-
-    const authorName = user?.name || 'Citizen Responder';
-
+    if (!estimate) return;
+    const aiAssessed = Boolean(ai?.ran && ai.verified);
+    const depth = midpoint(estimate.range);
+    const summary = summarise([
+      compareSensor(estimate.range, sensors.camera),
+      compareSensor(estimate.range, sensors.node),
+      compareAi(estimate.range, ai?.ran ? ai.estimatedDepthCm : null),
+    ]).text;
+    const author = user?.name || 'Citizen Responder';
     addReport({
       id: `rep-${Date.now()}`,
-      title: title || 'Water Rising Rapidly on Roadside',
+      title: title || 'Water rising on the road',
       location,
-      lat: 3.1642,
-      lon: 101.7031,
-      waterDepthCm: depthCm,
+      lat: position.lat,
+      lon: position.lon,
+      waterDepthCm: depth,
+      depthRangeCm: estimate.range,
+      depthMethod: estimate.label,
+      evidenceSummary: summary.replace(' A person still reviews this report.', ''),
       status: aiAssessed ? 'AI_VERIFIED' : 'UNDER_REVIEW',
       verifiedBy: aiAssessed ? 'AI assessment (not an official verification)' : 'Not yet reviewed',
       timestampStr: 'Just now',
-      author: authorName,
+      author,
       upvotes: 1,
-      imageUrl: selectedImage,
-      description: `Reported flood incident. Depth reported by the user: ${depthCm} cm.${aiAssessed ? ' A visual AI assessment judged the photo to show flooding.' : ' No AI check was completed.'}`,
-      aiVerification: aiResult ?? undefined,
+      imageUrl: image,
+      description: `Depth from the photo: ${formatRange(estimate.range)} (${estimate.label.toLowerCase()}).${aiAssessed ? ' An AI assessment judged the photo to show flooding.' : ' No AI check was completed.'}`,
+      aiVerification: ai ?? undefined,
     });
-
-    // Immediately broadcast ground-truth flood incident alert to community via Telegram Bot
-    dispatchFloodIncidentReportAlert({
-      title: title || 'Water Rising Rapidly on Roadside',
-      location,
-      waterDepthCm: depthCm,
-      author: authorName,
-      hasPhotoEvidence: !!selectedImage,
-    });
-
+    dispatchFloodIncidentReportAlert({ title: title || 'Water rising on the road', location, waterDepthCm: depth, author, hasPhotoEvidence: true });
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-4">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95">
-        {/* Modal Header */}
-        <div className="p-5 bg-gradient-to-r from-[#071426] to-[#0B1E38] text-white flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400">
-              <Camera className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-red-400 uppercase tracking-widest block">
-                Citizen Ground-Truth Alert
-              </span>
-              <h3 className="font-heading font-bold text-base md:text-lg text-white">
-                Report Flood Hazard & Photo Evidence
-              </h3>
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-slate-950/70 backdrop-blur-sm md:items-center md:p-6" role="dialog" aria-modal="true" aria-labelledby="report-title" onClick={onClose}>
+      <form
+        onSubmit={submit}
+        onClick={(e) => e.stopPropagation()}
+        className="flex h-dvh w-full flex-col overflow-hidden bg-white md:h-auto md:max-h-[92vh] md:max-w-2xl md:rounded-3xl md:shadow-2xl"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:px-6 md:pt-4">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-700">
+              <Camera className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <h2 id="report-title" className="truncate font-heading text-lg/6 font-bold text-slate-900">Report a flood</h2>
+              <p className="truncate text-xs/4 text-slate-600">Photo, depth and a check against nearby sensors</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
-          >
-            <X className="w-5 h-5" />
+          <button type="button" onClick={onClose} aria-label="Close" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 ${focusRing}`}>
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4 max-h-[82vh] overflow-y-auto">
-          {/* Incident Title */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Incident Headline
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Water Overflowing Curbside into Residential Porch"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs md:text-sm focus:outline-none focus:border-[#1677FF]"
-            />
-          </div>
-
-          {/* Location with Auto-Capture Indicator */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Location (GPS Auto-Captured)
-              </label>
-              <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                <span>Geotagged</span>
-              </span>
-            </div>
-            <input
-              type="text"
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs md:text-sm focus:outline-none focus:border-[#1677FF]"
-            />
-          </div>
-
-          {/* Water Depth Slider */}
-          <div>
-            <div className="flex justify-between items-center mb-1 text-xs">
-              <span className="font-bold text-slate-700 uppercase tracking-wider">
-                Estimated Water Depth:
-              </span>
-              <span className="font-mono text-sm font-black text-[#1677FF]">
-                {depthCm} cm
-              </span>
-            </div>
-            <input
-              type="range"
-              min="5"
-              max="150"
-              value={depthCm}
-              onChange={(e) => setDepthCm(Number(e.target.value))}
-              className="w-full accent-[#1677FF] cursor-pointer"
-            />
-            <div className="flex justify-between text-xs text-slate-400 font-mono">
-              <span>5cm (Puddle)</span>
-              <span>35cm (Curb)</span>
-              <span>75cm (Waist)</span>
-              <span>150cm (Deep)</span>
-            </div>
-          </div>
-
-          {/* REAL IMAGE UPLOAD DROPZONE */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Upload Flood Photo (Evidence)
-            </label>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-
-            <div
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all ${
-                isDragging
-                  ? 'border-[#1677FF] bg-blue-50/50'
-                  : 'border-slate-300 hover:border-[#1677FF] hover:bg-slate-50'
-              }`}
-            >
-              {selectedImage ? (
-                <div className="flex items-center gap-3 text-left">
-                  <img
-                    src={selectedImage}
-                    alt="Preview"
-                    className="w-20 h-20 rounded-xl object-cover border border-slate-200 shadow-xs"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <span className="font-bold text-xs text-slate-900 block truncate">
-                      {customFileName || 'Flood Incident Photo'}
-                    </span>
-                    <span className="text-xs text-slate-400 block mt-0.5">
-                      Ready for automated visual verification
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        fileInputRef.current?.click();
-                      }}
-                      className="mt-2 text-xs font-bold text-[#1677FF] hover:underline flex items-center gap-1"
-                    >
-                      <UploadCloud className="w-3.5 h-3.5" />
-                      <span>Choose Different Photo</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="py-4 space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 text-[#1677FF] flex items-center justify-center mx-auto">
-                    <UploadCloud className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-800 block">
-                      Click to upload photo or drag & drop
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      Supports JPG, PNG, WebP up to 10MB
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Quick preset options */}
-            <div className="mt-2 space-y-1.5">
-              <span className="text-xs text-slate-400 font-semibold block">Or select real incident photo sample:</span>
-              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage('/banjir_drain.jpg');
-                    setCustomFileName('banjir_drain_overflow.jpg');
-                    setTitle('Monsoon Drain Overflowing into Residential Road');
-                    setLocation('Seksyen 13, Shah Alam');
-                    setDepthCm(38);
-                    setAiResult(null);
-                  }}
-                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
-                    selectedImage === '/banjir_drain.jpg'
-                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
-                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="block truncate">1. Drain Overflow</span>
-                  <span className="text-xs text-slate-400">Seksyen 13 · 38cm</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage('/banjir_underpass.jpg');
-                    setCustomFileName('banjir_rasau_underpass.jpg');
-                    setTitle('Sungai Rasau Underpass Water Accumulation');
-                    setLocation('Sungai Rasau, Klang');
-                    setDepthCm(42);
-                    setAiResult(null);
-                  }}
-                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
-                    selectedImage === '/banjir_underpass.jpg'
-                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
-                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="block truncate">2. Underpass Flood</span>
-                  <span className="text-xs text-slate-400">Sg Rasau · 42cm</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage('/banjir2.jpg');
-                    setCustomFileName('banjir_kampung_baru.jpg');
-                    setTitle('Jalan Raja Muda Musa Water Spillover');
-                    setLocation('Kampung Baru, Kuala Lumpur');
-                    setDepthCm(35);
-                    setAiResult(null);
-                  }}
-                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
-                    selectedImage === '/banjir2.jpg'
-                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
-                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="block truncate">3. Road Spillover</span>
-                  <span className="text-xs text-slate-400">Kg Baru · 35cm</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage('/banjir3.jfif');
-                    setCustomFileName('banjir_sri_muda.jpg');
-                    setTitle('Submerged Drain & Road Clogged at Seksyen 25');
-                    setLocation('Taman Sri Muda, Seksyen 25');
-                    setDepthCm(50);
-                    setAiResult(null);
-                  }}
-                  className={`text-xs p-1.5 rounded-lg border text-left font-medium transition-all cursor-pointer ${
-                    selectedImage === '/banjir3.jfif'
-                      ? 'bg-blue-50 border-blue-400 text-blue-800 font-bold'
-                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="block truncate">4. Submerged Road</span>
-                  <span className="text-xs text-slate-400">Sri Muda · 50cm</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Automated Visual AI Verification Section */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
-                <ShieldCheck className="w-4 h-4 text-[#1677FF]" />
-                <span>Automated Visual Verification</span>
-              </div>
-              <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-[#1677FF] border border-blue-200">
-                AI Active
-              </span>
-            </div>
-
-            <p className="text-xs text-slate-500 leading-snug">
-              Multimodal vision analyzes water inundation, vehicle hydrolock hazard, and depth thresholds.
-            </p>
-
+        {/* Body */}
+        <div className="flex-1 space-y-6 overflow-y-auto overscroll-contain px-4 py-5 md:px-6">
+          <Step n={1} title="Your photo" hint="Include something of known size in the water: a person, a car, a kerb or a door.">
+            <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && pickFile(e.target.files[0])} />
             <button
               type="button"
-              onClick={handleRunAiVerification}
-              disabled={analyzing}
-              className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files?.[0]) pickFile(e.dataTransfer.files[0]); }}
+              className={`flex w-full items-center gap-3 rounded-2xl border-2 border-dashed p-3 text-left ${focusRing} ${dragging ? 'border-[#0958D9] bg-blue-50' : 'border-slate-300 hover:border-[#0958D9] hover:bg-slate-50'}`}
             >
+              <img src={image} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+              <span className="min-w-0">
+                <span className="block truncate text-sm/5 font-semibold text-slate-900">{fileName}</span>
+                <span className="mt-1 inline-flex items-center gap-1.5 text-sm/5 font-semibold text-[#0958D9]">
+                  <UploadCloud className="h-4 w-4" aria-hidden="true" /> Take or choose a photo
+                </span>
+                <span className="block text-xs/4 text-slate-600">or drop one here · JPG, PNG, WebP up to 10 MB</span>
+              </span>
+            </button>
+            {fileError && <p role="alert" className="mt-2 text-sm/5 font-medium text-red-700">{fileError}</p>}
+            <div className="mt-2">
+              <p className="mb-1.5 text-xs/4 font-semibold text-slate-600">Or try a sample photo</p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {SAMPLES.map((s) => (
+                  <button
+                    key={s.src}
+                    type="button"
+                    aria-pressed={image === s.src}
+                    aria-label={`Sample photo: ${s.name}`}
+                    onClick={() => { setImage(s.src); setFileName(`Sample: ${s.name.toLowerCase()}`); setTitle(s.title); setLocation(s.location); setAi(null); setFileError(null); }}
+                    className={`overflow-hidden rounded-xl border-2 ${focusRing} ${image === s.src ? 'border-[#0958D9]' : 'border-transparent'}`}
+                  >
+                    <img src={s.src} alt="" className="aspect-square w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Step>
+
+          <Step n={2} title="How deep is it?" hint="Use what is in the photo. You get a depth range, because sizes and camera angles vary.">
+            <DepthFromPhoto imageUrl={image} onChange={setEstimate} />
+          </Step>
+
+          <Step n={3} title="Where and what">
+            <div className="grid gap-3">
+              <label className="text-xs/4 font-semibold text-slate-700">
+                Short description
+                <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Drain overflowing onto the road" className={`${input} mt-1`} />
+              </label>
+              <label className="text-xs/4 font-semibold text-slate-700">
+                Place
+                <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} className={`${input} mt-1`} />
+              </label>
+              <p className="flex items-center gap-1.5 text-xs/4 text-slate-600">
+                <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> Placed on the map at your demo position, {position.label}.
+              </p>
+            </div>
+          </Step>
+
+          <Step n={4} title="AI photo check (optional)" hint="A multimodal model gives its opinion of the photo. It is one input, not the verdict.">
+            <button type="button" onClick={() => void runAi()} disabled={analyzing} className={`${btnSecondary} w-full`}>
               {analyzing ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Analyzing Photo for Flood Inundation...</span>
-                </>
+                <><span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700 motion-reduce:animate-none" aria-hidden="true" /> Asking the model…</>
               ) : (
-                <>
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Run Visual AI Assessment</span>
-                </>
+                <><Sparkles className="h-4 w-4 text-[#0958D9]" aria-hidden="true" /> Ask the AI about this photo</>
               )}
             </button>
-
-            {aiResult && (
-              <div role="status" className={`p-3 rounded-2xl border text-xs space-y-2 ${aiResult.ran ? 'bg-sky-50/90 border-sky-300 text-sky-950' : 'bg-slate-50 border-slate-300 text-slate-800'}`}>
-                {aiResult.ran ? (
+            {ai && (
+              <div role="status" className={`mt-2 rounded-xl border p-3 text-sm/5 ${ai.ran ? 'border-sky-200 bg-sky-50 text-sky-950' : 'border-slate-200 bg-slate-50 text-slate-800'}`}>
+                {ai.ran ? (
                   <>
-                    <div className="flex items-center justify-between gap-2 font-bold">
-                      <span className="flex items-center gap-1.5 text-sky-900">
-                        <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
-                        <span>{aiResult.verified ? 'AI assessment: looks like flooding' : 'AI assessment: could not confirm flooding'} ({Math.round(aiResult.confidenceScore * 100)}% model certainty)</span>
-                      </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-sky-200/80 text-sky-900 font-bold shrink-0">~{aiResult.estimatedDepthCm} cm</span>
-                    </div>
-                    <div className="p-2 rounded-xl bg-white/80 border border-sky-200 text-xs space-y-1">
-                      <div className="text-slate-700">
-                        <b>Photo authenticity:</b> {aiResult.appearsAuthentic === true ? 'looks genuine' : aiResult.appearsAuthentic === false ? 'looks suspicious' : 'model could not tell'}. This is an opinion, not proof.
-                      </div>
-                      {aiResult.detectedHazards.length > 0 && <div className="text-slate-700"><b>Hazards seen:</b> {aiResult.detectedHazards.join(', ')}</div>}
-                      <p className="text-slate-600 italic">"{aiResult.notes}"</p>
-                    </div>
+                    <p className="flex items-start gap-1.5 font-semibold">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                      {ai.verified ? 'The model thinks this shows flooding' : 'The model could not confirm flooding'}, about {ai.estimatedDepthCm} cm deep ({Math.round(ai.confidenceScore * 100)}% of its own certainty).
+                    </p>
+                    <p className="mt-1 text-xs/4 text-slate-700">
+                      Photo looks {ai.appearsAuthentic === true ? 'genuine' : ai.appearsAuthentic === false ? 'suspicious' : 'hard to judge'} to the model. {ai.detectedHazards.length > 0 && `Hazards: ${ai.detectedHazards.join(', ')}. `}
+                      “{ai.notes}”
+                    </p>
+                    <p className="mt-1 text-right text-xs/4 text-slate-600">{ai.engine}</p>
                   </>
                 ) : (
-                  <div className="flex items-start gap-1.5 font-semibold">
-                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-slate-600" aria-hidden="true" />
-                    <span>AI check not run. {aiResult.notes}</span>
-                  </div>
+                  <p className="flex items-start gap-1.5 font-medium"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /> The AI check did not run. {ai.notes}</p>
                 )}
-                <div className="text-xs text-slate-600 text-right font-medium">{aiResult.engine}</div>
               </div>
             )}
-          </div>
+          </Step>
 
-          {/* Submission Info Notice */}
-          <div className="text-xs text-slate-500 p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-1.5">
-            <Radio className="w-3.5 h-3.5 text-[#1677FF] shrink-0 mt-0.5" />
-            <span>
-              <b>Workflow:</b> The report is saved as <b>unverified</b>. It is marked <b>AI assessed</b> only if you run the AI check above and it judges the photo to show flooding. No agency reviews it in this demo.
-            </span>
-          </div>
+          <Step n={5} title="Evidence check" hint="Your measurement next to the sensors near you. This helps the reviewer; it does not decide.">
+            <EvidenceCheck range={estimate?.range ?? null} method={estimate?.label ?? null} ai={ai} camera={sensors.camera} node={sensors.node} positionLabel={position.label} />
+          </Step>
 
-          {/* Form Actions */}
-          <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-[#1677FF] hover:bg-[#0958D9] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-500/25 cursor-pointer"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Submit for Verification</span>
+          <p className="flex items-start gap-2 rounded-xl bg-blue-50 p-3 text-xs/4 text-slate-700">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#0958D9]" aria-hidden="true" />
+            Your report is saved as unverified. It shows as AI assessed only if you ran the AI check and the model judged it flooding. No agency reviews reports in this demo.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 md:px-6">
+          <span className="min-w-0 truncate text-sm/5 text-slate-700">
+            {estimate ? <>Depth <span className="font-bold text-slate-900">{formatRange(estimate.range)}</span></> : 'Measure the depth to send'}
+          </span>
+          <div className="flex shrink-0 gap-2">
+            <span className="hidden sm:block"><button type="button" onClick={onClose} className={btnSecondary}>Cancel</button></span>
+            <button type="submit" disabled={!estimate} className={btnPrimary}>
+              <Send className="h-4 w-4" aria-hidden="true" /> Send report
             </button>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

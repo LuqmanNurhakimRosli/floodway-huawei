@@ -1,5 +1,7 @@
-import { AlertTriangle, Bike, Car, CheckCircle2, Footprints, MapPin, Navigation, Route, Waves } from 'lucide-react';
+import { AlertTriangle, Ban, Bike, Car, CheckCircle2, Footprints, MapPin, Navigation, Route, Waves } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { Shelter } from '../../types';
+import type { Barrier } from '../../types/vision';
 import type { TravelMode } from '../../lib/mappers';
 import { ORIGINS } from '../../data/klDemo';
 import { formatCapacity, formatMin, percentOf } from '../../lib/format';
@@ -23,6 +25,7 @@ interface Props {
   onScenario: (s: Scenario) => void;
   floodedCount: number;
   cameraZoneCount: number;
+  closedBarriers: Barrier[];
   shelters: Shelter[];
   best: Record<string, ScoredRoute | null>;
   selectedId: string;
@@ -98,6 +101,26 @@ export function MapPanel(p: Props) {
         </p>
       </section>
 
+      {/* Closed underpass barriers: the one thing on this panel that overrides a route */}
+      {p.closedBarriers.length > 0 && (
+        <section aria-label="Closed underpass barriers" className="rounded-2xl border border-red-300 bg-red-50 p-3">
+          <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-red-800">
+            <Ban className="h-3.5 w-3.5" aria-hidden="true" /> {p.closedBarriers.length === 1 ? 'Underpass closed' : `${p.closedBarriers.length} underpasses closed`}
+          </p>
+          <ul className="mt-1 space-y-1">
+            {p.closedBarriers.map((b) => (
+              <li key={b.id} className="text-xs text-red-900">
+                <span className="font-bold">{b.name}.</span> {b.reason}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-xs text-red-900">
+            Routes through a closed barrier are marked Blocked and listed last. Simulated barriers.{' '}
+            <Link to="/control" className="font-bold underline underline-offset-2">Open the control room</Link>
+          </p>
+        </section>
+      )}
+
       {/* Route alternatives for the selected relief centre */}
       <section aria-labelledby="routes-label">
         <p id="routes-label" className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-600">
@@ -126,15 +149,26 @@ export function MapPanel(p: Props) {
                   <span className="text-slate-700">
                     {fmtKm(r.distanceM)} · ~{formatMin(etaMin(r, p.mode))}
                   </span>
-                  <span className={`shrink-0 font-bold ${r.crossings === 0 ? 'text-emerald-700' : 'text-red-700'}`}>
-                    {r.crossings === 0 ? 'Avoids flood' : `Crosses ${r.crossings}`}
-                  </span>
+                  {r.blockedBy.length > 0 ? (
+                    <span className="flex shrink-0 items-center gap-1 font-bold text-red-700">
+                      <Ban className="h-3.5 w-3.5" aria-hidden="true" /> Blocked
+                    </span>
+                  ) : (
+                    <span className={`shrink-0 font-bold ${r.crossings === 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                      {r.crossings === 0 ? 'Avoids flood' : `Crosses ${r.crossings}`}
+                    </span>
+                  )}
                 </button>
               </li>
             ))}
           </ul>
         )}
-        {p.alternatives.length > 0 && p.alternatives[0].crossings > 0 && (
+        {p.alternatives.length > 0 && p.alternatives[0].blockedBy.length > 0 && (
+          <p role="alert" className="mt-1.5 rounded-xl border border-red-300 bg-red-50 p-2 text-xs font-semibold text-red-900">
+            Every stored route to this centre passes a closed underpass barrier. Choose another relief centre.
+          </p>
+        )}
+        {p.alternatives.length > 0 && p.alternatives[0].blockedBy.length === 0 && p.alternatives[0].crossings > 0 && (
           <p className="mt-1.5 rounded-xl border border-red-200 bg-red-50 p-2 text-xs font-semibold text-red-900">
             Every stored route crosses flooded areas in this scenario. Route A crosses the fewest.
           </p>
@@ -213,8 +247,8 @@ export function MapPanel(p: Props) {
                         <>
                           <span className="font-bold text-slate-900">{fmtKm(b.distanceM)}</span>
                           <span className="font-semibold text-[#0958D9]">~{formatMin(etaMin(b, p.mode))}</span>
-                          <span className={`font-semibold ${b.crossings === 0 ? 'text-emerald-700' : 'text-red-700'}`}>
-                            {b.crossings === 0 ? 'Avoids flood' : `Crosses ${b.crossings} flooded`}
+                          <span className={`font-semibold ${b.crossings === 0 && b.blockedBy.length === 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                            {b.blockedBy.length > 0 ? 'Blocked by a closed barrier' : b.crossings === 0 ? 'Avoids flood' : `Crosses ${b.crossings} flooded`}
                           </span>
                         </>
                       ) : (
@@ -236,10 +270,11 @@ export function MapPanel(p: Props) {
                     <button
                       type="button"
                       onClick={p.onStart}
-                      disabled={p.navigating || !p.alternatives.length}
+                      disabled={p.navigating || !p.alternatives.length || (p.alternatives[p.chosen]?.blockedBy.length ?? 0) > 0}
                       className="mt-3 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[#1677FF] text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-[#0958D9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2 disabled:opacity-50"
                     >
-                      <Navigation className="h-4 w-4" aria-hidden="true" /> {p.navigating ? 'Navigating…' : 'Start turn-by-turn'}
+                      <Navigation className="h-4 w-4" aria-hidden="true" />{' '}
+                      {p.navigating ? 'Navigating…' : (p.alternatives[p.chosen]?.blockedBy.length ?? 0) > 0 ? 'Route blocked: pick another' : 'Start turn-by-turn'}
                     </button>
                   )}
                 </div>

@@ -32,6 +32,8 @@ export interface ScoredRoute extends RoadRoute {
   /** Number of distinct flood zones this route passes through. */
   crossings: number;
   crossedIds: string[];
+  /** Closed underpass barriers on this route. A blocked route cannot be driven at all. */
+  blockedBy: string[];
 }
 
 type RawRoute = { d: number; t: number; line: LatLon[]; steps: [number, string, number, number, number][] };
@@ -76,14 +78,17 @@ export function zonesCrossed(line: LatLon[], zones: Zone[]): string[] {
   return hit;
 }
 
-/** Fewest flood zones first; ties go to the quicker route. Never hides a route that crosses water: the caller shows the count. */
-export function rankRoutes(routes: RoadRoute[], zones: Zone[]): ScoredRoute[] {
+/**
+ * Open routes before routes through a closed barrier; then fewest flood zones; ties go to the quicker route.
+ * Never hides a route: the caller shows the crossing count and any closed barrier.
+ */
+export function rankRoutes(routes: RoadRoute[], zones: Zone[], closures: Zone[] = []): ScoredRoute[] {
   return routes
     .map((r, index) => {
       const crossedIds = zonesCrossed(r.line, zones);
-      return { ...r, index, crossings: crossedIds.length, crossedIds };
+      return { ...r, index, crossings: crossedIds.length, crossedIds, blockedBy: zonesCrossed(r.line, closures) };
     })
-    .sort((a, b) => a.crossings - b.crossings || a.durationS - b.durationS);
+    .sort((a, b) => Number(a.blockedBy.length > 0) - Number(b.blockedBy.length > 0) || a.crossings - b.crossings || a.durationS - b.durationS);
 }
 
 /** Position along the line after `distM` metres (clamped), plus the heading-ready index of the segment. */

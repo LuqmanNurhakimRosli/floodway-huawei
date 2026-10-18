@@ -99,6 +99,11 @@ export interface CitizenReport {
   description?: string;
   aiVerification?: AiVerificationResult;
   humanVerification?: HumanVerificationResult;
+  /** Depth range from the resident's photo and a reference object (cm). `waterDepthCm` is its midpoint. */
+  depthRangeCm?: { lo: number; hi: number };
+  depthMethod?: string;
+  /** Plain summary of how the photo compared with nearby sensors and the AI check. Not a verification. */
+  evidenceSummary?: string;
 }
 
 export interface SosEvent {

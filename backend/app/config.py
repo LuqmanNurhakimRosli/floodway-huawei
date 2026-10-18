@@ -47,7 +47,7 @@ DEFAULT_DEVICES = {
         "secret": "fw-secret-underpass",
         "mount_height_cm": 300.0,
         "lat": 3.1832,
-        "lon": 101.6798,
+        "lon": 101.6809,
         "warning_threshold_m": 0.15,
         "danger_threshold_m": 0.30,
         "initial_level_m": 0.0

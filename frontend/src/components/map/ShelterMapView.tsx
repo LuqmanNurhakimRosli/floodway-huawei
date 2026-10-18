@@ -22,6 +22,9 @@ import { formatCapacity, formatMin } from '../../lib/format';
 import type { TravelMode } from '../../lib/mappers';
 import { etaMin, lineLengthM, pointAtDistance, rankRoutes, stepAt, toRoadRoute, type LatLon, type RoadRoute, type ScoredRoute, type Zone } from '../../lib/routing';
 import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
+import { useVisionStore } from '../../hooks/vision/useVisionStore';
+import { closedBarrierZones } from '../../lib/vision/barriers';
+import { BarrierLayer } from './BarrierLayer';
 import { useDriveSim } from '../../hooks/useDriveSim';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
@@ -88,12 +91,17 @@ export function ShelterMapView() {
     [scenario, cameraHazards],
   );
 
+  // Closed underpass barriers (simulated) are not "wet roads to avoid if possible": a route through one is blocked.
+  const { barriers } = useVisionStore();
+  const closures = useMemo(() => closedBarrierZones(barriers), [barriers]);
+  const closedBarriers = useMemo(() => barriers.filter((b) => b.state === 'CLOSED'), [barriers]);
+
   const rankedFor = useCallback(
     (shelterId: string): ScoredRoute[] => {
       const raw = routesDb?.[`${origin.id}|${shelterId}`];
-      return raw ? rankRoutes(raw.map(toRoadRoute), zones) : [];
+      return raw ? rankRoutes(raw.map(toRoadRoute), zones, closures) : [];
     },
-    [routesDb, origin.id, zones],
+    [routesDb, origin.id, zones, closures],
   );
   const alternatives = useMemo(() => (selected ? rankedFor(selected.id) : []), [rankedFor, selected]);
   const best = useMemo(() => Object.fromEntries(shelters.map((s) => [s.id, rankedFor(s.id)[0] ?? null])), [shelters, rankedFor]);
@@ -124,7 +132,7 @@ export function ShelterMapView() {
   const nextText = step ? (step.next ? `${step.next.text}` : 'Arrive at the relief centre') : '';
 
   const start = () => {
-    if (!route || !selected || selected.status === 'FULL' || selected.status === 'CLOSED') return;
+    if (!route || route.blockedBy.length > 0 || !selected || selected.status === 'FULL' || selected.status === 'CLOSED') return;
     setSnap('peek'); // on a phone the sheet must get out of the way, so the map with the route is what you see
     setArrival(null);
     sim.start();
@@ -146,6 +154,7 @@ export function ShelterMapView() {
       }}
       floodedCount={floodedZones(scenario).length}
       cameraZoneCount={cameraHazards.length}
+      closedBarriers={closedBarriers}
       shelters={shelters}
       best={best}
       selectedId={selected?.id ?? ''}
@@ -177,8 +186,8 @@ export function ShelterMapView() {
           {route ? (
             <>
               {(route.distanceM / 1000).toFixed(1)} km · ~{formatMin(etaMin(route, mode))} ·{' '}
-              <span className={route.crossings === 0 ? 'font-bold text-emerald-700' : 'font-bold text-red-700'}>
-                {route.crossings === 0 ? 'avoids flood' : `crosses ${route.crossings} flooded`}
+              <span className={route.crossings === 0 && route.blockedBy.length === 0 ? 'font-bold text-emerald-700' : 'font-bold text-red-700'}>
+                {route.blockedBy.length > 0 ? 'blocked by a closed barrier' : route.crossings === 0 ? 'avoids flood' : `crosses ${route.crossings} flooded`}
               </span>
             </>
           ) : routesDb ? (
@@ -196,7 +205,7 @@ export function ShelterMapView() {
         <button
           type="button"
           onClick={start}
-          disabled={!route || selected.status === 'FULL' || selected.status === 'CLOSED'}
+          disabled={!route || route.blockedBy.length > 0 || selected.status === 'FULL' || selected.status === 'CLOSED'}
           className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[#1677FF] px-3.5 text-xs font-bold text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] focus-visible:ring-offset-2 disabled:opacity-50"
         >
           <Navigation className="h-4 w-4" aria-hidden="true" /> Start
@@ -213,6 +222,7 @@ export function ShelterMapView() {
           <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
           <VisionHazardLayer />
           <FloodProneLayer scenario={scenario} />
+          <BarrierLayer />
           <FitRoute line={route?.line ?? null} bottomPad={desktop ? 0 : sheetH} enabled={!sim.active} />
           <FollowCar pos={car} active={sim.active} />
 

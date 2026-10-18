@@ -138,6 +138,6 @@ def seed_barriers(engine: VisionEngine) -> None:
         trigger="camera:sample-klang-jamek", trigger_name="Sg. Klang @ Masjid Jamek (sample camera)",
     ))
     engine.barriers.register(Barrier(
-        id="B-02", name="Jalan Kuching underpass B-02 (demo)", lat=3.1832, lon=101.6798, radius_m=120,
+        id="B-02", name="Jalan Kuching underpass B-02 (demo)", lat=3.1832, lon=101.6809, radius_m=120,
         trigger="node:fw-node-03", trigger_name="Underpass depth node fw-node-03",
     ))

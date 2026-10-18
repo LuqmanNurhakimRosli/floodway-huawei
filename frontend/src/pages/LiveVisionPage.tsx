@@ -1,6 +1,6 @@
-import { ChevronDown, Search, SlidersHorizontal, Video } from 'lucide-react';
+import { ChevronDown, Search, ShieldHalf, SlidersHorizontal, Video } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '../components/layout/DashboardSidebar';
 import { Header } from '../components/layout/Header';
 import { BottomNav } from '../components/layout/BottomNav';
@@ -108,7 +108,18 @@ export default function LiveVisionPage() {
                 </h1>
                 <p className="mt-0.5 hidden text-sm/5 text-slate-600 @min-[640px]/main:block">AI reads the water level from nearby river cameras every few seconds.</p>
               </div>
-              {!loading && <ConnectionChip usingMock={state.usingMock} connected={state.connected} online={onlineCount} total={state.cameras.length} />}
+              <div className="flex items-center gap-2">
+                {!loading && <ConnectionChip usingMock={state.usingMock} connected={state.connected} online={onlineCount} total={state.cameras.length} />}
+                <Link
+                  to="/control"
+                  className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-xs font-bold ${interactive} ${
+                    state.barriers.some((b) => b.state === 'CLOSED') ? 'border-red-300 bg-red-50 text-red-800' : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
+                  }`}
+                >
+                  <ShieldHalf className="h-4 w-4" aria-hidden="true" />
+                  {state.barriers.some((b) => b.state === 'CLOSED') ? 'Underpass closed' : 'Control room'}
+                </Link>
+              </div>
             </div>
             {!loading && state.usingMock && <div className="mt-3"><OfflineNotice forcedMock={FORCE_MOCK} error={state.error} /></div>}
 

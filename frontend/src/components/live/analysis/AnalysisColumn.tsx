@@ -1,4 +1,4 @@
-import { ChevronDown, Map as MapIcon } from 'lucide-react';
+import { ChevronDown, Map as MapIcon, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { isAlertLevel } from '../../../lib/vision/levels';
@@ -26,6 +26,12 @@ export function AnalysisColumn({ camera, history, action }: Props) {
     <div className="grid items-start gap-4 @min-[640px]/analysis:grid-cols-2">
       <div className="space-y-3">
         <WaterLevelCard camera={camera} history={history} />
+        {camera.online && reading?.accepted === false && (
+          <p className="flex items-start gap-2 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm/5 font-medium text-slate-800" role="status">
+            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-slate-600" aria-hidden="true" />
+            Latest reading held by the fault filter: {reading.fault ?? 'it jumped more than water can rise'}. The level waits for the next reading to agree.
+          </p>
+        )}
         {alerting && (
           <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm/5 font-medium text-amber-900">
             <MapIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />

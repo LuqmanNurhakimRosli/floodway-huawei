@@ -64,7 +64,7 @@ export function ReportPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <button
                 onClick={() => setIsCctvModalOpen(true)}
                 className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -78,7 +78,7 @@ export function ReportPage() {
                 className="px-4 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-red-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>🚨 Report Flood with Photo Evidence</span>
+                <span>Report a flood</span>
               </button>
             </div>
           </div>
