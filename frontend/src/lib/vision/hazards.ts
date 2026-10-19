@@ -1,5 +1,5 @@
 import type { Camera, Level } from '../../types/vision';
-import { isAlertLevel } from './levels';
+import { isAlertLevel } from './levelRules';
 
 /** A flood zone the evacuation map should route around. Derived from cameras at WARNING or DANGER. */
 export interface VisionHazard {

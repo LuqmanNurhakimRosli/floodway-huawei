@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "FloodWay",
+    "slug": "floodway",
+    "scheme": "floodway",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#0958D9" },
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.floodway.mobile" },
+    "android": {
+      "package": "com.floodway.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#0958D9",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"],
+      "blockedPermissions": [
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "FloodWay uses your location while the app is open to show flood areas and relief centres near you. It is not sent anywhere unless you share it.",
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      ["expo-notifications", { "color": "#0958D9" }],
+      "expo-status-bar"
+    ],
+    "experiments": { "typedRoutes": true }
+  }
+}
