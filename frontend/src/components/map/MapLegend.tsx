@@ -29,6 +29,8 @@ export function LegendList({ floodColor }: { floodColor: string }) {
     { key: 'flood', swatch: <Dot color={floodColor} />, label: 'Flooded area', source: 'Simulated scenario' },
     { key: 'watch', swatch: <Dot color="#0284C7" dashed />, label: 'Low-lying, on watch', source: 'Hand-placed demo areas' },
     { key: 'cam', swatch: <Dot color="#DC2626" />, label: 'Camera zone', source: 'Sample cameras' },
+    { key: 'verified', swatch: <Dot color="#D97706" />, label: 'Verified reports', source: 'Citizen reports, verified' },
+    { key: 'unverified', swatch: <span className="h-3 w-3 rounded-full bg-slate-500 ring-2 ring-white" />, label: 'Unverified report', source: 'Pin only, no area' },
     { key: 'shelters', swatch: <span className="text-sm leading-none text-emerald-600">⛨</span>, label: 'Relief centre', source: 'Demo list' },
   ];
   return (

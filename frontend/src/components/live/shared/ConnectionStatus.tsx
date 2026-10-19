@@ -30,7 +30,7 @@ export function OfflineNotice({ forcedMock, error }: { forcedMock: boolean; erro
       <CloudOff className="h-4 w-4 shrink-0" aria-hidden="true" />
       <span className="min-w-0">
         {forcedMock ? (
-          <>Mock mode: showing labelled sample cameras, not real feeds.</>
+          <>Sample mode: showing labelled sample cameras, not real feeds.</>
         ) : (
           <>
             <span className="font-semibold">Server unreachable.</span> Showing labelled sample cameras until it reconnects

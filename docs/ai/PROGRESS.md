@@ -2,7 +2,7 @@
 
 Read this before you change anything. Update it before you stop (rules in `/AGENTS.md`). Keep it short: detail goes in `docs/ai/CHANGELOG.md`.
 
-**Last updated:** 2026-10-18 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 152 tests + tsc + build, backend 148 passed (npm run check; pytest -q)
+**Last updated:** 2026-10-18 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 161 tests + tsc + build, backend 148 passed (npm run check; pytest -q)
 
 ## Status board
 
@@ -29,6 +29,7 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 | Brand and visual design | Done 2026-10-18 (blue again) | Original logo blue restored app-wide (accent #1677FF, filled #0958D9, dark #003EB3, sidebar #071426, page #F4F7FB); the short teal refresh is gone. 20px cards, Outfit headings, Plus Jakarta Sans body. Home: greeting + search, family card (`FamilyCard`), Near you carousel, relief list. Profile rebuilt as a settings list (personal info, family circle and location, emergency contacts, Telegram, operator token, log out) |
 | Family circle (Life360-style) | Done 2026-10-18 (simulated members) | `/map` is now a full-screen family map on phones: circle switcher (Family, Neighbours), member pins with battery and flood status, Check in, hold-to-send SOS (Telegram via the backend when set up), activity feed, places with arrival/leave alerts, Safety tab (in or within 300 m of a flood area), Route tab = the evacuation planner, for you or for a member. Only "You" can be real (phone GPS, opt-in, never uploaded); everyone else, their movement and replies are simulated and labelled. `lib/family.ts`, `services/family/familyStore.ts`, `hooks/useFamily.ts`, `components/family/`. Flood scenario moved to AppContext so Home and the map agree |
 | Welcome animation | Done 2026-10-18 | `components/brand/EvacuationLoop.tsx`: 8 s seamless SVG loop (rain, rising water, a family walking the safe route to a relief centre, alert and arrival chips). Drawn shapes only, no flood photos. Reduced motion shows one still frame |
+| Verified-report areas | Done 2026-10-19 (demo data) | Circles from verified reports on the map. Not yet used by routing and not decayed over time; see docs/ai/HANDOVER.md |
 | Other pages' touch targets | Open | Home, map, reports, profile still have targets under 44 px on phones |
 
 ## Open work, in order
@@ -87,6 +88,7 @@ Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, 
 
 ## Change log (newest first; one line each)
 
+- 2026-10-19 · Verified-report areas on the map (lib/verifiedReports.ts, components/map/VerifiedReportLayer.tsx): circles from verified reports sized by independent reporters and depth (500 m to 5 km), shaded by reporter count, labelled with count, depth and radius; unverified reports are grey pins only. Removed "prototype"/"mock" wording from three labels (kept demo/sample/simulated). Handover in docs/ai/HANDOVER.md. Check: frontend 161 tests + tsc + build.
 - 2026-10-18 · Blue brand back (reverse of the teal swap); Life360-style family map on /map (family circle, check-in, SOS, places, safety, activity, route tab), FamilyCard on Home, Profile as a settings list, animated Welcome (EvacuationLoop, no photos); legend moved into the Layers sheet; InPageActionDock removed; layout-check takes CHROME_PATH. Files: lib/family.ts, data/familyDemo.ts, services/family/familyStore.ts, hooks/useFamily.ts, components/family/*, ShelterMapView, MapPanel, BottomSheet, MapLegend, WelcomePage, ProfileSettings, AppContext, telegramService, index.css. Check: frontend 152 tests + tsc + build; layout check clean on / /home /map /reports /live /profile /control at 4-5 sizes.
 - 2026-10-18 · Upgrade: underpass barrier loop (barriers.py, BarrierLayer, routing blocks closed barriers, /control), sensor fault filter + lead-time log (fault_filter.py, /lead-times), storm lab (storm_lab.py, recorded JSON), depth from photo + evidence check (ReportModal, DepthFromPhoto, EvidenceCheck, depthFromPhoto.ts), bench barrier firmware, POST /reports guarded by the write token. Check: frontend 144 tests + build, backend 148 passed; layout check clean on /control /reports /live /map /home at 5 sizes.
 - 2026-10-18 · Visual refresh to a deep teal, travel-app style (reference supplied by the user): tokens, fonts, BottomNav, HomePage + HomeGreeting/NearYou/ReliefList, WelcomePage; CameraStatusRow removed. Check: frontend 144 tests + build; layout check clean on /home /map /reports /live /control /profile at 4 sizes.

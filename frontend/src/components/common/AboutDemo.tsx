@@ -32,7 +32,7 @@ export function AboutDemo({ tone = 'light', className = '' }: Props) {
         <li>Map data &copy; OpenStreetMap contributors.</li>
       </ul>
       <p className={`mt-2 font-semibold ${dark ? 'text-amber-300' : 'text-amber-900'}`}>
-        This is a prototype. For real flood warnings follow official sources.
+        This is a demo. For real flood warnings follow official sources.
       </p>
     </aside>
   );

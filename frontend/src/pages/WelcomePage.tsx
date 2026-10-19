@@ -62,7 +62,7 @@ export function WelcomePage() {
       {/* Copy and actions */}
       <main className="mx-auto flex w-full max-w-md flex-col justify-center px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 md:py-12">
         <p className="inline-flex w-fit items-center gap-1.5 rounded-full bg-blue-100/70 px-3 py-1 text-xs font-semibold text-[#0958D9]">
-          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Prototype for the Huawei ICT Competition 2026
+          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Demo for the Huawei ICT Competition 2026
         </p>
         <h1 className="mt-3 font-heading text-[34px]/[40px] font-extrabold tracking-tight text-slate-900 md:text-[44px]/[50px]">
           Know before the <span className="text-[#1677FF]">water</span> rises

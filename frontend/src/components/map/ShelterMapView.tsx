@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { dispatchArrivalCheckin, type TelegramResult } from '../../services/telegramService';
 import { VisionHazardLayer } from './VisionHazardLayer';
 import { FloodProneLayer, floodedZones } from './FloodProneLayer';
+import { VerifiedReportLayer } from './VerifiedReportLayer';
 import { BottomSheet, type Snap } from './BottomSheet';
 import { MapPanel, type ShelterFilter } from './MapPanel';
 import { NavigationHud } from './NavigationHud';
@@ -93,7 +94,7 @@ function FollowCar({ pos, active }: { pos: LatLon | null; active: boolean }) {
  */
 export function ShelterMapView() {
   const navigate = useNavigate();
-  const { shelters, floodScenario } = useApp();
+  const { shelters, floodScenario, reports } = useApp();
   const { user } = useAuth();
   const family = useFamily();
   const zones = useFloodZones();
@@ -265,6 +266,7 @@ export function ShelterMapView() {
           <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
           <VisionHazardLayer />
           <FloodProneLayer scenario={floodScenario} />
+          <VerifiedReportLayer reports={reports} />
           <BarrierLayer />
           <FitCircle points={memberPoints} circleId={circle.id} bottomPad={bottomPad} ready={desktop || sheetH > 0} />
           <FitRoute line={showRoute ? (route?.line ?? null) : null} bottomPad={bottomPad} enabled={showRoute && !sim.active} />
