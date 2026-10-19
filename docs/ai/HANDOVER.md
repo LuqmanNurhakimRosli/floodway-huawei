@@ -4,7 +4,7 @@ Read `docs/ai/PROGRESS.md` first, then `AGENTS.md`. This file is the short versi
 
 ## Branch and checks
 - Branch `ccr-693c90f8-qu560k`. Push with `git push -u origin ccr-693c90f8-qu560k`. Do not open a PR unless asked.
-- Frontend: `cd frontend && npm run check` (165 tests, tsc, build). Backend: `backend\.venv\Scripts\python.exe -m pytest -q` (148 passed on 2026-10-19).
+- Frontend: `cd frontend && npm run check` (167 tests, tsc, build). Backend: `backend\.venv\Scripts\python.exe -m pytest -q` (148 passed on 2026-10-19).
 - Layout: `CHROME_PATH=<browser> npm run layout-check` (set CHROME_PATH on machines without Chrome).
 
 ## What changed most recently
@@ -15,6 +15,14 @@ Read `docs/ai/PROGRESS.md` first, then `AGENTS.md`. This file is the short versi
    - `components/map/VerifiedReportLayer.tsx`: draws the circles, a permanent label on each ("3 verified reports, 35 to 50 cm, 1.9 km radius"), and pins for every non-rejected report. Unverified pins are grey and draw no area.
    - Tests: `__tests__/verifiedReports.test.ts` (9 tests).
 4. **Labels**: removed "prototype" and "mock" from the three visible strings (`AboutDemo`, `WelcomePage`, `ConnectionStatus`). Kept "demo", "sample" and "simulated" labels on purpose (see the honesty section).
+
+## Map tiles and fonts
+- `components/map/BaseMap.tsx` tries CARTO Voyager, then OpenStreetMap, then draws an offline street map from `data/klRoutes.json` (attribution reads "Offline map: saved roads only"). It re-probes the first provider every minute.
+- Fonts ship with the app (`@fontsource-variable/outfit`, `@fontsource-variable/plus-jakarta-sans`, `@fontsource/jetbrains-mono`), imported in `main.tsx`.
+- Cloud sessions block outside hosts, so tiles and openrouter.ai fail there; that is the sandbox, not the app.
+
+## Demo film
+- `booth/floodway-app-demo/` (see its README). Captures the running app, renders frame by frame, adds a generated score.
 
 ## Known gaps (not done)
 - Done 2026-10-19: verified areas feed `useFloodZones`, so routing, the Safety tab and the Home family card all avoid them. Areas use reports from the last 6 hours, fade after 1 hour (dashed outline, lower opacity), and drop out at 6 hours. Reports carry `createdAt` (ms). Older data falls back to parsing `timestampStr`, and a report with no readable time does not count. Labels name AI-assessed reports, e.g. "2 verified reports (1 AI-assessed)".

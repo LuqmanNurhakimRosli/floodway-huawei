@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FloodWay app demo film</title>
+<style>
+/* Fonts come from the frontend's own bundled copies, so the film renders offline. */
+@font-face { font-family: 'Outfit'; src: url('../../frontend/node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+@font-face { font-family: 'Jakarta'; src: url('../../frontend/node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2'); font-weight: 200 800; }
+@font-face { font-family: 'Mono'; src: url('../../frontend/node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); font-weight: 700; }
+:root { --navy: #071426; --navy2: #0B2A5B; --blue: #1677FF; --blue2: #0958D9; --sky: #8FC0FF; --ink: #E8F0FB; --muted: #A8BAD4; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--navy); }
+#stage { position: absolute; inset: 0; overflow: hidden; font-family: 'Jakarta', sans-serif; color: var(--ink); }
+#bg { position: absolute; inset: 0; background: radial-gradient(1200px 900px at 75% 40%, #0F3A7A 0%, transparent 60%), linear-gradient(160deg, #071426 0%, #0A2149 55%, #071426 100%); }
+.blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .5; }
+#grid { position: absolute; inset: 0; background-image: radial-gradient(rgba(143,192,255,.12) 1.2px, transparent 1.4px); background-size: 34px 34px; }
+#waves { position: absolute; left: 0; bottom: 0; width: 1920px; height: 220px; }
+#rain line { stroke: rgba(143,192,255,.35); stroke-width: 2; stroke-linecap: round; }
+
+#phone { position: absolute; left: 1010px; top: 64px; width: 434px; height: 952px; border-radius: 62px; background: #0B1220; padding: 12px; box-shadow: 0 50px 120px -30px rgba(0,0,0,.75), 0 0 0 2px #24324A inset, 0 0 0 1px rgba(255,255,255,.08); }
+#screen { position: relative; width: 410px; height: 928px; border-radius: 50px; overflow: hidden; background: #F4F7FB; }
+/* a status bar above the app, so the notch never covers app content; the app area is 390x844 scaled by 1.052 */
+#status { position: absolute; left: 0; right: 0; top: 0; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0; font: 700 15px/1 'Jakarta', sans-serif; color: #0E1A2B; background: #fff; }
+#inner { position: absolute; left: 0; top: 40px; width: 390px; height: 844px; transform: scale(1.0513); transform-origin: 0 0; overflow: hidden; }
+#shots img, #inner > img { position: absolute; left: 0; top: 0; width: 390px; display: block; }
+#notch { position: absolute; left: 50%; top: 9px; width: 108px; height: 28px; margin-left: -54px; border-radius: 20px; background: #0B1220; z-index: 5; }
+#overlay { position: absolute; inset: 0; pointer-events: none; }
+.hl { position: absolute; border-radius: 18px; border: 3px solid var(--blue); box-shadow: 0 0 0 6px rgba(22,119,255,.22), 0 0 30px rgba(22,119,255,.55); }
+.ripple { position: absolute; border-radius: 50%; border: 3px solid rgba(255,255,255,.95); background: rgba(22,119,255,.22); }
+.finger { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: rgba(255,255,255,.92); box-shadow: 0 6px 20px rgba(7,20,38,.45); }
+
+#callouts { position: absolute; inset: 0; pointer-events: none; }
+#links { position: absolute; inset: 0; }
+.co { position: absolute; left: 1515px; width: 360px; padding: 18px 22px; border-radius: 22px; background: rgba(255,255,255,.96); color: #0E1A2B; box-shadow: 0 24px 60px -24px rgba(0,0,0,.7); }
+.co b { display: block; font: 800 26px/1.15 'Outfit', sans-serif; }
+.co span { display: block; margin-top: 4px; font: 600 19px/1.35 'Jakarta', sans-serif; color: #44546B; }
+
+#caption { position: absolute; left: 130px; top: 0; width: 760px; }
+.kicker { font: 700 20px/1 'Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--sky); }
+.ctitle { margin-top: 18px; font: 800 72px/1.02 'Outfit', sans-serif; letter-spacing: -.01em; color: #fff; }
+.cbody { margin-top: 24px; font: 500 28px/1.5 'Jakarta', sans-serif; color: var(--muted); max-width: 720px; }
+.cbody b { color: #fff; font-weight: 700; }
+
+#diagram { position: absolute; left: 130px; top: 600px; width: 760px; height: 380px; }
+.cell { position: absolute; width: 365px; height: 178px; border-radius: 22px; background: rgba(255,255,255,.06); border: 1px solid rgba(143,192,255,.18); overflow: hidden; }
+.cell svg { position: absolute; left: 0; top: 0; }
+.cell p { position: absolute; left: 170px; top: 0; bottom: 0; width: 185px; display: flex; align-items: center; font: 700 21px/1.3 'Jakarta', sans-serif; color: #fff; }
+.cell p small { display: block; font-weight: 500; color: var(--muted); font-size: 18px; margin-top: 4px; }
+
+#chapters { position: absolute; left: 130px; bottom: 54px; display: flex; gap: 10px; }
+.ch { position: relative; padding: 10px 14px; min-width: 52px; text-align: center; white-space: nowrap; border-radius: 999px; font: 700 17px/1 'Jakarta', sans-serif; color: rgba(232,240,251,.55); background: rgba(255,255,255,.05); overflow: hidden; }
+.ch i { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--blue); }
+.ch .n { font-family: 'Mono', monospace; }
+.ch .l { display: none; margin-left: 8px; }
+.ch.on { color: #fff; background: rgba(22,119,255,.28); }
+.ch.on .l { display: inline; }
+
+#intro, #outro { position: absolute; inset: 0; }
+.brand { position: absolute; display: flex; align-items: center; gap: 28px; }
+.brand .tile { width: 132px; height: 132px; border-radius: 34px; background: #fff; display: grid; place-items: center; box-shadow: 0 30px 70px -20px rgba(0,0,0,.6); }
+.brand .tile img { width: 96px; }
+.brand h1 { font: 900 150px/1 'Outfit', sans-serif; letter-spacing: -.02em; color: #fff; }
+.tag { position: absolute; font: 700 54px/1.1 'Outfit', sans-serif; color: #fff; }
+.tag em { font-style: normal; color: var(--blue); background: linear-gradient(90deg, #4096FF, #8FC0FF); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { position: absolute; font: 500 30px/1.45 'Jakarta', sans-serif; color: var(--muted); }
+.feat { position: absolute; width: 360px; height: 128px; border-radius: 26px; background: rgba(255,255,255,.07); border: 1px solid rgba(143,192,255,.22); padding: 22px 26px; }
+.feat b { display: block; font: 800 30px/1.1 'Outfit', sans-serif; color: #fff; }
+.feat span { display: block; margin-top: 8px; font: 500 19px/1.35 'Jakarta', sans-serif; color: var(--muted); }
+.feat::before { content: ''; position: absolute; left: 0; top: 22px; bottom: 22px; width: 4px; border-radius: 4px; background: var(--blue); }
+.honest { position: absolute; font: 600 21px/1.4 'Jakarta', sans-serif; color: rgba(168,186,212,.9); }
+#fade { position: absolute; inset: 0; background: var(--navy); pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg">
+    <div class="blob" id="b1" style="width:700px;height:700px;background:#1677FF"></div>
+    <div class="blob" id="b2" style="width:600px;height:600px;background:#22D3EE;opacity:.18"></div>
+    <div id="grid"></div>
+    <svg id="rain" width="1920" height="1080" style="position:absolute;inset:0"></svg>
+    <svg id="waves" viewBox="0 0 1920 220" preserveAspectRatio="none">
+      <path id="w1" fill="rgba(22,119,255,.20)"></path>
+      <path id="w2" fill="rgba(22,119,255,.32)"></path>
+    </svg>
+  </div>
+
+  <div id="caption"><div class="kicker" id="ck"></div><div class="ctitle" id="ct"></div><div class="cbody" id="cb"></div></div>
+  <div id="diagram"></div>
+
+  <div id="phone"><div id="screen">
+    <div id="status"><span>9:41</span><svg width="64" height="14" viewBox="0 0 64 14" aria-hidden="true"><g fill="#0E1A2B"><rect x="0" y="9" width="3" height="5" rx="1"/><rect x="5" y="6" width="3" height="8" rx="1"/><rect x="10" y="3" width="3" height="11" rx="1"/><rect x="15" y="0" width="3" height="14" rx="1"/><path d="M31 13l-3.5-3.5a5 5 0 0 1 7 0zM25 7a8.5 8.5 0 0 1 12 0l-1.6 1.6a6.2 6.2 0 0 0-8.8 0zM22.4 4.4a12.2 12.2 0 0 1 17.2 0L38 6a10 10 0 0 0-14 0z"/><rect x="44" y="1.5" width="17" height="11" rx="3" fill="none" stroke="#0E1A2B" stroke-width="1.4"/><rect x="46" y="3.5" width="11" height="7" rx="1.5"/><rect x="62" y="5" width="1.6" height="4" rx=".8"/></g></svg></div>
+    <div id="inner">
+      <img id="welcome" alt="">
+      <div id="shots"></div>
+      <img id="nav" alt="">
+      <div id="overlay"></div>
+    </div>
+    <div id="notch"></div>
+  </div></div>
+
+  <div id="callouts"><svg id="links" width="1920" height="1080"></svg></div>
+  <div id="chapters"></div>
+
+  <div id="intro">
+    <div class="brand" id="ibrand" style="left:130px;top:330px"><div class="tile"><img src="../../frontend/public/logo.svg" alt=""></div><h1>FloodWay</h1></div>
+    <div class="tag" id="itag" style="left:130px;top:520px">Know before the <em>water</em> rises.</div>
+    <div class="sub" id="isub" style="left:130px;top:610px;width:820px">A flood early-warning and evacuation app for families in Kuala Lumpur. Here is every feature, on a phone.</div>
+  </div>
+
+  <div id="outro">
+    <div class="sub" id="ohead" style="left:130px;top:150px;font:800 60px/1.05 Outfit,sans-serif;color:#fff">Everything in one app</div>
+    <div id="feats"></div>
+    <div class="brand" id="obrand" style="left:50%;top:370px;transform:translateX(-50%)"><div class="tile"><img src="../../frontend/public/logo.svg" alt=""></div><h1>FloodWay</h1></div>
+    <div class="tag" id="otag" style="left:0;right:0;top:560px;text-align:center">Know before the <em>water</em> rises.</div>
+    <div class="honest" id="ohonest" style="left:0;right:0;top:680px;text-align:center">Demo data: sample camera scenes, a simulated family circle and flood scenario.<br>Demo for the Huawei ICT Competition 2026.</div>
+  </div>
+  <div id="fade"></div>
+</div>
+
+<script>
+(() => {
+const BOXES = /*BOXES*/{}/*END*/;
+const CAP = 'cap/';
+const LOOP_FRAMES = 240, LOOP_FPS = 30;
+const PH = { x: 1010, y: 64, sx: 1022, sy: 116, k: 1.0513 };
+const $ = (id) => document.getElementById(id);
+
+// ── easing and timing helpers ──
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lin = (t, a, b) => clamp((t - a) / (b - a));
+const outExpo = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const inCubic = (x) => x * x * x;
+/** 0 to 1 to 0: in over `fi` from a, out over `fo` ending at b. */
+const vis = (t, a, b, fi = 0.5, fo = 0.35) => Math.min(outExpo(lin(t, a, a + fi)), 1 - inCubic(lin(t, b - fo, b)));
+const keys = (t, ks) => {
+  if (t <= ks[0][0]) return ks[0][1];
+  for (let i = 1; i < ks.length; i++) if (t <= ks[i][0]) return ks[i - 1][1] + (ks[i][1] - ks[i - 1][1]) * inOut(lin(t, ks[i - 1][0], ks[i][0]));
+  return ks[ks.length - 1][1];
+};
+
+const B = (scene, key) => BOXES[scene]?.[key];
+const union = (a, b) => ({ x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.max(a.x + a.w, b.x + b.w) - Math.min(a.x, b.x), h: Math.max(a.y + a.h, b.y + b.h) - Math.min(a.y, b.y) });
+
+// ── the timeline ──
+const T_END = 116;
+const CHAPTERS = [['Opening', 4.4], ['Home', 14.6], ['Family map', 29.2], ['SOS', 44], ['Verified reports', 57.2], ['Safe routes', 70.6], ['Reports', 82.2], ['Live Vision', 94.2], ['Control room', 103.2]];
+const CH_END = 109.2;
+
+const homeScroll = [[14.6, 0], [17.6, 0], [19, B('home', 'family').y - 150], [22.2, B('home', 'family').y - 150], [23.6, B('home', 'near').y - 120], [26.2, B('home', 'near').y - 120], [27.4, B('home', 'relief').y - 150], [29.4, B('home', 'relief').y - 150]];
+const controlH = (BOXES.control?.imgH ?? 3418);
+const controlScroll = [[103.2, 0], [104.8, 0], [106.6, 760], [107.4, 760], [109, Math.min(1500, controlH - 844)]];
+const SHOTS = [
+  { img: 'home', t0: 14.6, t1: 29.6, scroll: homeScroll, nav: 'nav-home' },
+  { img: 'map-people', t0: 29.2, t1: 33.9 },
+  { img: 'map-safety', t0: 33.5, t1: 37 },
+  { img: 'map-tokwan', t0: 36.6, t1: 41 },
+  { img: 'map-places', t0: 40.6, t1: 44.4 },
+  { img: 'sos-hold', t0: 44, t1: 48 },
+  { img: 'sos-sent', t0: 47.6, t1: 50.6 },
+  { img: 'sos-map', t0: 50.2, t1: 53 },
+  { img: 'checkin', t0: 52.6, t1: 54.8 },
+  { img: 'checkin-done', t0: 54.4, t1: 56 },
+  { img: 'activity', t0: 55.6, t1: 57.6 },
+  { img: 'map-verified', t0: 57.2, t1: 71 },
+  { img: 'map-layers', t0: 70.6, t1: 73.8 },
+  { img: 'map-route', t0: 73.4, t1: 77.4 },
+  { img: 'map-drive', t0: 77, t1: 82.6 },
+  { img: 'reports', t0: 82.2, t1: 84.8 },
+  { img: 'report-photo', t0: 84.4, t1: 88 },
+  { img: 'report-depth', t0: 87.6, t1: 91.4 },
+  { img: 'report-evidence', t0: 91, t1: 94.6 },
+  { img: 'live', t0: 94.2, t1: 103.6 },
+  { img: 'control', t0: 103.2, t1: 117, scroll: controlScroll },
+];
+
+const HIGHLIGHTS = [
+  { scene: 'home', box: B('home', 'hero'), a: 15.2, b: 17.4, title: 'Area status', text: 'One level, and how fresh it is', scroll: homeScroll },
+  { scene: 'home', box: B('home', 'family'), a: 19.2, b: 22.1, title: 'Your family', text: 'Who is safe, who needs help', scroll: homeScroll },
+  { scene: 'home', box: B('home', 'near'), a: 23.8, b: 26.1, title: 'Near you', text: 'Cameras, underpasses, centres', scroll: homeScroll },
+  { scene: 'home', box: B('home', 'relief'), a: 27.6, b: 29.3, title: 'Relief centres', text: 'Distance, time, how full', scroll: homeScroll },
+  { box: B('map-people', 'switcher'), a: 29.9, b: 31.3, title: 'Circles', text: 'Family and Neighbours' },
+  { box: union(B('map-people', 'pills'), B('map-people', 'sos')), a: 31.4, b: 33.2, title: 'Check in and SOS', text: 'Always one tap away' },
+  { box: B('map-safety', 'summary'), a: 34, b: 36.4, title: 'Who needs help first', text: 'In, or within 300 m of, a flood area' },
+  { box: B('map-tokwan', 'card'), a: 37.1, b: 40.3, title: 'Tok Wan, 18% battery', text: 'Plan, send, or ask to check in' },
+  { box: B('map-places', 'list'), a: 41.1, b: 43.7, title: 'Places', text: 'Alerts on arriving and leaving' },
+  { box: B('sos-map', 'banner'), a: 50.7, b: 52.3, title: 'SOS is on', text: 'The whole circle sees it' },
+  { box: B('map-verified', 'label'), a: 57.9, b: 63.4, title: 'Verified area', text: 'Count, depth and radius' },
+  { box: B('map-layers', 'scenario'), a: 71.1, b: 73.3, title: 'Flood scenario', text: 'Normal, Warning or Danger' },
+  { box: B('map-route', 'from'), a: 73.9, b: 76.8, title: 'Your route, or theirs', text: 'Avoids every flood zone' },
+];
+
+const tabX = (i) => { const tb = B('map-people', 'tabs'); return { x: tb.x + tb.w * (i + 0.5) / 4, y: tb.y + tb.h / 2 }; };
+const ctr = (b) => ({ x: b.x + b.w / 2, y: b.y + b.h / 2 });
+const TAPS = [
+  { t: 13.9, ...ctr(B('welcome', 'cta')) },
+  { t: 33.3, ...tabX(1) },
+  { t: 40.4, ...tabX(2) },
+  { t: 43.8, ...ctr(B('map-people', 'sos')) },
+  { t: 52.2, ...ctr(B('map-people', 'pills')) },
+  { t: 70.4, x: 354, y: 300 },
+  { t: 73.2, ...tabX(3) },
+];
+
+const CAPTIONS = [
+  { a: 5.8, b: 14.4, k: '01 · Opening', t: 'A calm, clear start', c: 'The app opens on a looping evacuation scene: rain, rising water, and a family walking the safe route to a relief centre. <b>Drawn shapes only, never flood footage.</b>' },
+  { a: 14.8, b: 21.9, k: '02 · Home', t: 'Flood risk at a glance', c: 'One status for your area from the river cameras, with how fresh the reading is. Right below it: <b>your family, and who needs attention.</b>' },
+  { a: 22.1, b: 29.1, k: '02 · Home', t: 'What is near you', c: 'River cameras, closed underpasses and relief centres as swipeable cards. Then the nearest centres, with <b>distance, travel time and how full</b> each one is.' },
+  { a: 29.4, b: 36.4, k: '03 · Family map', t: 'See where your family is', c: 'Everyone’s position, battery, and whether they are <b>in or near a flood area</b>. The Safety tab puts the people who need help first.' },
+  { a: 36.6, b: 43.8, k: '03 · Family map', t: 'Help the right person', c: 'Tok Wan is inside a flood area with 18% battery. <b>Plan her route, send it to her, or ask her to check in.</b>' },
+  { a: 44.1, b: 52.2, k: '04 · SOS', t: 'Hold for SOS', c: 'A two-second hold, so a pocket tap cannot send it. Your circle sees <b>your position and the nearest open relief centre</b>. It also goes to Telegram when the server is set up.' },
+  { a: 52.4, b: 57, k: '04 · Check in', t: 'Check in as safe', c: 'One tap tells the circle where you are. Every check-in, SOS and arrival lands in the <b>activity feed</b>.' },
+  { a: 57.4, b: 70.4, k: '05 · Verified reports', t: 'Reports become flood areas', c: 'Only verified reports draw an area. It grows with <b>independent people, not repeat taps</b>, and fades as reports age.' },
+  { a: 70.8, b: 76.9, k: '06 · Safe routes', t: 'Routes that avoid the water', c: 'Pick a flood scenario and a relief centre. Routes avoid <b>flooded areas, verified report areas and closed underpasses</b>.' },
+  { a: 77.1, b: 82, k: '06 · Safe routes', t: 'Turn-by-turn to safety', c: 'Directions on real roads from OpenStreetMap. In the demo the drive is simulated, and arriving <b>checks you in</b>.' },
+  { a: 82.4, b: 87.4, k: '07 · Reports', t: 'Report a flood in seconds', c: 'Take a photo, or try one of the sample photos, and say where it is. <b>No account needed.</b>' },
+  { a: 87.6, b: 94, k: '07 · Reports', t: 'Depth from the photo', c: 'Compare the water with a kerb, a car door or a person to get a <b>depth range</b>. The evidence check sets it beside the nearest camera and sensor. <b>A person still reviews it.</b>' },
+  { a: 94.4, b: 103, k: '08 · Live Vision', t: 'Cameras read the water', c: 'Each camera’s water level is read every few seconds and graded <b>Normal, Advisory, Warning or Danger</b>. The cameras here are sample scenes, labelled SAMPLE.' },
+  { a: 103.4, b: 109, k: '09 · Control room', t: 'Underpasses close in time', c: 'A barrier closes when its camera or depth sensor reads Danger and reopens when the water falls. A fault filter holds impossible jumps. <b>Barriers are simulated in this demo.</b>' },
+];
+
+const FEATURES = [
+  ['Flood alerts', 'Area status from river cameras'], ['Family circle', 'Positions, battery, flood risk'], ['SOS and check-in', 'Hold to send, one tap safe'], ['Verified reports', 'Areas from independent people'],
+  ['Safe routes', 'Around water and closed underpasses'], ['Photo depth check', 'A depth range, then a review'], ['Live Vision', 'Water level every few seconds'], ['Control room', 'Barriers, fault filter, storm lab'],
+];
+
+// ── build the DOM once ──
+const shotEls = SHOTS.map((s) => { const im = new Image(); im.src = CAP + s.img + '.png'; im.alt = ''; $('shots').appendChild(im); return im; });
+const navEl = $('nav'); navEl.src = CAP + 'nav-home.png';
+const hlEls = HIGHLIGHTS.map(() => { const d = document.createElement('div'); d.className = 'hl'; $('overlay').appendChild(d); return d; });
+const coEls = HIGHLIGHTS.map((h) => { const d = document.createElement('div'); d.className = 'co'; d.innerHTML = `<b>${h.title}</b><span>${h.text}</span>`; $('callouts').appendChild(d); return d; });
+const linkEls = HIGHLIGHTS.map(() => { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('fill', 'none'); p.setAttribute('stroke', '#8FC0FF'); p.setAttribute('stroke-width', '3'); p.setAttribute('stroke-dasharray', '2 8'); p.setAttribute('stroke-linecap', 'round'); $('links').appendChild(p); return p; });
+const dotEls = HIGHLIGHTS.map(() => { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('r', '7'); c.setAttribute('fill', '#1677FF'); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', '3'); $('links').appendChild(c); return c; });
+const tapEls = TAPS.map(() => { const r = document.createElement('div'); r.className = 'ripple'; const f = document.createElement('div'); f.className = 'finger'; $('overlay').append(r, f); return { r, f }; });
+// SOS hold ring drawn over the captured button
+const ring = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ring.setAttribute('width', '390'); ring.setAttribute('height', '844'); ring.style.position = 'absolute'; ring.style.left = '0'; ring.style.top = '0';
+const rb = B('sos-hold', 'ring'), rc = ctr(rb), rr = rb.w / 2 - 6;
+ring.innerHTML = `<circle id="ringArc" cx="${rc.x}" cy="${rc.y}" r="${rr}" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" transform="rotate(-90 ${rc.x} ${rc.y})" stroke-dasharray="0 ${2 * Math.PI * rr}"/>`;
+$('overlay').appendChild(ring);
+const ringArc = ring.querySelector('#ringArc');
+const chEls = CHAPTERS.map(([n], i) => { const d = document.createElement('div'); d.className = 'ch'; d.innerHTML = `<span class="n">${String(i + 1).padStart(2, '0')}</span><span class="l">${n}</span><i></i>`; $('chapters').appendChild(d); return d; });
+const featEls = FEATURES.map(([b, s], i) => { const d = document.createElement('div'); d.className = 'feat'; d.innerHTML = `<b>${b}</b><span>${s}</span>`; d.style.left = `${130 + (i % 4) * 400}px`; d.style.top = `${300 + Math.floor(i / 4) * 160}px`; $('feats').appendChild(d); return d; });
+
+// rain
+const rainLines = Array.from({ length: 70 }, (_, i) => {
+  const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  $('rain').appendChild(l);
+  return { l, x: (i * 137.5) % 1960, sp: 420 + ((i * 53) % 260), ph: (i * 0.37) % 1, len: 26 + ((i * 11) % 22) };
+});
+const wavePath = (t, amp, len, speed, base) => {
+  let d = `M0 220 L0 ${base}`;
+  for (let x = 0; x <= 1920; x += 24) d += ` L${x} ${(base + Math.sin((x / len) * Math.PI * 2 + t * speed) * amp).toFixed(1)}`;
+  return d + ' L1920 220 Z';
+};
+
+// verified-report diagram: four cells
+const CELLS = [
+  { a: 58.4, title: 'Unverified', sub: 'a grey pin, never an area' },
+  { a: 61.2, title: '1 verified report', sub: 'a small area, about 500 m' },
+  { a: 64.0, title: '3 different people', sub: 'bigger and brighter' },
+  { a: 66.8, title: 'As reports age', sub: 'fades after 1 h, gone at 6 h' },
+];
+const cellEls = CELLS.map((c, i) => {
+  const d = document.createElement('div'); d.className = 'cell';
+  d.style.left = `${(i % 2) * 390}px`; d.style.top = `${Math.floor(i / 2) * 200}px`;
+  d.innerHTML = `<svg width="160" height="178" viewBox="0 0 160 178"><rect width="160" height="178" fill="#E9EFF7"/><path d="M0 60 L160 40 M20 0 L60 178 M0 130 L160 150 M110 0 L130 178" stroke="#fff" stroke-width="8"/><g class="g"></g></svg><p><span>${c.title}<small>${c.sub}</small></span></p>`;
+  $('diagram').appendChild(d);
+  return d;
+});
+const pin = (x, y, col) => `<circle cx="${x}" cy="${y}" r="9" fill="${col}" stroke="#fff" stroke-width="3"/>`;
+cellEls[0].querySelector('.g').innerHTML = pin(70, 80, '#64748B') + pin(100, 110, '#64748B');
+cellEls[1].querySelector('.g').innerHTML = `<circle class="c" cx="80" cy="89" r="34" fill="#D97706" fill-opacity=".22" stroke="#D97706" stroke-width="3"/>` + pin(80, 89, '#D97706');
+cellEls[2].querySelector('.g').innerHTML = `<circle class="c" cx="80" cy="89" r="66" fill="#DC2626" fill-opacity=".38" stroke="#DC2626" stroke-width="3"/>` + pin(66, 78, '#DC2626') + pin(96, 86, '#DC2626') + pin(78, 106, '#DC2626');
+cellEls[3].querySelector('.g').innerHTML = `<circle class="c" cx="80" cy="89" r="66" fill="#DC2626" fill-opacity=".38" stroke="#DC2626" stroke-width="3"/>` + pin(80, 89, '#DC2626');
+
+// welcome frames: decoded once, swapped by index
+const welcomeFrames = Array.from({ length: LOOP_FRAMES }, (_, i) => { const im = new Image(); im.src = `${CAP}welcome/f${String(i).padStart(3, '0')}.jpg`; return im; });
+const welcomeEl = $('welcome');
+let lastWelcome = -1;
+
+function setCaption(t) {
+  const c = CAPTIONS.find((x) => t >= x.a && t < x.b);
+  const k = $('ck'), ti = $('ct'), b = $('cb');
+  if (!c) { $('caption').style.opacity = 0; return; }
+  if (k.dataset.id !== String(c.a)) { k.dataset.id = String(c.a); k.textContent = c.k; ti.textContent = c.t; b.innerHTML = c.c; }
+  $('caption').style.opacity = 1;
+  const top = c.k.startsWith('05') ? 150 : 280;
+  $('caption').style.top = `${top}px`;
+  const part = (el, d) => { const p = vis(t, c.a + d, c.b, 0.8, 0.35); el.style.opacity = p; el.style.transform = `translateY(${(1 - p) * 34}px)`; };
+  part(k, 0); part(ti, 0.08); part(b, 0.18);
+}
+
+window.renderFrame = async (t) => {
+  // background motion
+  $('b1').style.transform = `translate(${1000 + Math.sin(t * 0.21) * 160}px, ${120 + Math.cos(t * 0.17) * 90}px)`;
+  $('b2').style.transform = `translate(${200 + Math.cos(t * 0.13) * 200}px, ${560 + Math.sin(t * 0.19) * 80}px)`;
+  $('w1').setAttribute('d', wavePath(t, 14, 640, 0.9, 120));
+  $('w2').setAttribute('d', wavePath(t, 10, 420, -1.3, 150));
+  const rainOn = 1 - lin(t, 6, 9) + lin(t, 109.5, 111) * 0.6;
+  rainLines.forEach((r) => {
+    const y = (((t * r.sp) / 1100 + r.ph) % 1) * 1180 - 80;
+    const x = r.x - y * 0.18;
+    r.l.setAttribute('x1', x); r.l.setAttribute('y1', y); r.l.setAttribute('x2', x - r.len * 0.18); r.l.setAttribute('y2', y + r.len);
+    r.l.style.opacity = rainOn;
+  });
+
+  // intro
+  const io = 1 - inCubic(lin(t, 5.2, 6.0));
+  ['ibrand', 'itag', 'isub'].forEach((id, i) => {
+    const p = outExpo(lin(t, 0.4 + i * 0.35, 1.6 + i * 0.35));
+    $(id).style.opacity = p * io; $(id).style.transform = `translateY(${(1 - p) * 40}px)`;
+  });
+
+  // phone: slides in, floats, steps aside for the outro
+  const pIn = outExpo(lin(t, 4.2, 5.8));
+  const pout = inCubic(lin(t, 109, 110.2));
+  const px = (1 - pIn) * 760 + pout * 900;
+  const float = Math.sin(t * 0.8) * 4;
+  $('phone').style.transform = `translate(${px}px, ${float}px) rotate(${(1 - pIn) * 6}deg)`;
+  $('phone').style.opacity = pIn * (1 - pout);
+
+  // welcome loop frames
+  const wi = ((Math.floor((t - 4.2) * LOOP_FPS) % LOOP_FRAMES) + LOOP_FRAMES) % LOOP_FRAMES;
+  welcomeEl.style.opacity = t < 15.2 ? 1 : 0;
+  if (t < 15.2 && wi !== lastWelcome) {
+    lastWelcome = wi;
+    welcomeEl.src = welcomeFrames[wi].src;
+    try { await welcomeEl.decode(); } catch (e) {}
+  }
+
+  // screens
+  SHOTS.forEach((s, i) => {
+    const el = shotEls[i];
+    const on = t >= s.t0 - 0.01 && t < s.t1;
+    el.style.display = on ? 'block' : 'none';
+    if (!on) return;
+    el.style.opacity = outExpo(lin(t, s.t0, s.t0 + 0.4));
+    const y = s.scroll ? keys(t, s.scroll) : 0;
+    el.style.transform = `translateY(${-y}px)`;
+  });
+  const homeOn = t >= 14.6 && t < 29.6;
+  navEl.style.display = homeOn ? 'block' : 'none';
+  navEl.style.top = '779px'; navEl.style.opacity = outExpo(lin(t, 14.6, 15));
+
+  // highlights and callouts
+  const lineParts = [];
+  HIGHLIGHTS.forEach((h, i) => {
+    const p = vis(t, h.a, h.b, 0.45, 0.3);
+    const hl = hlEls[i], co = coEls[i], ln = linkEls[i], dot = dotEls[i];
+    if (p <= 0.001 || !h.box) { hl.style.opacity = 0; co.style.opacity = 0; ln.style.opacity = 0; dot.style.opacity = 0; return; }
+    const sy = h.scroll ? keys(t, h.scroll) : 0;
+    const bx = h.box, pad = 6, y = bx.y - sy;
+    hl.style.left = `${bx.x - pad}px`; hl.style.top = `${y - pad}px`; hl.style.width = `${bx.w + pad * 2}px`; hl.style.height = `${bx.h + pad * 2}px`;
+    hl.style.opacity = p; hl.style.transform = `scale(${1.04 - 0.04 * p})`;
+    // stage coordinates of the box's right edge, middle
+    const ex = PH.sx + (bx.x + bx.w + pad) * PH.k, ey = PH.sy + (y + bx.h / 2) * PH.k + Math.sin(t * 0.8) * 4;
+    const cy = clamp(ey - 50, 90, 900);
+    co.style.top = `${cy}px`; co.style.left = `${PH.x + 434 + 48}px`; co.style.opacity = p; co.style.transform = `translateX(${(1 - p) * 40}px)`;
+    ln.setAttribute('d', `M${ex} ${ey} C ${ex + 30} ${ey}, ${PH.x + 434 + 18} ${cy + 50}, ${PH.x + 434 + 48} ${cy + 50}`);
+    ln.style.opacity = p; dot.setAttribute('cx', ex); dot.setAttribute('cy', ey); dot.style.opacity = p;
+  });
+
+  // taps: a fingertip lands, then a ripple
+  TAPS.forEach((tp, i) => {
+    const { r, f } = tapEls[i];
+    const fp = vis(t, tp.t - 0.45, tp.t + 0.25, 0.25, 0.2);
+    f.style.left = `${tp.x}px`; f.style.top = `${tp.y}px`; f.style.opacity = fp * 0.95;
+    f.style.transform = `scale(${t < tp.t ? 1 : 0.8})`;
+    const rp = lin(t, tp.t, tp.t + 0.6);
+    const sz = 20 + rp * 90;
+    r.style.left = `${tp.x - sz / 2}px`; r.style.top = `${tp.y - sz / 2}px`; r.style.width = r.style.height = `${sz}px`;
+    r.style.opacity = rp > 0 && rp < 1 ? 1 - rp : 0;
+  });
+
+  // SOS hold: the ring fills over two seconds while the finger holds
+  const hold = lin(t, 45.4, 47.4);
+  const holdOn = t >= 44.9 && t < 47.7;
+  ring.style.display = holdOn ? 'block' : 'none';
+  ringArc.setAttribute('stroke-dasharray', `${hold * 2 * Math.PI * rr} ${2 * Math.PI * rr}`);
+  if (holdOn) {
+    const f = tapEls[0].f; // borrow one fingertip for the hold
+    f.style.left = `${rc.x}px`; f.style.top = `${rc.y}px`; f.style.opacity = vis(t, 44.9, 47.7, 0.3, 0.25) * 0.95; f.style.transform = 'scale(0.85)';
+  }
+
+  // diagram for the verified-report rules
+  const dOn = vis(t, 57.6, 70.4, 0.4, 0.4);
+  $('diagram').style.opacity = dOn;
+  CELLS.forEach((c, i) => {
+    const p = outExpo(lin(t, c.a, c.a + 0.7));
+    cellEls[i].style.opacity = p; cellEls[i].style.transform = `translateY(${(1 - p) * 26}px) scale(${0.96 + 0.04 * p})`;
+    const circ = cellEls[i].querySelector('.c');
+    if (circ && i > 0 && i < 3) circ.setAttribute('r', String((i === 1 ? 34 : 66) * (0.4 + 0.6 * outExpo(lin(t, c.a + 0.2, c.a + 1.2)))));
+    if (i === 3 && circ) {
+      const age = lin(t, c.a + 0.8, c.a + 3.0);
+      circ.setAttribute('fill-opacity', String(0.38 * (1 - age * 0.85)));
+      circ.setAttribute('stroke-opacity', String(1 - age * 0.75));
+      circ.setAttribute('stroke-dasharray', age > 0.05 ? '8 7' : '');
+    }
+  });
+
+  setCaption(t);
+
+  // chapters
+  const chOn = vis(t, 5.2, CH_END, 0.6, 0.5);
+  $('chapters').style.opacity = chOn;
+  CHAPTERS.forEach(([, s], i) => {
+    const e = i + 1 < CHAPTERS.length ? CHAPTERS[i + 1][1] : CH_END;
+    const on = t >= s && t < e;
+    chEls[i].classList.toggle('on', on);
+    chEls[i].querySelector('i').style.width = `${(t >= e ? 1 : on ? lin(t, s, e) : 0) * 100}%`;
+  });
+
+  // outro: feature grid, then the brand
+  const gridOn = vis(t, 109.6, 112.8, 0.6, 0.45);
+  $('ohead').style.opacity = gridOn; $('ohead').style.transform = `translateY(${(1 - outExpo(lin(t, 109.6, 110.4))) * 30}px)`;
+  featEls.forEach((el, i) => {
+    const p = outExpo(lin(t, 109.9 + i * 0.12, 110.7 + i * 0.12));
+    el.style.opacity = Math.min(p, gridOn); el.style.transform = `translateY(${(1 - p) * 30}px)`;
+  });
+  ['obrand', 'otag', 'ohonest'].forEach((id, i) => {
+    const p = outExpo(lin(t, 113 + i * 0.3, 114 + i * 0.3));
+    $(id).style.opacity = p;
+    $(id).style.transform = (id === 'obrand' ? 'translateX(-50%) ' : '') + `translateY(${(1 - p) * 30}px)`;
+  });
+  $('fade').style.opacity = Math.max(1 - lin(t, 0, 0.5), inCubic(lin(t, T_END - 0.7, T_END)));
+};
+
+window.FILM_SECONDS = T_END;
+Promise.all([...document.images].map((i) => i.decode().catch(() => {})).concat(welcomeFrames.slice(0, 2).map((i) => i.decode().catch(() => {}))))
+  .then(() => document.fonts.ready)
+  .then(() => { window.renderFrame(0).then(() => { window.FLOODWAY_READY = true; }); });
+
+// preview in a normal browser: play in real time (?t=40 starts at 40 s)
+if (!location.search.includes('render')) {
+  const start = Number(new URLSearchParams(location.search).get('t') || 0);
+  const t0 = performance.now() - start * 1000;
+  const loop = async () => { await window.renderFrame(((performance.now() - t0) / 1000) % T_END); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+}
+})();
+</script>
+</body>
+</html>

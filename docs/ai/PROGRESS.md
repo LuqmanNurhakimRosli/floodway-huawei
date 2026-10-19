@@ -2,7 +2,7 @@
 
 Read this before you change anything. Update it before you stop (rules in `/AGENTS.md`). Keep it short: detail goes in `docs/ai/CHANGELOG.md`.
 
-**Last updated:** 2026-10-18 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 165 tests + tsc + build, backend 148 passed (npm run check; pytest -q)
+**Last updated:** 2026-10-18 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 167 tests + tsc + build, backend 148 passed (npm run check; pytest -q)
 
 ## Status board
 
@@ -16,6 +16,8 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 | Control room `/control` | Done 2026-10-18 | Barriers, log, fault filter health, storm lab, live alert timing |
 | PENYU robot concept | Concept only, outside the app | Shared as a standalone 3D artifact on request (not in the app). Labelled CONCEPT · NOT BUILT; all numbers are design targets |
 | Live AI photo check | Blocked here | The cloud sandbox network policy refuses openrouter.ai, so the AI check could not be exercised end to end in this session. The no-key and failure paths were exercised and say so honestly |
+| Basemap failover | Done 2026-10-19 | `components/map/BaseMap.tsx`: CARTO Voyager, then OpenStreetMap, then an offline street map drawn from the stored routes with place names (re-probes tiles every minute). Fonts are bundled with @fontsource instead of Google Fonts |
+| App demo film | Done 2026-10-19 | `booth/floodway-app-demo/`: 1:56 walkthrough of every feature on a phone, real app captures with motion graphics and a generated score. Rebuild steps in its README; the MP4 is not committed (booth `out/` is ignored) |
 | Map and evacuation | Done | KL only: 8 demo relief centres, 16 flood-prone areas, stored OSM routes (`node frontend/scripts/build_kl_routes.mjs` to rebuild) |
 | Sample media | Done 2026-10-12 | 60 photographic frames (5 cameras x 12-rung ladder); the page shows the rung matching the reading. Read by `ReferenceDiffAnalyzer` against each camera's dry frame; `check_ladder` PASS (4 cameras 12 of 12, drain 11 of 12). Details and limits: `backend/app/vision/sample_media/README.md` |
 | Feed overlays | Done | Photo shows clean by default (lines and waterline); the Zone and Water toggles remain |
@@ -88,6 +90,7 @@ Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, 
 
 ## Change log (newest first; one line each)
 
+- 2026-10-19 · Map never blank: BaseMap provider chain + offline street map, zoom-aware labels; fonts self-hosted (@fontsource, Google Fonts link removed); duplicate pin CSS removed; mapConfig test. App demo film (booth/floodway-app-demo: capture.mjs, film.html, render.mjs, make_audio.py). Check: frontend 167 tests + tsc + build, backend 148 passed, layout check clean on 7 routes x 4 sizes. Live AI check still not run: the sandbox blocks openrouter.ai.
 - 2026-10-19 · Verified-report areas now drive routing and safety (useFloodZones), fade with age (reports gain createdAt; reportTime parses older strings; 6 h window, fading after 1 h), and label AI-assessed reports. Files: lib/verifiedReports.ts, VerifiedReportLayer, MapPanel, useFamily, mappers, api seed, ReportModal, types. Check: frontend 165 tests + tsc + build; layout check clean on /map /home at 3 sizes.
 - 2026-10-19 · Verified-report areas on the map (lib/verifiedReports.ts, components/map/VerifiedReportLayer.tsx): circles from verified reports sized by independent reporters and depth (500 m to 5 km), shaded by reporter count, labelled with count, depth and radius; unverified reports are grey pins only. Removed "prototype"/"mock" wording from three labels (kept demo/sample/simulated). Handover in docs/ai/HANDOVER.md. Check: frontend 161 tests + tsc + build.
 - 2026-10-18 · Blue brand back (reverse of the teal swap); Life360-style family map on /map (family circle, check-in, SOS, places, safety, activity, route tab), FamilyCard on Home, Profile as a settings list, animated Welcome (EvacuationLoop, no photos); legend moved into the Layers sheet; InPageActionDock removed; layout-check takes CHROME_PATH. Files: lib/family.ts, data/familyDemo.ts, services/family/familyStore.ts, hooks/useFamily.ts, components/family/*, ShelterMapView, MapPanel, BottomSheet, MapLegend, WelcomePage, ProfileSettings, AppContext, telegramService, index.css. Check: frontend 152 tests + tsc + build; layout check clean on / /home /map /reports /live /profile /control at 4-5 sizes.
