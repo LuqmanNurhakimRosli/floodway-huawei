@@ -67,7 +67,7 @@ export function ReportPage() {
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <button
                 onClick={() => setIsCctvModalOpen(true)}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="min-h-11 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Video className="w-4 h-4 text-[#1677FF]" />
                 <span>Sample cameras</span>
@@ -75,7 +75,7 @@ export function ReportPage() {
 
               <button
                 onClick={() => setIsReportModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-red-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className="min-h-11 px-4 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-red-500/25 transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Report a flood</span>
@@ -115,7 +115,7 @@ export function ReportPage() {
             <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
               <button
                 onClick={() => setViewMode('public')}
-                className={`py-1.5 px-3.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-11 px-3.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                   viewMode === 'public'
                     ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200'
                     : 'text-slate-600 hover:text-slate-900'
@@ -127,7 +127,7 @@ export function ReportPage() {
 
               <button
                 onClick={() => setViewMode('authority')}
-                className={`py-1.5 px-3.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-11 px-3.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                   viewMode === 'authority'
                     ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
                     : 'text-amber-800 hover:text-amber-950'
@@ -149,7 +149,7 @@ export function ReportPage() {
                   <button
                     key={tab.id}
                     onClick={() => setFilter(tab.id as any)}
-                    className={`py-1.5 px-3 rounded-lg transition-colors cursor-pointer ${
+                    className={`min-h-11 px-3 rounded-lg transition-colors cursor-pointer ${
                       filter === tab.id
                         ? 'bg-[#1677FF] text-white shadow-xs'
                         : 'text-slate-600 hover:bg-slate-100'

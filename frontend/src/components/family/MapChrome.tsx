@@ -93,7 +93,7 @@ export function MapTopBar({ circles, circleId, unread, onSettings, onActivity, o
           <button
             type="button"
             onClick={onLayers}
-            className="mx-auto mt-2 flex min-h-8 w-fit items-center gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-3 text-xs font-bold text-slate-800 shadow-md ring-1 ring-slate-200/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+            className="mx-auto mt-2 flex min-h-11 w-fit items-center gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-3 text-xs font-bold text-slate-800 shadow-md ring-1 ring-slate-200/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
           >
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: SCENARIO_COLOR[floodScenario] }} aria-hidden="true" />
             {SCENARIOS.find((s) => s.id === floodScenario)?.label} · simulated

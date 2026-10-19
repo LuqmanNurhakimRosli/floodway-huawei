@@ -63,7 +63,7 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate('/home')}
-          className="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900"
+          className="-ml-2 flex min-h-11 items-center gap-2 rounded-xl px-2 text-xs font-bold text-slate-600 hover:text-slate-900"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Exit Navigation</span>

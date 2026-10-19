@@ -46,7 +46,7 @@ export function NearYou() {
     <section aria-labelledby="near-title" className="min-w-0">
       <div className="flex items-center justify-between gap-3">
         <h2 id="near-title" className="font-heading text-lg/7 font-bold text-slate-900">Near you</h2>
-        <Link to="/live" className="text-sm font-semibold text-[#0958D9] hover:underline">View all</Link>
+        <Link to="/live" className="-mr-2 inline-flex min-h-11 items-center rounded-xl px-2 text-sm font-semibold text-[#0958D9] hover:underline">View all</Link>
       </div>
 
       <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:px-0" role="group" aria-label="Show">
@@ -56,7 +56,7 @@ export function NearYou() {
             type="button"
             aria-pressed={filter === f.id}
             onClick={() => setFilter(f.id)}
-            className={`min-h-10 shrink-0 rounded-full border px-4 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] motion-reduce:transition-none ${
+            className={`min-h-11 shrink-0 rounded-full border px-4 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] motion-reduce:transition-none ${
               filter === f.id ? 'border-[#0958D9] bg-[#0958D9] text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
             }`}
           >

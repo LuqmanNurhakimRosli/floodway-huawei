@@ -14,7 +14,7 @@ export function ReliefList() {
     <section aria-labelledby="relief-title" className="min-w-0">
       <div className="flex items-center justify-between gap-3">
         <h2 id="relief-title" className="font-heading text-lg/7 font-bold text-slate-900">Relief centres</h2>
-        <Link to="/map" className="text-sm font-semibold text-[#0958D9] hover:underline">View all</Link>
+        <Link to="/map" className="-mr-2 inline-flex min-h-11 items-center rounded-xl px-2 text-sm font-semibold text-[#0958D9] hover:underline">View all</Link>
       </div>
       <ul className="mt-2 space-y-2.5">
         {rows.map((s) => {

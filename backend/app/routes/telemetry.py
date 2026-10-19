@@ -3,9 +3,10 @@ import hmac
 import hashlib
 from collections import defaultdict, deque
 from statistics import median
-from fastapi import APIRouter, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Header, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field
 from app.config import DEVICES, MAX_SKEW_SECONDS
+from app.security import require_write_token
 from app.services.phase_machine import PhaseMachine
 from app.vision.fault_filter import JumpFilter
 from app.vision.schemas import Level
@@ -35,17 +36,26 @@ class IngestPayload(BaseModel):
     sig: str = ""
 
 @router.post("/ingest")
-def ingest_sensor_reading(p: IngestPayload, request: Request):
+async def ingest_sensor_reading(p: IngestPayload, request: Request, authorization: str | None = Header(default=None)):
     dev = DEVICES.get(p.device_id)
     if not dev:
         raise HTTPException(404, f"Unknown device {p.device_id}")
 
-    # Optional signature check if secret is set and provided
-    if dev.get("secret") and p.sig:
+    # A reading changes state (history, level, and through it an underpass barrier), so it needs one of two proofs:
+    # the device's HMAC signature over a recent timestamp, or the operator write token (tools, tests, the storm lab).
+    # A wrong or stale signature is always refused. With no write token set (local development) unsigned readings
+    # stay open, as every other write route does.
+    if p.sig:
+        if not dev.get("secret"):
+            raise HTTPException(401, "This device has no signing secret configured")
         expected_msg = f"{p.device_id}.{p.ts}.{p.distance_cm:.1f}".encode()
         good_sig = hmac.new(dev["secret"].encode(), expected_msg, hashlib.sha256).hexdigest()
         if not hmac.compare_digest(good_sig, p.sig):
             raise HTTPException(401, "Invalid HMAC signature")
+        if abs(time.time() - p.ts) > MAX_SKEW_SECONDS:
+            raise HTTPException(401, f"Signed timestamp is more than {MAX_SKEW_SECONDS} s from server time (replay or clock drift)")
+    else:
+        await require_write_token(authorization)
 
     raw_buffer[p.device_id].append(p.distance_cm)
     filtered_dist = median(raw_buffer[p.device_id])

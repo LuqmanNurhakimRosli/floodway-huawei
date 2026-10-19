@@ -83,8 +83,8 @@ export function HomeMap() {
               <Polyline positions={route.route} pathOptions={{ color: '#0284C7', weight: 5, opacity: 0.95, dashArray: '8 8' }} />
             </>
           )}
-          <Marker position={[DEMO_ORIGIN.lat, DEMO_ORIGIN.lon]} icon={userDot} />
-          {shelter && <Marker position={[shelter.lat, shelter.lon]} icon={shelterPin} />}
+          <Marker position={[DEMO_ORIGIN.lat, DEMO_ORIGIN.lon]} icon={userDot} interactive={false} keyboard={false} />
+          {shelter && <Marker position={[shelter.lat, shelter.lon]} icon={shelterPin} interactive={false} keyboard={false} />}
         </MapContainer>
         {shelter && (
           <div className="absolute inset-x-3 bottom-8 z-10 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl border border-slate-700/80 bg-slate-900/90 px-3 py-2 text-xs/4 text-white backdrop-blur-md">

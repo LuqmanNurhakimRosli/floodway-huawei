@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useVisionStore } from '../../hooks/vision/useVisionStore';
+import { useNow } from '../../hooks/useNow';
 import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon } from 'lucide-react';
 import { FloodWayLogo } from '../brand/FloodWayLogo';
 import { useApp } from '../../contexts/AppContext';
@@ -10,6 +13,9 @@ export function Header() {
   const { selectedLocation, setSelectedLocation } = useApp();
   const { user } = useAuth();
   const [showLocationMenu, setShowLocationMenu] = useState(false);
+  const { alerts } = useVisionStore();
+  const now = useNow(60000);
+  const recentAlerts = alerts.filter((a) => now - Date.parse(a.timestamp) < 3600000).length;
 
   const locations = ORIGINS.map((o) => o.location);
 
@@ -69,10 +75,15 @@ export function Header() {
       <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
         <IoTHeaderPopover />
 
-        <button aria-label="Notifications" className="p-2 max-md:flex max-md:min-h-11 max-md:min-w-11 max-md:items-center max-md:justify-center rounded-xl bg-slate-100 hover:bg-slate-200/70 text-slate-600 transition-colors relative">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white" />
-        </button>
+        {/* Opens the camera alert list. The dot shows only when a camera raised an alert in the last hour. */}
+        <Link
+          to="/live"
+          aria-label={recentAlerts ? `Alerts: ${recentAlerts} in the last hour` : 'Alerts: none in the last hour'}
+          className="relative flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+        >
+          <Bell className="w-4 h-4" aria-hidden="true" />
+          {recentAlerts > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white" aria-hidden="true" />}
+        </Link>
 
         <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] flex items-center justify-center text-white text-xs font-bold shadow-xs">

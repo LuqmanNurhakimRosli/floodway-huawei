@@ -7,6 +7,7 @@ import '@fontsource-variable/outfit';
 import '@fontsource-variable/plus-jakarta-sans';
 import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/700.css';
+import 'leaflet/dist/leaflet.css';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

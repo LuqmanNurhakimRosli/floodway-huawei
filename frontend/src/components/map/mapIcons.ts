@@ -54,14 +54,16 @@ export const createShelterIcon = (isSelected: boolean, status: string) => {
   return new L.DivIcon({
     className: 'shelter-icon',
     html: `
+      <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><!-- 44px tap area -->
       <div class="shelter-marker ${isSelected ? 'selected' : ''}">
         <div style="width: ${isSelected ? '38px' : '32px'}; height: ${isSelected ? '38px' : '32px'}; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 2px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
           ${symbol}
         </div>
         ${isSelected ? '<div class="shelter-marker-ring"></div>' : ''}
       </div>
+      </div>
     `,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
   });
 };

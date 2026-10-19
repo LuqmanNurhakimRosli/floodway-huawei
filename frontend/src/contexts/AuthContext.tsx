@@ -13,10 +13,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('floodway_user');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
+    // A saved profile is only trusted when it has the right shape; anything else (an old format, a hand edit) would
+    // crash every screen that reads the name, so it is dropped and the demo profile is used instead.
+    try {
+      const saved = JSON.parse(localStorage.getItem('floodway_user') || 'null');
+      if (saved && typeof saved === 'object' && typeof saved.name === 'string' && typeof saved.email === 'string') return saved;
+    } catch (e) {}
     // Default demo user for instant reviewer access
     return {
       id: 'usr-01',

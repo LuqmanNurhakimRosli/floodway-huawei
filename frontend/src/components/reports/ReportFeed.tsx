@@ -21,6 +21,24 @@ interface Props {
 }
 
 export function ReportFeed({ filter, viewMode = 'public' }: Props) {
+  // Share uses the phone's share sheet when there is one; otherwise it copies the text. Either way it says what happened.
+  const [shared, setShared] = React.useState<string | null>(null);
+  const [shareMsg, setShareMsg] = React.useState('');
+  const share = async (r: CitizenReport) => {
+    const text = `${r.title} (${r.location}). Reported depth ${r.waterDepthCm} cm. Citizen report, not an official warning.`;
+    setShared(r.id);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'FloodWay report', text });
+        setShareMsg('Shared');
+      } else {
+        await navigator.clipboard.writeText(text);
+        setShareMsg('Copied');
+      }
+    } catch (e) {
+      setShareMsg((e as Error)?.name === 'AbortError' ? '' : 'Could not share');
+    }
+  };
   const { reports, upvoteReport, approveReport, rejectReport } = useApp();
 
   const filteredReports = reports.filter((r) => {
@@ -192,15 +210,21 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 <>
                   <button
                     onClick={() => upvoteReport(report.id)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-[#1677FF] transition-colors cursor-pointer"
+                    className="-ml-2 flex min-h-11 items-center gap-1.5 rounded-xl px-2 text-xs font-bold text-slate-600 hover:text-[#1677FF] transition-colors cursor-pointer"
                   >
                     <ThumbsUp className="w-3.5 h-3.5" />
                     <span>{report.upvotes} Confirmations</span>
                   </button>
 
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <button className="p-1 rounded-lg hover:bg-slate-100 hover:text-slate-600 cursor-pointer" title="Share Alert">
-                      <Share2 className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 text-slate-500">
+                    {shared === report.id && <span role="status" className="text-xs font-semibold text-slate-700">{shareMsg}</span>}
+                    <button
+                      type="button"
+                      onClick={() => void share(report)}
+                      aria-label={`Share report: ${report.title}`}
+                      className="flex min-h-11 min-w-11 items-center justify-center rounded-xl hover:bg-slate-100 hover:text-slate-700 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+                    >
+                      <Share2 className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 </>
