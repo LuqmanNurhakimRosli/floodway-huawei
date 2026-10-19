@@ -57,15 +57,22 @@ if (stillsArg > -1) {
   for (const t of times) fs.writeFileSync(path.join(OUT, 'stills', `t${t.toFixed(1).padStart(5, '0')}.png`), await shot(t));
   console.log(`${times.length} stills -> out/stills/`);
 } else {
-  const frames = Math.round(SECONDS * FPS);
-  const file = path.join(OUT, 'floodway-app-demo-silent.mp4');
+  // --chunk i/n renders only frames [i*frames/n, (i+1)*frames/n) to its own file, so chunks can run in parallel and be
+  // joined with ffmpeg's concat demuxer (same settings, so no re-encode)
+  const total = Math.round(SECONDS * FPS);
+  const chunkArg = process.argv.indexOf('--chunk');
+  const [ci, cn] = chunkArg > -1 ? process.argv[chunkArg + 1].split('/').map(Number) : [0, 1];
+  const first = Math.floor((ci * total) / cn), last = Math.floor(((ci + 1) * total) / cn);
+  const frames = last - first;
+  const file = path.join(OUT, cn > 1 ? `chunk-${ci}.mp4` : 'floodway-app-demo-silent.mp4');
   const ff = spawn(process.env.FFMPEG_PATH || 'ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-',
-    '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p',
+    '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'medium', '-crf', '18', '-threads', '1', '-pix_fmt', 'yuv420p',
     '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-r', String(FPS), '-movflags', '+faststart', file], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const t0 = Date.now();
   for (let i = 0; i < frames; i++) {
-    const buf = await shot(i / FPS);
+    const buf = await shot((first + i) / FPS);
     if (!ff.stdin.write(buf)) await new Promise((r) => ff.stdin.once('drain', r));
-    if (i % (FPS * 5) === 0) console.log(`  ${i}/${frames} frames`);
+    if (i % (FPS * 5) === 0) console.log(`  chunk ${ci}: ${i}/${frames} frames, ${((Date.now() - t0) / Math.max(1, i)).toFixed(0)} ms/frame`);
   }
   ff.stdin.end();
   const code = await new Promise((r) => ff.on('close', r));

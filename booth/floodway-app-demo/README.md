@@ -40,7 +40,11 @@ cd frontend && npm run dev                 # app on :5173 (and backend/run.py on
 cd booth/floodway-app-demo
 node capture.mjs                           # cap/: screenshots, welcome frames, element boxes (about 2 minutes)
 node render.mjs --stills 16,46.5,60        # review stills in out/stills/
-node render.mjs                            # out/floodway-app-demo-silent.mp4 (about 15 minutes)
+node render.mjs                            # out/floodway-app-demo-silent.mp4 (about 30 minutes)
+# faster: four chunks in parallel, then join them without re-encoding
+for i in 0 1 2 3; do node render.mjs --chunk $i/4 & done; wait
+printf "file %s\n" chunk-0.mp4 chunk-1.mp4 chunk-2.mp4 chunk-3.mp4 > out/chunks.txt
+ffmpeg -y -f concat -safe 0 -i out/chunks.txt -c copy out/floodway-app-demo-silent.mp4
 ../../backend/.venv/bin/python make_audio.py
 ffmpeg -y -i out/floodway-app-demo-silent.mp4 -i out/score.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -shortest out/floodway-app-demo.mp4
 ```
