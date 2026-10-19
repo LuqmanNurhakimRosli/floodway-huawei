@@ -6,6 +6,8 @@ import { useVisionHazards } from './vision/useVisionHazards';
 import * as store from '../services/family/familyStore';
 import type { FamilyState } from '../services/family/familyStore';
 import type { Zone } from '../lib/routing';
+import { verifiedZones } from '../lib/verifiedReports';
+import { useNow } from './useNow';
 
 /** The family circle, with the simulation running while the caller is mounted. Your demo position follows the header. */
 export function useFamily(): FamilyState {
@@ -21,13 +23,21 @@ export function useFamily(): FamilyState {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
 }
 
-/** Flood zones for the current scenario plus any sample-camera zones at WARNING or DANGER: the same set routes avoid. */
+/**
+ * Every flood zone routes and safety checks avoid: the scenario's flooded areas, sample-camera zones at WARNING or
+ * DANGER, and areas built from recent verified citizen reports (lib/verifiedReports.ts).
+ */
 export function useFloodZones(): Zone[] {
-  const { floodScenario } = useApp();
+  const { floodScenario, reports } = useApp();
   const cameraHazards = useVisionHazards();
+  const now = useNow(60000); // areas fade with age, so re-evaluate every minute
   return useMemo(
-    () => [...floodedZones(floodScenario), ...cameraHazards.map((h) => ({ id: `cam-${h.cameraId}`, lat: h.lat, lon: h.lon, radiusM: h.radiusM }))],
-    [floodScenario, cameraHazards],
+    () => [
+      ...floodedZones(floodScenario),
+      ...cameraHazards.map((h) => ({ id: `cam-${h.cameraId}`, lat: h.lat, lon: h.lon, radiusM: h.radiusM })),
+      ...verifiedZones(reports, now),
+    ],
+    [floodScenario, cameraHazards, reports, now],
   );
 }
 

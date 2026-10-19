@@ -1,6 +1,6 @@
 import { Circle, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import type { CitizenReport } from '../../types';
-import { areaLabel, buildVerifiedAreas, isVerified } from '../../lib/verifiedReports';
+import { areaAge, areaLabel, buildVerifiedAreas, countsNow, isVerified } from '../../lib/verifiedReports';
 import { reportStatusInfo } from '../../lib/reportStatus';
 
 /** Colour by depth, as on the flood layer: amber shallow, red at danger depth. */
@@ -11,8 +11,8 @@ const TONE = { amber: '#D97706', red: '#DC2626' } as const;
  * Every report also gets a small pin: verified ones in their depth colour, unverified ones in grey, so a rumour is
  * visible as a pin but never paints an area.
  */
-export function VerifiedReportLayer({ reports }: { reports: CitizenReport[] }) {
-  const areas = buildVerifiedAreas(reports);
+export function VerifiedReportLayer({ reports, now }: { reports: CitizenReport[]; now: number }) {
+  const areas = buildVerifiedAreas(reports, now);
 
   return (
     <>
@@ -23,7 +23,7 @@ export function VerifiedReportLayer({ reports }: { reports: CitizenReport[] }) {
             key={a.id}
             center={[a.lat, a.lon]}
             radius={a.radiusM}
-            pathOptions={{ color, weight: 2, opacity: 0.85, fillColor: color, fillOpacity: 0.12 + 0.38 * a.intensity }}
+            pathOptions={{ color, weight: 2, opacity: 0.85 * a.freshness, fillColor: color, fillOpacity: (0.12 + 0.38 * a.intensity) * a.freshness, dashArray: a.freshness < 1 ? '6 6' : undefined }}
           >
             <Tooltip permanent direction="center" className="fw-area-label">
               {areaLabel(a)}
@@ -32,6 +32,7 @@ export function VerifiedReportLayer({ reports }: { reports: CitizenReport[] }) {
               <div className="p-1 text-xs">
                 <b className="block text-slate-900">Verified flood reports nearby</b>
                 <span className="block font-semibold text-slate-700">{areaLabel(a)}</span>
+                <span className="block text-slate-600">{areaAge(a, now)}. Routes avoid this area.</span>
                 <span className="mt-1 block text-slate-600">Built from verified citizen reports. Not an official flood map.</span>
               </div>
             </Popup>
@@ -40,7 +41,8 @@ export function VerifiedReportLayer({ reports }: { reports: CitizenReport[] }) {
       })}
 
       {reports.filter((r) => r.status !== 'REJECTED').map((r) => {
-        const verified = isVerified(r);
+        // a verified report too old to count is drawn like any other report, without its area
+        const verified = isVerified(r) && countsNow(r, now);
         const color = verified ? TONE[r.waterDepthCm >= 30 ? 'red' : 'amber'] : '#64748B';
         return (
           <CircleMarker key={r.id} center={[r.lat, r.lon]} radius={verified ? 6 : 5} pathOptions={{ color: '#FFFFFF', weight: 2, fillColor: color, fillOpacity: 1 }}>

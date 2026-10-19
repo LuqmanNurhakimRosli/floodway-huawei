@@ -4,7 +4,7 @@ Read `docs/ai/PROGRESS.md` first, then `AGENTS.md`. This file is the short versi
 
 ## Branch and checks
 - Branch `ccr-693c90f8-qu560k`. Push with `git push -u origin ccr-693c90f8-qu560k`. Do not open a PR unless asked.
-- Frontend: `cd frontend && npm run check` (161 tests, tsc, build). Backend: `backend\.venv\Scripts\python.exe -m pytest -q` (148 passed on 2026-10-19).
+- Frontend: `cd frontend && npm run check` (165 tests, tsc, build). Backend: `backend\.venv\Scripts\python.exe -m pytest -q` (148 passed on 2026-10-19).
 - Layout: `CHROME_PATH=<browser> npm run layout-check` (set CHROME_PATH on machines without Chrome).
 
 ## What changed most recently
@@ -17,8 +17,8 @@ Read `docs/ai/PROGRESS.md` first, then `AGENTS.md`. This file is the short versi
 4. **Labels**: removed "prototype" and "mock" from the three visible strings (`AboutDemo`, `WelcomePage`, `ConnectionStatus`). Kept "demo", "sample" and "simulated" labels on purpose (see the honesty section).
 
 ## Known gaps (not done)
-- **Routing ignores verified areas.** `useFamily.useFloodZones` and the route planner use `FLOOD_PRONE` and camera hazards only. Verified areas should feed the same zone list once the product owner agrees.
-- **No decay.** Reports carry only a display string for time (`timestampStr`), so areas never fade. Needs a real timestamp on reports first.
+- Done 2026-10-19: verified areas feed `useFloodZones`, so routing, the Safety tab and the Home family card all avoid them. Areas use reports from the last 6 hours, fade after 1 hour (dashed outline, lower opacity), and drop out at 6 hours. Reports carry `createdAt` (ms). Older data falls back to parsing `timestampStr`, and a report with no readable time does not count. Labels name AI-assessed reports, e.g. "2 verified reports (1 AI-assessed)".
+- The backend `/reports` route does not send `createdAt` yet. The frontend mapper reads `createdAt` or `created_at` when it appears.
 - **Demo flood areas are still hand-placed** (`FLOOD_PRONE` in `data/klDemo.ts`, 16 circles). Routing and the Safety tab depend on them.
 - **Family circle is local to the browser** (localStorage). No accounts or server sync.
 - **Seed reports** are demo data; their status pill reads "DEMO DATA".

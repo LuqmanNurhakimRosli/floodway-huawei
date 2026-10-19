@@ -212,6 +212,7 @@ export function ShelterMapView() {
       onClearFrom={routeFor ? () => setRouteFor(null) : undefined}
       floodedCount={floodedZones(floodScenario).length}
       cameraZoneCount={cameraHazards.length}
+      reportAreaCount={zones.filter((z) => z.id.startsWith('rep-')).length}
       closedBarriers={closedBarriers}
       shelters={shelters}
       best={best}
@@ -266,7 +267,7 @@ export function ShelterMapView() {
           <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
           <VisionHazardLayer />
           <FloodProneLayer scenario={floodScenario} />
-          <VerifiedReportLayer reports={reports} />
+          <VerifiedReportLayer reports={reports} now={now} />
           <BarrierLayer />
           <FitCircle points={memberPoints} circleId={circle.id} bottomPad={bottomPad} ready={desktop || sheetH > 0} />
           <FitRoute line={showRoute ? (route?.line ?? null) : null} bottomPad={bottomPad} enabled={showRoute && !sim.active} />

@@ -93,6 +93,8 @@ export interface CitizenReport {
   status: 'OFFICIAL_VERIFIED' | 'AI_VERIFIED' | 'VERIFIED' | 'UNDER_REVIEW' | 'REJECTED';
   verifiedBy: string;
   timestampStr: string;
+  /** When the report was made (ms since epoch). Older data has only `timestampStr`; see lib/verifiedReports reportTime. */
+  createdAt?: number;
   author: string;
   upvotes: number;
   imageUrl?: string;

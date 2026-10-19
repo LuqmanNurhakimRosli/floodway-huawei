@@ -18,6 +18,8 @@ interface Props {
   /** Present when the route is for a family member: switches back to your own. */
   onClearFrom?: () => void;
   floodedCount: number;
+  /** Areas built from recent verified citizen reports. */
+  reportAreaCount: number;
   cameraZoneCount: number;
   closedBarriers: Barrier[];
   shelters: Shelter[];
@@ -54,7 +56,7 @@ export function MapPanel(p: Props) {
         <MapPin className="h-5 w-5 shrink-0 text-[#0958D9]" aria-hidden="true" />
         <p className="min-w-0 flex-1 text-sm/5 text-slate-800">
           <span className="font-bold">{p.fromLabel}</span>
-          <span className="block text-xs text-slate-600">Starts from the nearest demo start point, {p.originLabel}. {p.floodedCount} of 16 demo areas flooded{p.cameraZoneCount > 0 ? ` plus ${p.cameraZoneCount} camera ${p.cameraZoneCount === 1 ? 'zone' : 'zones'}` : ''}.</span>
+          <span className="block text-xs text-slate-600">Starts from the nearest demo start point, {p.originLabel}. {p.floodedCount} of 16 demo areas flooded{p.cameraZoneCount > 0 ? `, ${p.cameraZoneCount} camera ${p.cameraZoneCount === 1 ? 'zone' : 'zones'}` : ''}{p.reportAreaCount > 0 ? `, ${p.reportAreaCount} verified-report ${p.reportAreaCount === 1 ? 'area' : 'areas'}` : ''}. Routes avoid all of them.</span>
         </p>
         {p.onClearFrom && (
           <button type="button" onClick={p.onClearFrom} className="min-h-11 shrink-0 rounded-xl border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]">
@@ -132,7 +134,7 @@ export function MapPanel(p: Props) {
         )}
         {p.alternatives.length > 0 && p.alternatives[0].blockedBy.length === 0 && p.alternatives[0].crossings > 0 && (
           <p className="mt-1.5 rounded-xl border border-red-200 bg-red-50 p-2 text-xs font-semibold text-red-900">
-            Every stored route crosses flooded areas in this scenario. Route A crosses the fewest.
+            Every stored route crosses a flooded area. Route A crosses the fewest.
           </p>
         )}
         <p className="mt-1.5 text-xs text-slate-600">Roads from OpenStreetMap. Time has no live traffic{p.mode !== 'car' ? ' and uses a typical speed for this mode' : ''}.</p>

@@ -61,8 +61,11 @@ export async function fetchReports(): Promise<CitizenReport[]> {
 
   // Used only when the backend is unreachable. Demo data: the reports are examples, nobody verified them, and the
   // photos do not show the places named.
+  const now = Date.now();
+  const minAgo = (s: string) => (s === 'Just now' ? 0 : Number.parseInt(s, 10) || 0);
   const demo = (r: Omit<CitizenReport, 'verifiedBy' | 'status'> & { status: CitizenReport['status'] }): CitizenReport => ({
     ...r,
+    createdAt: now - minAgo(r.timestampStr) * 60000,
     verifiedBy: 'Demo data (not verified)',
   });
   return [

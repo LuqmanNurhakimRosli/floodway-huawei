@@ -54,6 +54,16 @@ export function normalizeImageUrl(url: unknown): string | undefined {
   return url.startsWith('/assets/') ? url.slice('/assets'.length) : url;
 }
 
+/** ms since epoch from a number (ms or s) or a date string; undefined when unreadable. */
+function timeOf(v: unknown): number | undefined {
+  if (typeof v === 'number' && Number.isFinite(v)) return v < 1e12 ? v * 1000 : v;
+  if (typeof v === 'string' && v.trim()) {
+    const t = Date.parse(v);
+    return Number.isFinite(t) ? t : undefined;
+  }
+  return undefined;
+}
+
 const REPORT_STATUS = ['OFFICIAL_VERIFIED', 'AI_VERIFIED', 'VERIFIED', 'UNDER_REVIEW', 'REJECTED'] as const;
 
 export function mapReport(raw: Raw): CitizenReport {
@@ -68,6 +78,7 @@ export function mapReport(raw: Raw): CitizenReport {
     status: pick(raw.status, REPORT_STATUS, 'UNDER_REVIEW'),
     verifiedBy: str(raw.verifiedBy ?? raw.verified_by),
     timestampStr: str(raw.timestampStr ?? raw.timestamp_str),
+    createdAt: timeOf(raw.createdAt ?? raw.created_at),
     author: str(raw.author, 'Anonymous'),
     upvotes: num(raw.upvotes),
     imageUrl: normalizeImageUrl(raw.imageUrl ?? raw.image_url),

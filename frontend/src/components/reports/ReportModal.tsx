@@ -115,6 +115,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
       status: aiAssessed ? 'AI_VERIFIED' : 'UNDER_REVIEW',
       verifiedBy: aiAssessed ? 'AI assessment (not an official verification)' : 'Not yet reviewed',
       timestampStr: 'Just now',
+      createdAt: Date.now(),
       author,
       upvotes: 1,
       imageUrl: image,
