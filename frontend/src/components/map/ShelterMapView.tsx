@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Polyline, Popup, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Polyline, Popup, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Navigation, Siren } from 'lucide-react';
@@ -16,7 +16,7 @@ import { NavigationHud } from './NavigationHud';
 import { ArrivalDialog } from './ArrivalDialog';
 import { createShelterIcon, gpsNavIcon } from './mapIcons';
 import { BarrierLayer } from './BarrierLayer';
-import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
+import { BaseMap } from './BaseMap';
 import { ORIGINS } from '../../data/klDemo';
 import { YOU_ID } from '../../data/familyDemo';
 import { formatCapacity, formatMin } from '../../lib/format';
@@ -264,7 +264,7 @@ export function ShelterMapView() {
     <div className="relative flex h-[calc(100dvh-var(--nav-h))] w-full flex-col overflow-hidden bg-slate-100 md:h-[calc(100vh-64px)] md:flex-row">
       <div className="relative min-h-[350px] flex-1">
         <MapContainer center={KL_CENTER} zoom={12} scrollWheelZoom preferCanvas zoomControl={false} className="z-0 h-full w-full">
-          <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
+          <BaseMap />
           <VisionHazardLayer />
           <FloodProneLayer scenario={floodScenario} />
           <VerifiedReportLayer reports={reports} now={now} />

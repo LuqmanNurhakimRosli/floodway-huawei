@@ -15,7 +15,7 @@
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #0F172A;
     background-color: #F4F7FB;
     overflow-x: hidden;
@@ -24,7 +24,7 @@
 
   /* One geometric face for headings on every screen, as in the mobile design reference. */
   h1, h2, h3, h4, .font-heading {
-    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Outfit Variable', 'Outfit', 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: -0.01em;
   }
 }
@@ -178,7 +178,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font: 800 15px/1 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  font: 800 15px/1 'Outfit Variable', 'Outfit', 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
   letter-spacing: 0.02em;
 }
 .fw-member-tail {
@@ -204,7 +204,7 @@
   border-radius: 9999px;
   background: #fff;
   color: #0F172A;
-  font: 700 10px/1.4 'Plus Jakarta Sans', sans-serif;
+  font: 700 10px/1.4 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
   box-shadow: 0 1px 4px rgba(7, 20, 38, 0.3);
 }
 .fw-member-batt--low { background: #DC2626; color: #fff; }
@@ -239,97 +239,7 @@
   border-radius: 14px;
   background: #fff;
   color: #0F172A;
-  font: 700 13px/1.3 'Plus Jakarta Sans', sans-serif;
-  box-shadow: 0 8px 24px -8px rgba(7, 20, 38, 0.4);
-}
-@media (prefers-reduced-motion: reduce) {
-  .fw-member, .fw-member-pulse { transition: none; animation: none; }
-}
-
-/* Family map pins: an initials bubble with a tail, a status ring and a battery chip (components/family/memberIcon.ts). */
-.fw-member {
-  position: relative;
-  width: 56px;
-  height: 64px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  filter: drop-shadow(0 6px 10px rgba(7, 20, 38, 0.35));
-  transition: transform 0.2s ease;
-}
-.fw-member--selected { transform: scale(1.12); z-index: 2; }
-.fw-member-bubble {
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
-  border: 3px solid #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font: 800 15px/1 'Outfit', 'Plus Jakarta Sans', sans-serif;
-  letter-spacing: 0.02em;
-}
-.fw-member-tail {
-  width: 14px;
-  height: 14px;
-  margin-top: -9px;
-  background: #fff;
-  transform: rotate(45deg);
-  border-radius: 0 0 4px 0;
-}
-.fw-member--near .fw-member-bubble { border-color: #FBBF24; }
-.fw-member--near .fw-member-tail { background: #FBBF24; }
-.fw-member--flooded .fw-member-bubble,
-.fw-member--sos .fw-member-bubble { border-color: #EF4444; }
-.fw-member--flooded .fw-member-tail,
-.fw-member--sos .fw-member-tail { background: #EF4444; }
-.fw-member--selected .fw-member-bubble { box-shadow: 0 0 0 4px rgba(22, 119, 255, 0.45); }
-.fw-member-batt {
-  position: absolute;
-  top: 34px;
-  right: -6px;
-  padding: 1px 5px;
-  border-radius: 9999px;
-  background: #fff;
-  color: #0F172A;
-  font: 700 10px/1.4 'Plus Jakarta Sans', sans-serif;
-  box-shadow: 0 1px 4px rgba(7, 20, 38, 0.3);
-}
-.fw-member-batt--low { background: #DC2626; color: #fff; }
-.fw-member-moving {
-  position: absolute;
-  top: -4px;
-  right: -2px;
-  width: 20px;
-  height: 20px;
-  border-radius: 9999px;
-  background: #0958D9;
-  color: #fff;
-  border: 2px solid #fff;
-  font-size: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.fw-member-pulse {
-  position: absolute;
-  left: 2px;
-  top: -2px;
-  width: 52px;
-  height: 52px;
-  border-radius: 9999px;
-  background: rgba(239, 68, 68, 0.45);
-  animation: pulse-ring 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-.leaflet-tooltip.fw-member-tip {
-  padding: 8px 12px;
-  border: 0;
-  border-radius: 14px;
-  background: #fff;
-  color: #0F172A;
-  font: 700 13px/1.3 'Plus Jakarta Sans', sans-serif;
+  font: 700 13px/1.3 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
   box-shadow: 0 8px 24px -8px rgba(7, 20, 38, 0.4);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -376,7 +286,19 @@
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.92);
   color: #0F172A;
-  font: 700 12px/1.3 'Plus Jakarta Sans', sans-serif;
+  font: 700 12px/1.3 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
   white-space: nowrap;
   box-shadow: 0 4px 14px -6px rgba(7, 20, 38, 0.45);
 }
+
+/* Place names on the offline street map (components/map/BaseMap.tsx). */
+.leaflet-tooltip.fw-place-label {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #475569;
+  font: 700 12px/1.2 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+}
+.leaflet-tooltip.fw-place-label::before { display: none; }

@@ -2,6 +2,7 @@ import { Circle, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import type { CitizenReport } from '../../types';
 import { areaAge, areaLabel, buildVerifiedAreas, countsNow, isVerified } from '../../lib/verifiedReports';
 import { reportStatusInfo } from '../../lib/reportStatus';
+import { LABEL_MIN_ZOOM, useZoom } from './BaseMap';
 
 /** Colour by depth, as on the flood layer: amber shallow, red at danger depth. */
 const TONE = { amber: '#D97706', red: '#DC2626' } as const;
@@ -13,6 +14,7 @@ const TONE = { amber: '#D97706', red: '#DC2626' } as const;
  */
 export function VerifiedReportLayer({ reports, now }: { reports: CitizenReport[]; now: number }) {
   const areas = buildVerifiedAreas(reports, now);
+  const zoom = useZoom();
 
   return (
     <>
@@ -25,7 +27,8 @@ export function VerifiedReportLayer({ reports, now }: { reports: CitizenReport[]
             radius={a.radiusM}
             pathOptions={{ color, weight: 2, opacity: 0.85 * a.freshness, fillColor: color, fillOpacity: (0.12 + 0.38 * a.intensity) * a.freshness, dashArray: a.freshness < 1 ? '6 6' : undefined }}
           >
-            <Tooltip permanent direction="center" className="fw-area-label">
+            {/* on the circle when zoomed in; on hover or tap when the whole city is in view */}
+            <Tooltip key={zoom >= LABEL_MIN_ZOOM ? 'on' : 'off'} permanent={zoom >= LABEL_MIN_ZOOM} direction="center" className="fw-area-label">
               {areaLabel(a)}
             </Tooltip>
             <Popup>

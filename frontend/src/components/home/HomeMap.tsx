@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Maximize2, Route } from 'lucide-react';
-import { BASEMAP_ATTRIBUTION, BASEMAP_MAX_ZOOM, BASEMAP_URL } from '../../config/mapConfig';
+import { BaseMap } from '../map/BaseMap';
 import { useApp } from '../../contexts/AppContext';
 import { useVisionHazards } from '../../hooks/vision/useVisionHazards';
 import { formatKm, formatMin } from '../../lib/format';
@@ -74,7 +74,7 @@ export function HomeMap() {
       </div>
       <div className="relative min-h-[280px] flex-1">
         <MapContainer bounds={bounds} zoomControl={false} scrollWheelZoom={false} attributionControl className="z-0 h-full w-full">
-          <TileLayer attribution={BASEMAP_ATTRIBUTION} url={BASEMAP_URL} maxZoom={BASEMAP_MAX_ZOOM} />
+          <BaseMap />
           <ResizeFix />
           <VisionHazardLayer />
           {route && (

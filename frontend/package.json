@@ -13,6 +13,9 @@
     "map-fps": "node scripts/map-fps.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/outfit": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@tailwindcss/vite": "^4.1.18",
