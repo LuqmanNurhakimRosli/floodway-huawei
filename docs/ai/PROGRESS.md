@@ -2,7 +2,7 @@
 
 Read this before you change anything. Update it before you stop (rules in `/AGENTS.md`). Keep it short: detail goes in `docs/ai/CHANGELOG.md`.
 
-**Last updated:** 2026-10-18 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 167 tests + tsc + build, backend 148 passed (npm run check; pytest -q)
+**Last updated:** 2026-10-19 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 167 tests + tsc + build, backend 152 passed, mobile tsc + 16 jest tests (npm run check; pytest -q; mobile npm run check)
 
 ## Status board
 
@@ -32,7 +32,9 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 | Family circle (Life360-style) | Done 2026-10-18 (simulated members) | `/map` is now a full-screen family map on phones: circle switcher (Family, Neighbours), member pins with battery and flood status, Check in, hold-to-send SOS (Telegram via the backend when set up), activity feed, places with arrival/leave alerts, Safety tab (in or within 300 m of a flood area), Route tab = the evacuation planner, for you or for a member. Only "You" can be real (phone GPS, opt-in, never uploaded); everyone else, their movement and replies are simulated and labelled. `lib/family.ts`, `services/family/familyStore.ts`, `hooks/useFamily.ts`, `components/family/`. Flood scenario moved to AppContext so Home and the map agree |
 | Welcome animation | Done 2026-10-18 | `components/brand/EvacuationLoop.tsx`: 8 s seamless SVG loop (rain, rising water, a family walking the safe route to a relief centre, alert and arrival chips). Drawn shapes only, no flood photos. Reduced motion shows one still frame |
 | Verified-report areas | Done 2026-10-19 (demo data) | Circles from verified reports on the map; routing, the Safety tab and Home avoid them (`useFloodZones`). Last 6 h only, fading after 1 h; AI-assessed reports named in the label. Backend does not send `createdAt` yet |
-| Other pages' touch targets | Open | Home, map, reports, profile still have targets under 44 px on phones |
+| Phone touch targets | Done 2026-10-19 | Route audit: 0 targets under 44 px on 13 routes at 4 phone widths |
+| Route audit + audit fixes | Done 2026-10-19 | `frontend/scripts/route-audit.mjs` (13 routes x 9 viewports, 117 loads, 0 failing). Fixed: error boundary per route, malformed saved profile crash, inert bell and Share, unpkg Leaflet CSS, API timeouts, lazy pages (main chunk 782.8 -> 529.7 kB), `/ingest` signature + skew check, `/predict` bounds. Full list: `docs/FLOODWAY_FULL_AUDIT.md` |
+| Android app `mobile/` | Code done 2026-10-19 · **no APK yet, not run on a device** | Expo 58 / RN 0.88: Home, Map (Leaflet WebView, offline roads), Family (share location, contacts), Alerts (local notifications while open), Guide, Settings (server URL). Reuses web logic via `src/shared.ts`. Offline cache marked with its age; location opt-in, foreground only. tsc clean, 16 jest tests, Android bundle builds, prebuild manifest checked. APK blocked here (no Android SDK; dl.google.com and api.expo.dev refused). Steps: `docs/FLOODWAY_MOBILE_SETUP.md` |
 
 ## Open work, in order
 
@@ -41,7 +43,8 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 2. A learned water segmenter for user-added cameras: the classical analyser cannot read photographic water (see `sample_media/README.md`). Needs labelled frames and `analysis/yolo_seg.py`.
 3. User: delete `docs/_to-delete/` once happy (it holds the superseded docs, duplicate `assets/` and duplicate model folders; all are also in git history or were byte-identical copies).
 4. User: rotate the OpenRouter key (`VITE_OPENROUTER_API_KEY` was in the browser bundle) and the Telegram bot token. Neither was rotated by an agent.
-5. Phone touch-target pass on Home, Map, Reports, Profile.
+5. Android: build the preview APK (`npx eas-cli build -p android --profile preview`, after setting the backend in `mobile/eas.json`) and run the device checklist in `docs/FLOODWAY_MOBILE_SETUP.md` section 6. Record the results in `docs/FLOODWAY_TEST_REPORT.md`.
+6. Before any public deploy: set `VISION_WRITE_TOKEN` and `CORS_ORIGINS`; move device HMAC secrets out of `backend/app/config.py` (audit O1-O3).
 
 ## File map (where things live)
 
@@ -56,17 +59,21 @@ frontend/src/pages, components/ React pages; components/live/ is Live Vision; co
                                 components/family/ is the family map (pins, tabs, SOS, check-in); components/brand/ is the logo
                                 and the Welcome animation; lib/family.ts + services/family/ hold the family circle
 frontend/public/media/live/     webp copies of the sample frames, klang-rise.mp4
-frontend/scripts/               layout-check.mjs, map-fps.mjs, build_kl_routes.mjs
+frontend/scripts/               layout-check.mjs, route-audit.mjs, map-fps.mjs, build_kl_routes.mjs
+mobile/                         Android app (Expo): src/app/ screens (expo-router), src/lib/ api, cache, data, location, notify,
+                                zones; src/map/ Leaflet WebView page (+ generated assets); src/shared.ts = code from frontend/src;
+                                app.json, app.config.js, eas.json build config
 models/ml_pipeline/             GRU forecaster code, notebooks nb1-nb4, trained weights (synthetic), ModelArts package
 models/legacy_ann/              first Keras ANN on the Malaysia rainfall CSV (datasets/)
 scripts/                        check.ps1, public-demo.ps1, public_backend.py, render-poster.mjs, make_og_image.py, generate_image.py
 docs/ai/                        this file, CHANGELOG.md (detail)
+docs/FLOODWAY_*.md              2026-10-19 audit set: FULL_AUDIT, REMEDIATION, ARCHITECTURE, MOBILE_SETUP, TEST_REPORT
 docs/architecture/              system spec, API, DB, IoT, tech stack, conventions (some FYP-era: verify before trusting)
 docs/product/                   preliminary-round/ (poster, pitch script, meeting summary, transcript), pitch deck PDFs
 docs/ops/                       DEMO_RUNBOOK.md (what is real, simulated, not built; demo script; failure table)
 docs/plans/                     active plans only
 docs/reference/                 competition rules and forms, 3D house reference
-docs/screenshots/               evidence (after-c = latest, media-check = media plan)
+docs/screenshots/               evidence (after-c = latest, media-check = media plan, mobile-2026-10-19 = Android app renders)
 booth/                          film project (floodway-live-film/), MATA48 booth assets
 firmware/                       ESP32 depth node sketch, ESP32 bench barrier sketch (floodway_barrier.ino)
 docs/_to-delete/                quarantine, safe to remove
@@ -77,6 +84,8 @@ docs/_to-delete/                quarantine, safe to remove
 - All checks: `powershell -File scripts/check.ps1`
 - Backend: `cd backend; .venv\Scripts\python.exe run.py` (port 8080) · tests: `.venv\Scripts\python.exe -m pytest -q`
 - Frontend: `cd frontend; npm run dev` (5173) · `npm run check` · `npm run layout-check`
+- Mobile: `cd mobile; npm install; npm run check` · `npx expo start` (press a for the emulator) · APK steps in `docs/FLOODWAY_MOBILE_SETUP.md`
+- Route audit: dev servers running, then `cd frontend; node scripts/route-audit.mjs` (`CHROME_PATH=` when Chrome is not installed)
 - Media scripts (from `backend/`): `python -m app.vision.sample_media.check_ladder | check_frames | check_realism | export_ladder | make_loop`
 - Poster: `node scripts/capture-poster-shots.mjs` then `node scripts/render-poster.mjs phone|landscape`, then `node scripts/poster-to-pptx.mjs` for the editable PowerPoint (first time: `cd scripts/pptx-tool && npm install`) (needs Chrome and the dev servers; fonts load once from Google Fonts)
 
@@ -89,6 +98,9 @@ docs/_to-delete/                quarantine, safe to remove
 Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, OSM road routes. Simulated: sample cameras and frames, rainfall and river numbers, forecast, shelters, flood-prone areas, reports. Not built or not claimed: government camera feeds, agency verification, any Huawei Cloud call, field-validated accuracy. Full table: `docs/ops/DEMO_RUNBOOK.md` section 1.
 
 ## Change log (newest first; one line each)
+
+- 2026-10-19 · Android app in `mobile/` (Expo 58, RN 0.88, TypeScript strict) sharing UI-free web logic (`lib/vision/levelRules.ts` split out of `levels.ts`); preview builds allow http to a LAN backend, production https only; `scripts/check.ps1` runs the mobile check; five audit docs `docs/FLOODWAY_*.md`. Check: frontend 167 tests + tsc + build, backend 152 passed, mobile tsc + 16/16 jest, Android bundle 1273 modules, route audit 117/0. No APK: no Android SDK and build hosts blocked.
+- 2026-10-19 · Audit fixes (commit dad81a2): route-audit.mjs, ErrorBoundary + WebGL check, profile validation, live bell and Share, bundled Leaflet CSS, API timeouts, 44 px targets, lazy pages, `/ingest` signature + skew, `/predict` bounds (test_ingest_auth.py). Check: frontend 167 tests + tsc + build, backend 152 passed, route audit 117 loads 0 failing.
 
 - 2026-10-19 · Map never blank: BaseMap provider chain + offline street map, zoom-aware labels; fonts self-hosted (@fontsource, Google Fonts link removed); duplicate pin CSS removed; mapConfig test. App demo film (booth/floodway-app-demo: capture.mjs, film.html, render.mjs, make_audio.py). Check: frontend 167 tests + tsc + build, backend 148 passed, layout check clean on 7 routes x 4 sizes. Live AI check still not run: the sandbox blocks openrouter.ai.
 - 2026-10-19 · Verified-report areas now drive routing and safety (useFloodZones), fade with age (reports gain createdAt; reportTime parses older strings; 6 h window, fading after 1 h), and label AI-assessed reports. Files: lib/verifiedReports.ts, VerifiedReportLayer, MapPanel, useFamily, mappers, api seed, ReportModal, types. Check: frontend 165 tests + tsc + build; layout check clean on /map /home at 3 sizes.
