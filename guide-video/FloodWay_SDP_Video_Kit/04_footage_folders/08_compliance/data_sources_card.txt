@@ -1,0 +1,1 @@
+Data and sources: Forecast and warnings: MetMalaysia, via the open data API (data.gov.my). Map: OpenStreetMap. Trained models: GINKGO report, PLAN-AI 2026; re-test in progress. Street-camera frames: AI-generated samples. River node: design, not yet deployed. Relief centres: sample data. Training dataset provenance: to be confirmed.

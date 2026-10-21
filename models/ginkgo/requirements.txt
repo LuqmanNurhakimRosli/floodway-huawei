@@ -1,0 +1,4 @@
+# The four .pkl files were saved with scikit-learn 1.7.2. Other versions load them with "invalid results" warnings.
+scikit-learn==1.7.2
+joblib>=1.4
+numpy>=1.26

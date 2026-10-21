@@ -6,10 +6,11 @@ What is here, what it does, and what the app really uses. Checked 2026-10-12 by 
 
 | Folder | What it is | Used by the app? |
 |---|---|---|
-| `ml_pipeline/` | Water-level forecaster: `flood_core.py` (GRU, features, `FloodPredictor`), notebooks `nb1_data.py` to `nb4_terrain.py`, trained weights in `model_out/`, a ModelArts serving package in `modelarts_pkg/`, `terrain.json` | **No.** Nothing in `backend/` imports it |
+| `ginkgo/` | GINKGO Model 1, flood susceptibility: four scikit-learn 1.7.2 classifiers (`trained/*.pkl`), the team's loader (`registry.py`), `inspect_models.py`, `MODEL_CARD.md` | **No.** Not served until the feature order is known (see the card) |
+| `ml_pipeline/` | Water-level forecaster: `flood_core.py` (GRU, features, `FloodPredictor`), notebooks `nb1_data.py` to `nb4_terrain.py`, trained weights in `model_out/`, `terrain.json` | **No.** Nothing in `backend/` imports it |
 | `legacy_ann/` | First model: a Keras ANN (`flood_detector.h5`, 8 KB `.tflite`) on the monthly rainfall CSV in `datasets/` | No. Kept as history |
 
-Two byte-identical copies of the weights and the ModelArts package used to sit beside `ml_pipeline/` (`pytorch_gru/`, `modelarts_pkg/`). They are in `docs/_to-delete/models-duplicates/`.
+The Huawei ModelArts serving package (`ml_pipeline/modelarts_pkg/`) was a byte copy of `model_out/` plus ModelArts glue. It was removed on 2026-10-20 when the stack moved to Google (git history keeps it); the plan now serves models inside the FastAPI container on Cloud Run.
 
 ## The GRU forecaster (`ml_pipeline/flood_core.py`)
 
@@ -38,5 +39,5 @@ A scale mismatch to resolve before wiring: `nb2_train.py` uses `DANGER_M = 0.30`
 
 1. Add `FloodPredictor` to `forecaster.py` behind a `try`, with the formula as fallback and the label switched to "GRU, synthetic weights" while the weights are synthetic. Test both paths.
 2. Get real gauge and rainfall data (JPS export or the ESP32 log), run `nb1` and `nb2`, publish measured onset recall.
-3. Deploy `modelarts_pkg/` to Huawei ModelArts so "designed for Huawei Cloud" can become "calls Huawei Cloud".
+3. Ship `model_out/` inside the backend container and deploy it to Cloud Run (`nb3_package.py` has the smoke test and the steps), so "planned" can become "runs on Cloud Run".
 4. Retire `legacy_ann/` once nobody needs it. Its 62.7% accuracy on 825 district-year rows (2000 to 2010) cannot say anything about flash floods.

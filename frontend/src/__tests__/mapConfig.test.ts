@@ -17,4 +17,8 @@ describe('basemap providers', () => {
   it('needs no API key in the URL', () => {
     for (const p of BASEMAPS) expect(p.url).not.toMatch(/key=|token=|access_token/i);
   });
+
+  it('skips hosts that serve an "API key required" image instead of failing', () => {
+    for (const p of BASEMAPS) expect(p.url).not.toContain('cartocdn.com');
+  });
 });

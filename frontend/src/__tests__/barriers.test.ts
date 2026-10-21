@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { closedBarrierZones, evaluateBarrier, parseTrigger, SEED_BARRIERS } from '../lib/vision/barriers';
 import { rankRoutes, type RoadRoute } from '../lib/routing';
-import { describeRun, formatSeconds } from '../lib/vision/stormLab';
-import recorded from '../data/stormLabRecorded.json';
-import type { StormRun } from '../types/vision';
 
 const b01 = () => ({ ...SEED_BARRIERS[0] });
 
@@ -42,22 +39,5 @@ describe('routing with closed barriers', () => {
   });
   it('an open barrier blocks nothing', () => {
     expect(closedBarrierZones(SEED_BARRIERS)).toEqual([]);
-  });
-});
-
-describe('storm lab wording', () => {
-  const runs = (recorded as unknown as { runs: StormRun[] }).runs;
-  it('formats seconds plainly', () => {
-    expect(formatSeconds(12.3)).toBe('12 s');
-    expect(formatSeconds(67.1)).toBe('1 min 7 s');
-    expect(formatSeconds(null)).toBe('–');
-  });
-  it('describes each recorded run from its own numbers', () => {
-    const glitch = runs.find((r) => r.scenario === 'sensor-glitch')!;
-    expect(describeRun(glitch)).toMatch(/held 2 fooled readings and sent no alert/);
-    const storm = runs.find((r) => r.scenario === 'rising-storm')!;
-    expect(describeRun(storm)).toMatch(/Residents had/);
-    const surge = runs.find((r) => r.scenario === 'sudden-surge')!;
-    expect(describeRun(surge)).toMatch(/fault filter cost/);
   });
 });

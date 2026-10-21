@@ -79,8 +79,7 @@ export function MapPanel(p: Props) {
             ))}
           </ul>
           <p className="mt-1.5 text-xs text-red-900">
-            Routes through a closed barrier are marked Blocked and listed last. Simulated barriers.{' '}
-            <Link to="/control" className="font-bold underline underline-offset-2">Open the control room</Link>
+            Routes through a closed barrier are marked Blocked and listed last. Simulated barriers.
           </p>
         </section>
       )}

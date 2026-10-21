@@ -1,4 +1,4 @@
-import type { AlertEvent, Barrier, BarrierAction, BarrierEvent, Camera, CameraDraft, LeadTimeEntry, Reading, StormRun, StormScenario } from '../../types/vision';
+import type { AlertEvent, Barrier, BarrierEvent, Camera, CameraDraft, Reading } from '../../types/vision';
 import { authHeaders, NEEDS_TOKEN_MESSAGE } from '../auth';
 import { VISION_API } from './config';
 
@@ -41,13 +41,8 @@ export const getReadings = (id: string, limit = 30) => request<Reading[]>(`/came
 export const listAlerts = (limit = 20) => request<AlertEvent[]>(`/alerts?limit=${limit}`);
 export const testCamera = (draft: CameraDraft) => request<Reading>('/cameras/test', { method: 'POST', body: JSON.stringify(draft) }, 30000);
 
-export const listLeadTimes = (limit = 50) => request<LeadTimeEntry[]>(`/lead-times?limit=${limit}`);
 export const listBarriers = () => request<Barrier[]>('/barriers');
 export const listBarrierEvents = (limit = 30) => request<BarrierEvent[]>(`/barriers/events?limit=${limit}`);
-export const commandBarrier = (id: string, action: BarrierAction, note = '') =>
-  request<BarrierEvent>(`/barriers/${encodeURIComponent(id)}/command`, { method: 'POST', body: JSON.stringify({ action, note }) });
-export const listStormScenarios = () => request<StormScenario[]>('/storm-lab/scenarios');
-export const runStorm = (scenario: string) => request<StormRun>('/storm-lab/run', { method: 'POST', body: JSON.stringify({ scenario }) }, 60000);
 
 export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 export const PHOTO_TYPES = ['image/jpeg', 'image/png'];

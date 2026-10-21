@@ -13,6 +13,8 @@ export function Header() {
   const { selectedLocation, setSelectedLocation } = useApp();
   const { user } = useAuth();
   const [showLocationMenu, setShowLocationMenu] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  const initials = user?.name ? user.name.slice(0, 2).toUpperCase() : 'LN';
   const { alerts } = useVisionStore();
   const now = useNow(60000);
   const recentAlerts = alerts.filter((a) => now - Date.parse(a.timestamp) < 3600000).length;
@@ -85,15 +87,28 @@ export function Header() {
           {recentAlerts > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white" aria-hidden="true" />}
         </Link>
 
-        <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] flex items-center justify-center text-white text-xs font-bold shadow-xs">
-            {user?.name ? user.name.slice(0, 2).toUpperCase() : 'LN'}
+        <Link
+          to="/profile"
+          className="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200 hover:opacity-90 transition-opacity"
+          aria-label="View your profile"
+        >
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] overflow-hidden flex items-center justify-center text-white text-xs font-bold shadow-xs">
+            {!avatarFailed ? (
+              <img
+                src="/media/avatars/avatar-you.jpg"
+                alt={user?.name || 'Luqman Nurhakim'}
+                className="w-full h-full object-cover"
+                onError={() => setAvatarFailed(true)}
+              />
+            ) : (
+              <span>{initials}</span>
+            )}
           </div>
           <div className="hidden xl:flex flex-col">
             <span className="text-xs font-semibold text-slate-800 leading-tight">{user?.name || 'Luqman Nurhakim'}</span>
             <span className="text-xs text-slate-400 font-medium">Citizen Responder</span>
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );

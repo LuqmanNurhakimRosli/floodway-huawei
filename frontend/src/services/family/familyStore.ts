@@ -70,6 +70,7 @@ function initial(): FamilyState {
       name: 'You',
       relation: 'You',
       colors: ['#4096FF', '#0958D9'],
+      avatar: '/media/avatars/avatar-you.jpg',
       isYou: true,
       lat: 3.1642,
       lon: 101.7031,
@@ -125,7 +126,7 @@ function log(memberId: string, kind: EventKind, text: string): CircleEvent {
   return e;
 }
 
-const firstName = (id: string) => (id === YOU_ID ? 'You' : (state.members[id]?.name.split(' ')[0] ?? 'Someone'));
+const firstName = (id: string) => (id === YOU_ID ? 'You' : (state.members[id]?.name ?? 'Someone'));
 
 // ---- Simulation: only the driver moves; everyone else stays where they are and refreshes now and then. ----
 

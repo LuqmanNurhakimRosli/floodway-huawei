@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg-ayah" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+    <linearGradient id="hair-ayah" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="eye-ayah" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#78350F"/>
+      <stop offset="50%" stop-color="#B45309"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFECD1"/>
+      <stop offset="100%" stop-color="#F5C09B"/>
+    </linearGradient>
+    <linearGradient id="skin-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EAA67C"/>
+      <stop offset="100%" stop-color="#D88656"/>
+    </linearGradient>
+    <clipPath id="circle-clip">
+      <circle cx="128" cy="128" r="128"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#circle-clip)">
+    <!-- Background -->
+    <rect width="256" height="256" fill="url(#bg-ayah)"/>
+    <circle cx="210" cy="50" r="32" fill="#FDE68A" opacity="0.2"/>
+    <path d="M-10 180 L260 90" stroke="#FBBF24" stroke-width="2.5" opacity="0.25"/>
+
+    <!-- Shirt & Collar -->
+    <path d="M36 256 Q44 196 96 186 L128 206 L160 186 Q212 196 220 256 Z" fill="#1E293B"/>
+    <!-- Collared Polo / Shirt -->
+    <path d="M98 186 L128 228 L158 186 Z" fill="#B45309"/>
+    <path d="M110 186 L128 214 L146 186 Z" fill="#FFFBEB"/>
+
+    <!-- Neck -->
+    <path d="M108 158 L108 196 Q128 204 148 196 L148 158 Z" fill="url(#skin)"/>
+    <path d="M108 158 Q128 174 148 158 L148 168 Q128 182 108 168 Z" fill="url(#skin-shadow)"/>
+
+    <!-- Jaw & Face -->
+    <path d="M78 106 Q76 156 128 178 Q180 156 178 106 Q178 72 128 72 Q78 72 78 106 Z" fill="url(#skin)"/>
+
+    <!-- Nose -->
+    <path d="M126 128 L129 135 L125 137" stroke="#C27855" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+    <!-- Father's Neat Mustache (Sophisticated Anime Father look) -->
+    <path d="M118 144 Q128 141 138 144 Q134 148 128 146 Q122 148 118 144 Z" fill="#334155"/>
+
+    <!-- Warm Dependable Smile -->
+    <path d="M116 152 Q128 162 140 152" stroke="#9A3412" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+
+    <!-- Ears -->
+    <path d="M78 116 Q70 122 72 133 Q74 141 80 139" fill="url(#skin)" stroke="#C27855" stroke-width="1.5"/>
+    <path d="M178 116 Q186 122 184 133 Q182 141 176 139" fill="url(#skin)" stroke="#C27855" stroke-width="1.5"/>
+
+    <!-- Left Eye Behind Glasses -->
+    <g id="ayah-eye-l">
+      <path d="M92 118 Q104 110 116 119" stroke="#0F172A" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+      <ellipse cx="104" cy="124" rx="8" ry="9.5" fill="url(#eye-ayah)"/>
+      <ellipse cx="104" cy="124" rx="4" ry="4.5" fill="#451A03"/>
+      <circle cx="101" cy="120" r="3" fill="#FFFFFF"/>
+      <circle cx="107" cy="127" r="1.5" fill="#FFFFFF"/>
+      <path d="M96 132 Q104 135 112 132" stroke="#0F172A" stroke-width="1.4" fill="none"/>
+      <!-- Eyebrow -->
+      <path d="M88 103 Q102 96 116 104" stroke="#334155" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+      <!-- Soft smile crinkle at outer corner -->
+      <path d="M88 120 L84 122" stroke="#C27855" stroke-width="1.2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Right Eye Behind Glasses -->
+    <g id="ayah-eye-r">
+      <path d="M140 119 Q152 110 164 118" stroke="#0F172A" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+      <ellipse cx="152" cy="124" rx="8" ry="9.5" fill="url(#eye-ayah)"/>
+      <ellipse cx="152" cy="124" rx="4" ry="4.5" fill="#451A03"/>
+      <circle cx="149" cy="120" r="3" fill="#FFFFFF"/>
+      <circle cx="155" cy="127" r="1.5" fill="#FFFFFF"/>
+      <path d="M144 132 Q152 135 160 132" stroke="#0F172A" stroke-width="1.4" fill="none"/>
+      <path d="M140 104 Q154 96 168 103" stroke="#334155" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+      <path d="M168 120 L172 122" stroke="#C27855" stroke-width="1.2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Stylish Modern Anime Glasses (Semi-rimless metallic) -->
+    <g stroke="#FBBF24" stroke-width="2.5" fill="none" opacity="0.95">
+      <!-- Left frame -->
+      <rect x="88" y="110" width="32" height="24" rx="6" stroke="#475569" stroke-width="2"/>
+      <line x1="88" y1="110" x2="120" y2="110" stroke="#F59E0B" stroke-width="3"/>
+      <!-- Right frame -->
+      <rect x="136" y="110" width="32" height="24" rx="6" stroke="#475569" stroke-width="2"/>
+      <line x1="136" y1="110" x2="168" y2="110" stroke="#F59E0B" stroke-width="3"/>
+      <!-- Bridge & Temples -->
+      <path d="M120 116 Q128 114 136 116" stroke="#F59E0B" stroke-width="2.5"/>
+      <line x1="88" y1="116" x2="78" y2="118" stroke="#475569" stroke-width="2"/>
+      <line x1="168" y1="116" x2="178" y2="118" stroke="#475569" stroke-width="2"/>
+      <!-- Glass reflection glint -->
+      <line x1="94" y1="114" x2="102" y2="128" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+      <line x1="142" y1="114" x2="150" y2="128" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+    </g>
+
+    <!-- Neat Anime Hair (Mature, handsome parted hair with silver streaks) -->
+    <g fill="url(#hair-ayah)">
+      <path d="M66 106 Q64 48 128 40 Q192 48 190 106 Q198 122 186 138 Q176 100 176 86 Q128 64 80 86 Q80 100 70 138 Q58 122 66 106 Z"/>
+      <!-- Parted side sweep -->
+      <path d="M78 86 Q96 90 108 104 Q106 84 122 80 Q138 92 144 104 Q146 84 162 86 Q170 96 174 108 Q174 82 186 86 Z"/>
+      <!-- Silver grey highlights at temples (distinguished) -->
+      <path d="M72 104 Q76 86 86 80" stroke="#94A3B8" stroke-width="2" fill="none"/>
+      <path d="M184 104 Q180 86 170 80" stroke="#94A3B8" stroke-width="2" fill="none"/>
+    </g>
+    <!-- Top Hair Sheen -->
+    <ellipse cx="128" cy="64" rx="26" ry="5" fill="#94A3B8" opacity="0.35"/>
+  </g>
+</svg>

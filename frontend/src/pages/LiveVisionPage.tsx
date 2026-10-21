@@ -111,15 +111,11 @@ export default function LiveVisionPage() {
               </div>
               <div className="flex items-center gap-2">
                 {!loading && <ConnectionChip usingMock={state.usingMock} connected={state.connected} online={onlineCount} total={state.cameras.length} />}
-                <Link
-                  to="/control"
-                  className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-xs font-bold ${interactive} ${
-                    state.barriers.some((b) => b.state === 'CLOSED') ? 'border-red-300 bg-red-50 text-red-800' : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
-                  }`}
-                >
-                  <ShieldHalf className="h-4 w-4" aria-hidden="true" />
-                  {state.barriers.some((b) => b.state === 'CLOSED') ? 'Underpass closed' : 'Control room'}
-                </Link>
+                {state.barriers.some((b) => b.state === 'CLOSED') && (
+                  <Link to="/map" className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border border-red-300 bg-red-50 px-3 text-xs font-bold text-red-800 ${interactive}`}>
+                    <ShieldHalf className="h-4 w-4" aria-hidden="true" /> Underpass closed
+                  </Link>
+                )}
               </div>
             </div>
             {!loading && state.usingMock && <div className="mt-3"><OfflineNotice forcedMock={FORCE_MOCK} error={state.error} /></div>}

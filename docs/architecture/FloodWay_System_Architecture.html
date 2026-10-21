@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FloodWay system architecture</title>
+<style>
+:root{--bg:#F4F7FB;--accent:#1677FF;--dark:#003EB3;--navy:#071426;--line:#CFDBEC;--muted:#3E5068;--tag:#E7F0FF}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden}
+body{background:var(--bg);font-family:Inter,Arial,sans-serif;color:var(--navy);position:relative;font-size:20px;line-height:1.25}
+h1{position:absolute;top:22px;left:0;right:0;text-align:center;font-size:40px;font-weight:700;letter-spacing:-.2px;color:var(--navy)}
+.zones{position:absolute;top:100px;left:36px;width:1848px;height:852px;display:grid;grid-template-columns:380px 724px 600px;column-gap:72px}
+.zone{display:flex;flex-direction:column;min-height:0}
+.zh{background:var(--dark);color:#fff;font-weight:700;font-size:20px;letter-spacing:.08em;height:36px;line-height:36px;padding:0 14px;border-radius:8px;margin-bottom:12px;flex:none}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px 16px;margin-bottom:10px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tt{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;line-height:1.25}
+.card p{margin-top:3px}
+.ic{width:26px;height:26px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tag{display:inline-block;background:var(--tag);color:var(--dark);border:1px solid #9EC5FF;border-radius:999px;padding:1px 12px;font-size:18px;font-weight:600;white-space:nowrap;line-height:1.5}
+.tag.plan{background:#EEF1F5;color:var(--muted);border-color:#C9D2DE}
+.z1 .card{flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+.li{display:flex;align-items:center;gap:12px;margin-top:6px;font-size:20px}
+.li .ic{width:24px;height:24px}
+.backend{flex:1;border:2.5px dashed var(--accent);border-radius:18px;padding:10px 16px 10px;background:rgba(22,119,255,.04);display:flex;flex-direction:column}
+.bl{font-size:22px;font-weight:700;color:var(--dark);margin-bottom:8px}
+.fusion{background:#E7F0FF;border:2px solid var(--accent)}
+.store{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.store .chip{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:20px;font-weight:600;line-height:1.25}
+.store .chip small{display:block;font-weight:400;color:var(--muted);font-size:18px}
+.store .chip .tag{margin-left:6px;vertical-align:1px}
+.z3 .card.table{padding-bottom:12px}
+table{width:100%;border-collapse:collapse;margin-top:6px;font-size:20px}
+th{font-size:18px;font-weight:700;color:var(--dark);text-align:left;padding:4px 6px;border-bottom:2px solid var(--dark)}
+td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle;line-height:1.25}
+td.lv{font-weight:700;width:120px}
+th:nth-child(2),td:nth-child(2){width:160px}
+.sw{display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:10px;border:1px solid rgba(7,20,38,.18)}
+.hex{font-variant-numeric:tabular-nums;font-size:20px;vertical-align:middle}
+.legend{position:absolute;top:964px;left:36px;width:1848px;display:flex;justify-content:center;gap:30px;font-size:20px;align-items:center}
+.lg{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.num{display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--dark);color:#fff;font-weight:700;align-items:center;justify-content:center;font-size:18px;flex:none}
+.foot{position:absolute;top:1012px;left:140px;width:1640px;text-align:center;font-size:18px;color:var(--muted);line-height:1.4}
+.badge{position:absolute;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:var(--dark);color:#fff;border:3px solid #fff;font-weight:700;font-size:20px;display:flex;align-items:center;justify-content:center;z-index:9;box-shadow:0 1px 3px rgba(7,20,38,.25)}
+#arr{position:absolute;left:0;top:0;z-index:8;pointer-events:none}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<symbol id="i-photo" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/></symbol>
+<symbol id="i-text" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 15h6M9 18h4"/></symbol>
+<symbol id="i-gps" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 11.4 3.5 3.5 0 0 0 7 18z"/></symbol>
+<symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 14h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 7.4 3.5 3.5 0 0 0 7 14z"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3"/></symbol>
+<symbol id="i-river" viewBox="0 0 24 24"><path d="M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M12 3v3"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/></symbol>
+<symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+<symbol id="i-merge" viewBox="0 0 24 24"><circle cx="6" cy="5.5" r="2"/><circle cx="6" cy="18.5" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 7.5v9M8 5.5c5 0 8 2.5 8 4.5M8 18.5c5 0 8-2.5 8-4.5"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M9 5L3 7v13l6-2 6 2 6-2V5l-6 2z"/><path d="M9 5v13M15 7v13"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.5"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
+<symbol id="i-solar" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="11" rx="1.5"/><path d="M9 6v11M15 6v11M3 11.5h18M12 17v3M8 20h8"/></symbol>
+<symbol id="i-ping" viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0"/><path d="M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1.2"/></symbol>
+<symbol id="i-signal" viewBox="0 0 24 24"><path d="M4 9a11 11 0 0 1 16 0M7 12.5a6.5 6.5 0 0 1 10 0"/><circle cx="12" cy="16.5" r="1.5"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6"/><path d="M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3"/></symbol>
+</defs>
+</svg>
+
+<h1>FloodWay: AI-Powered Flood Early Warning, System Architecture and Data Flow</h1>
+
+<div class="zones">
+
+  <!-- ZONE 1: DATA SOURCES -->
+  <div class="zone z1">
+    <div class="zh">DATA SOURCES</div>
+
+    <section class="card" id="userapp">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-photo"/></svg>User app (Android and web)</span></div>
+      <div class="li"><svg class="ic"><use href="#i-photo"/></svg>Photo</div>
+      <div class="li"><svg class="ic"><use href="#i-text"/></svg>Text description</div>
+      <div class="li"><svg class="ic"><use href="#i-gps"/></svg>GPS location</div>
+      <div class="li"><svg class="ic"><use href="#i-clock"/></svg>Timestamp</div>
+    </section>
+
+    <section class="card" id="weather">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-cloud"/></svg>Weather forecast API</span></div>
+      <p>(open data)</p>
+      <p>Rain forecast for the district</p>
+    </section>
+
+    <section class="card" id="iot">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-river"/></svg>IoT river node</span><span class="tag">Design, build next</span></div>
+      <div class="li"><svg class="ic"><use href="#i-ping"/></svg>Ultrasonic sensor</div>
+      <div class="li"><svg class="ic"><use href="#i-solar"/></svg>Solar panel</div>
+      <div class="li"><svg class="ic"><use href="#i-signal"/></svg>LoRa link</div>
+    </section>
+
+    <section class="card" id="cctv">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-camera"/></svg>Street cameras (CCTV)</span><span class="tag">Sample frames only</span></div>
+    </section>
+  </div>
+
+  <!-- ZONE 2: AI PROCESSING LAYER -->
+  <div class="zone z2">
+    <div class="zh">AI PROCESSING LAYER</div>
+    <div class="backend" id="backend">
+      <div class="bl">FloodWay backend (Python FastAPI)</div>
+
+      <section class="card" id="model1">
+        <div class="hd"><span class="tt"><svg class="ic"><use href="#i-chip"/></svg>Model 1, flood susceptibility</span><span class="tag">Re-test pending</span></div>
+        <p>Gradient boosting and Random Forest</p>
+        <p>Input: Earth Engine satellite and terrain layers</p>
+        <p>Output: score 0 to 100 as Low, Moderate, High</p>
+      </section>
+
+      <section class="card" id="rain">
+        <div class="hd"><span class="tt"><svg class="ic"><use href="#i-rain"/></svg>Rainfall trigger</span><span class="tag">Prototype</span></div>
+        <p>Random Forest on forecast rain and flood history</p>
+        <p>Output: district probability that raises Advisory</p>
+      </section>
+
+      <section class="card" id="vision">
+        <div class="hd"><span class="tt"><svg class="ic"><use href="#i-eye"/></svg>Vision check</span><span class="tag">An opinion, reviewed by a person</span></div>
+        <p>Gemini API (Google), multimodal model</p>
+        <p>Output: looks like flooding, depth estimate, “AI-generated or edited?” question</p>
+      </section>
+
+      <section class="card" id="camera">
+        <div class="hd"><span class="tt"><svg class="ic"><use href="#i-camera"/></svg>Camera analysis</span></div>
+        <p>Water-line detection, jump filter, level hysteresis</p>
+      </section>
+
+      <section class="card fusion" id="fusion">
+        <div class="hd"><span class="tt"><svg class="ic"><use href="#i-merge"/></svg>Fusion rules</span></div>
+        <p>Any single input can raise a level; two inputs at Warning together raise Danger</p>
+      </section>
+
+      <div class="store" id="store">
+        <div class="chip">Firebase Auth<small>In use</small></div>
+        <div class="chip">Cloud Firestore<small>In use</small></div>
+        <div class="chip">Cloud Run<small>Planned · API</small></div>
+        <div class="chip">Firebase Hosting<small>Planned · web app</small></div>
+        <div class="chip">Cloud Storage<small>Planned · map tiles</small></div>
+        <div class="chip">Earth Engine<small>Planned · Model 1</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE 3: OUTPUTS -->
+  <div class="zone z3">
+    <div class="zh">OUTPUTS</div>
+
+    <section class="card" id="map">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-map"/></svg>Interactive map</span></div>
+      <p>OpenStreetMap, Leaflet</p>
+      <svg viewBox="0 0 536 118" width="100%" height="118" style="display:block;margin-top:8px;border-radius:10px">
+        <rect width="536" height="118" fill="#EEF4FD"/>
+        <rect x="4" y="4" width="84" height="52" rx="6" fill="#16A34A" opacity=".9"/>
+        <rect x="92" y="4" width="84" height="52" rx="6" fill="#16A34A" opacity=".9"/>
+        <rect x="180" y="4" width="84" height="52" rx="6" fill="#EAB308" opacity=".9"/>
+        <rect x="268" y="4" width="84" height="52" rx="6" fill="#16A34A" opacity=".9"/>
+        <rect x="356" y="4" width="84" height="52" rx="6" fill="#F97316" opacity=".9"/>
+        <rect x="444" y="4" width="88" height="52" rx="6" fill="#EAB308" opacity=".9"/>
+        <rect x="4" y="62" width="84" height="52" rx="6" fill="#EAB308" opacity=".9"/>
+        <rect x="92" y="62" width="84" height="52" rx="6" fill="#F97316" opacity=".9"/>
+        <rect x="180" y="62" width="84" height="52" rx="6" fill="#F97316" opacity=".9"/>
+        <rect x="268" y="62" width="84" height="52" rx="6" fill="#DC2626" opacity=".9"/>
+        <rect x="356" y="62" width="84" height="52" rx="6" fill="#F97316" opacity=".9"/>
+        <rect x="444" y="62" width="88" height="52" rx="6" fill="#DC2626" opacity=".9"/>
+        <path d="M0 100 C110 84 170 50 290 58 S450 22 536 14" stroke="#9BD3FF" stroke-width="12" fill="none" stroke-linecap="round"/>
+        <circle cx="128" cy="34" r="8" fill="#071426" stroke="#fff" stroke-width="3"/>
+        <circle cx="300" cy="92" r="8" fill="#071426" stroke="#fff" stroke-width="3"/>
+        <circle cx="460" cy="36" r="8" fill="#071426" stroke="#fff" stroke-width="3"/>
+      </svg>
+      <p style="margin-top:6px">Colour-coded risk tiles, camera pins</p>
+    </section>
+
+    <section class="card" id="route">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-route"/></svg>Route that avoids flooded roads</span></div>
+    </section>
+
+    <section class="card table" id="ladder">
+      <div class="tt" style="margin-bottom:2px">Four-level warning ladder</div>
+      <table>
+        <thead><tr><th>Level</th><th>Colour</th><th>Resident action</th></tr></thead>
+        <tbody>
+          <tr><td class="lv">Normal</td><td><span class="sw" style="background:#16A34A"></span><span class="hex">#16A34A</span></td><td>App shows green</td></tr>
+          <tr><td class="lv">Advisory</td><td><span class="sw" style="background:#EAB308"></span><span class="hex">#EAB308</span></td><td>Check the route</td></tr>
+          <tr><td class="lv">Warning</td><td><span class="sw" style="background:#F97316"></span><span class="hex">#F97316</span></td><td>Push alert, route ready</td></tr>
+          <tr><td class="lv">Danger</td><td><span class="sw" style="background:#DC2626"></span><span class="hex">#DC2626</span></td><td>Evacuate to the nearest open shelter</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card" id="alerts" style="margin-top:auto;margin-bottom:0">
+      <div class="hd"><span class="tt"><svg class="ic"><use href="#i-bell"/></svg>Alerts</span></div>
+      <p>Push (Firebase Cloud Messaging, planned) and Telegram</p>
+    </section>
+  </div>
+</div>
+
+<div class="legend" id="legend">
+  <span class="lg"><span class="num">1</span>camera reading</span>
+  <span class="lg"><span class="num">2</span>citizen report</span>
+  <span class="lg"><span class="num">3</span>forecast</span>
+  <span class="lg"><span class="num">4</span>map</span>
+  <span class="lg"><span class="num">5</span>route</span>
+  <span class="lg"><span class="num">6</span>alert</span>
+</div>
+
+<div class="foot">Sample cameras and frames are AI-generated sample imagery. Model 1 accuracy is not shown until it is tested on held-out areas. No live government feed is connected.</div>
+
+<svg id="arr" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <marker id="ah" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L12,6 L0,12 z" fill="#1677FF"/>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+const arrows = [
+  // [number, from id, from side fraction, to id, to fraction, badge position along curve]
+  [1, 'cctv',   0.5, 'camera', 0.5, 0.5],
+  [2, 'userapp',0.5, 'vision', 0.5, 0.3],
+  [3, 'weather',0.5, 'rain',   0.5, 0.55],
+  [4, 'model1', 0.5, 'map',    0.5, 0.5],
+  [5, 'fusion', 0.3, 'route',  0.5, 0.5],
+  [6, 'fusion', 0.7, 'alerts', 0.5, 0.5],
+];
+function bez(t, x0, y0, c1x, c1y, c2x, c2y, x1, y1){
+  const u = 1 - t;
+  return [u*u*u*x0 + 3*u*u*t*c1x + 3*u*t*t*c2x + t*t*t*x1,
+          u*u*u*y0 + 3*u*u*t*c1y + 3*u*t*t*c2y + t*t*t*y1];
+}
+
+function draw(){
+  const svg = document.getElementById('arr');
+  svg.querySelectorAll('path.fl').forEach(p=>p.remove());
+  document.querySelectorAll('.badge').forEach(b=>b.remove());
+  for (const [n, a, fa, b, fb, tb] of arrows){
+    const ra = document.getElementById(a).getBoundingClientRect();
+    const rb = document.getElementById(b).getBoundingClientRect();
+    const x0 = ra.right + 3, y0 = ra.top + ra.height*fa;
+    const x1 = rb.left - 3,  y1 = rb.top + rb.height*fb;
+    const dx = (x1 - x0) * 0.5;
+    const c1x = x0 + dx, c2x = x1 - dx;
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('class','fl');
+    p.setAttribute('d', `M${x0} ${y0} C${c1x} ${y0} ${c2x} ${y1} ${x1} ${y1}`);
+    p.setAttribute('fill','none'); p.setAttribute('stroke','#1677FF');
+    p.setAttribute('stroke-width','2.5'); p.setAttribute('marker-end','url(#ah)');
+    svg.appendChild(p);
+    const [mx, my] = bez(tb, x0, y0, c1x, y0, c2x, y1, x1, y1);
+    const badge = document.createElement('div');
+    badge.className = 'badge';
+    badge.textContent = n;
+    badge.style.left = mx + 'px';
+    badge.style.top = my + 'px';
+    document.body.appendChild(badge);
+  }
+}
+document.fonts.ready.then(()=>{ draw(); window.__done = true; });
+window.addEventListener('resize', draw);
+</script>
+</body>
+</html>

@@ -95,4 +95,4 @@ no upload of position. "Send my location" hands a message to the share sheet, an
 
 | Real | Simulated or sample | Not built |
 |---|---|---|
-| Camera pipeline, uploads, alerts, fault filter, OSM road routes, offline cache, local notifications | Sample cameras and frames, relief centres, flood-prone areas, reports, family members on the web map, underpass barriers, forecast inputs | Government camera feeds, agency verification, Huawei Cloud calls, push to a closed app, family location sharing server |
+| Camera pipeline, uploads, alerts, fault filter, OSM road routes, offline cache, local notifications | Sample cameras and frames, relief centres, flood-prone areas, reports, family members on the web map, underpass barriers, forecast inputs | Government camera feeds, agency verification, cloud model calls (Cloud Run, FCM push to a closed app, Earth Engine are planned), family location sharing server |

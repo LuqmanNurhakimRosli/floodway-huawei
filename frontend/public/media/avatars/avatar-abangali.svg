@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg-ali" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="60%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#064E3B"/>
+    </linearGradient>
+    <linearGradient id="hair-ali" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="eye-ali" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#065F46"/>
+      <stop offset="50%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#6EE7B7"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFECD1"/>
+      <stop offset="100%" stop-color="#F9CAA7"/>
+    </linearGradient>
+    <linearGradient id="skin-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F2AE80"/>
+      <stop offset="100%" stop-color="#E28E5A"/>
+    </linearGradient>
+    <clipPath id="circle-clip">
+      <circle cx="128" cy="128" r="128"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#circle-clip)">
+    <!-- Background -->
+    <rect width="256" height="256" fill="url(#bg-ali)"/>
+    <circle cx="40" cy="50" r="35" fill="#34D399" opacity="0.2"/>
+    <path d="M0 200 L260 80" stroke="#34D399" stroke-width="3" opacity="0.25"/>
+
+    <!-- Sporty Hoodie / Polo -->
+    <path d="M36 256 Q44 196 96 186 L128 206 L160 186 Q212 196 220 256 Z" fill="#047857"/>
+    <path d="M98 186 L128 226 L158 186 Z" fill="#065F46"/>
+    <path d="M110 186 L128 212 L146 186 Z" fill="#F0FDF4"/>
+    <!-- Sport stripe -->
+    <path d="M52 235 L96 186 M204 235 L160 186" stroke="#34D399" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Neck -->
+    <path d="M110 158 L110 196 Q128 204 146 196 L146 158 Z" fill="url(#skin)"/>
+    <path d="M110 158 Q128 174 146 158 L146 168 Q128 182 110 168 Z" fill="url(#skin-shadow)"/>
+
+    <!-- Jaw & Face -->
+    <path d="M80 106 Q78 152 128 176 Q178 152 176 106 Q176 72 128 72 Q80 72 80 106 Z" fill="url(#skin)"/>
+    <ellipse cx="96" cy="135" rx="10" ry="5" fill="#F43F5E" opacity="0.25"/>
+    <ellipse cx="160" cy="135" rx="10" ry="5" fill="#F43F5E" opacity="0.25"/>
+
+    <!-- Nose -->
+    <path d="M127 131 L129 136 L126 137" stroke="#C27855" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+
+    <!-- Confident anime grin with teeth sparkle -->
+    <path d="M112 147 Q128 165 146 147 Q128 150 112 147 Z" fill="#881337"/>
+    <path d="M116 149 Q128 157 142 149 Z" fill="#FFFFFF"/>
+    <!-- Tooth star sparkle -->
+    <path d="M142 146 L144 142 L146 146 L150 148 L146 150 L144 154 L142 150 L138 148 Z" fill="#FEF08A"/>
+
+    <!-- Left Eye (Open, determined & friendly) -->
+    <g id="ali-eye-l">
+      <path d="M88 118 Q102 109 116 119" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="103" cy="124" rx="8.5" ry="10.5" fill="url(#eye-ali)"/>
+      <ellipse cx="103" cy="124" rx="4" ry="5" fill="#022C22"/>
+      <circle cx="100" cy="120" r="3.2" fill="#FFFFFF"/>
+      <circle cx="106" cy="128" r="1.6" fill="#FFFFFF"/>
+      <path d="M93 133 Q102 136 111 133" stroke="#0F172A" stroke-width="1.5" fill="none"/>
+      <path d="M86 104 Q100 97 114 104" stroke="#1E293B" stroke-width="4" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Right Eye (Charismatic anime wink! 😉) -->
+    <g id="ali-eye-r">
+      <path d="M140 125 Q152 113 166 124" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <path d="M140 125 Q152 133 166 124" stroke="#0F172A" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <!-- Cheek crease for wink -->
+      <path d="M150 133 Q156 136 162 133" stroke="#F43F5E" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path d="M142 104 Q156 97 168 106" stroke="#1E293B" stroke-width="4" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Ears -->
+    <path d="M80 116 Q72 122 74 133 Q76 141 82 139" fill="url(#skin)" stroke="#C27855" stroke-width="1.5"/>
+    <path d="M176 116 Q184 122 182 133 Q180 141 174 139" fill="url(#skin)" stroke="#C27855" stroke-width="1.5"/>
+
+    <!-- Anime Spiky Hair (Cool elder brother hairstyle) -->
+    <g fill="url(#hair-ali)">
+      <!-- Silhouette -->
+      <path d="M64 106 Q62 50 128 42 Q194 50 192 106 Q200 122 188 138 Q176 102 176 88 Q128 66 80 88 Q80 102 68 138 Q56 122 64 106 Z"/>
+      <!-- Dynamic Spikes on Top -->
+      <path d="M96 56 L108 30 L118 48 L134 26 L144 46 L160 32 L166 56 Z"/>
+      <path d="M64 92 L50 78 L72 74 L60 60 L84 62 Z"/>
+      <path d="M192 92 L206 78 L184 74 L196 60 L172 62 Z"/>
+      <!-- Forehead bangs -->
+      <path d="M78 86 Q96 92 106 108 Q104 88 122 84 Q132 100 138 110 Q138 86 156 88 Q164 100 168 112 Q172 84 184 88 Z"/>
+    </g>
+
+    <!-- Hair Sheen -->
+    <ellipse cx="128" cy="72" rx="30" ry="6" fill="#34D399" opacity="0.45"/>
+    <ellipse cx="106" cy="68" rx="8" ry="3" fill="#A7F3D0" opacity="0.7"/>
+    <ellipse cx="150" cy="70" rx="10" ry="3" fill="#A7F3D0" opacity="0.7"/>
+  </g>
+</svg>

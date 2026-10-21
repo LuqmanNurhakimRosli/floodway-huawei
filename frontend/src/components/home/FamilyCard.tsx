@@ -37,18 +37,28 @@ export function FamilyCard() {
         </Link>
       </div>
 
-      <ul className="-mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+      <ul className="-mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:none] snap-x snap-mandatory">
         {members.map((m) => {
           const k = m.status === 'sos' ? 'sos' : riskAt([m.lat, m.lon], zones).risk;
           return (
-            <li key={m.id} className="relative flex w-[84px] shrink-0 flex-col items-center gap-1.5 text-center">
-              <Avatar member={m} size="lg" ring={k === 'clear' ? undefined : k} />
-              <span className="w-full truncate text-sm font-bold text-slate-900">{m.isYou ? 'You' : m.name.split(' ')[0]}</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGE[k]}`}>
-                {k === 'sos' && <Siren className="-mt-0.5 mr-0.5 inline h-3 w-3" aria-hidden="true" />}
-                {LABEL[k]}
-              </span>
-              <span className="sr-only">{whereText(m, family.places)}</span>
+            <li key={m.id} className="relative flex w-[92px] shrink-0 flex-col items-center text-center snap-start">
+              <Link
+                to="/map"
+                className="group flex flex-col items-center gap-1.5 rounded-2xl p-1 transition-all duration-150 hover:-translate-y-0.5 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+                title={`View ${m.isYou ? 'your location' : m.name} on the map`}
+              >
+                <div className="transition-transform duration-150 group-hover:scale-105">
+                  <Avatar member={m} size="lg" ring={k === 'clear' ? undefined : k} />
+                </div>
+                <span className="w-full truncate text-sm font-bold text-slate-900 group-hover:text-[#0958D9] transition-colors">
+                  {m.isYou ? 'You' : m.name}
+                </span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGE[k]}`}>
+                  {k === 'sos' && <Siren className="-mt-0.5 mr-0.5 inline h-3 w-3" aria-hidden="true" />}
+                  {LABEL[k]}
+                </span>
+                <span className="sr-only">{whereText(m, family.places)}</span>
+              </Link>
             </li>
           );
         })}

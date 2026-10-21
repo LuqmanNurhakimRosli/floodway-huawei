@@ -1,6 +1,6 @@
 // Single source of truth for Live Vision. Module-level so the Live page AND the Map page share one connection.
 // React reads it through hooks/vision/useVisionStore (useSyncExternalStore).
-import type { AlertEvent, Barrier, BarrierAction, BarrierEvent, Camera, CameraDraft, Reading, ServerMessage } from '../../types/vision';
+import type { AlertEvent, Barrier, BarrierEvent, Camera, CameraDraft, Reading, ServerMessage } from '../../types/vision';
 import { evaluateBarrier, SEED_BARRIERS } from '../../lib/vision/barriers';
 import { FORCE_MOCK } from './config';
 import { mockCameras, startMockFeed } from './mockVision';
@@ -257,29 +257,6 @@ export async function addCamera(draft: CameraDraft): Promise<Camera> {
 export async function removeCamera(cameraId: string): Promise<void> {
   if (!state.usingMock) await api.deleteCamera(cameraId);
   setState({ cameras: state.cameras.filter((c) => c.id !== cameraId) });
-}
-
-/** Operator override for a barrier. On sample data it changes only this page; with a server it needs the operator token. */
-export async function commandBarrier(barrierId: string, action: BarrierAction): Promise<void> {
-  if (state.usingMock) {
-    const now = new Date().toISOString();
-    const b = state.barriers.find((x) => x.id === barrierId);
-    if (!b) return;
-    const next: Barrier =
-      action === 'auto' ? { ...b, mode: 'auto' } : { ...b, mode: 'manual', state: action === 'close' ? 'CLOSED' : 'OPEN', changed_at: now };
-    const reason = action === 'auto' ? 'Operator resumed automatic control.' : `Operator ${action === 'close' ? 'closed' : 'opened'} the barrier.`;
-    if (action !== 'auto') next.reason = reason;
-    const event: BarrierEvent = {
-      id: `local-${barrierId}-${now}`, barrier_id: b.id, barrier_name: b.name, state: next.state, cause: action === 'auto' ? 'resume' : 'manual',
-      reason, timestamp: now, trigger: b.trigger, level: b.last_level, value: null,
-    };
-    applyMessage({ type: 'barrier', barrier: next, event });
-    return;
-  }
-  const event = await api.commandBarrier(barrierId, action);
-  // The socket also pushes this; refetching the list keeps the page right if the socket is down.
-  const barriers = await api.listBarriers().catch(() => state.barriers);
-  setState({ barriers, barrierEvents: state.barrierEvents.some((e) => e.id === event.id) ? state.barrierEvents : [event, ...state.barrierEvents].slice(0, BARRIER_LOG_MAX) });
 }
 
 export function ackAlert(alertId: string): void {

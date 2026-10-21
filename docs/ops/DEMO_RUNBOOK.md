@@ -1,6 +1,6 @@
 # FloodWay demo runbook
 
-For the Huawei ICT Competition: prelim 14 Oct, semi-final 3 Nov, final 18 Nov. Written from the app as it is on branch
+For the Sime Darby Property University Hackathon 2026 (first written for the Huawei ICT preliminary round). Written from the app as it is on branch
 `demo-polish`. Everything here was checked against the running app; where something was not, it says so.
 
 ---
@@ -22,15 +22,15 @@ Say this plainly. A judge who asks "is that real?" must get a straight answer.
 | **Real data, simulated drive** | Evacuation route (Map) | Road geometry and turn steps come from OpenStreetMap through the public OSRM server, computed in advance and stored. The route chosen avoids the flood areas it can; the car on screen is a sped-up simulation, not a tracked position. No live traffic. |
 | **Approximate** | Evacuation route (Home) | A straight line bent around camera flood zones. Not road-aware. The UI says "approximate". |
 | **Not built / not claimed** | Any public JPS or DBKL camera feed | No confirmed public API. Never say the cameras are government feeds. |
-| **Not built / not claimed** | Verification by an agency, certification, a Huawei Cloud call | Nothing verifies reports. No Huawei Cloud service is called by this demo. It is designed for Huawei Cloud. |
+| **Not built / not claimed** | Verification by an agency, certification, a cloud model call | Nothing verifies reports. No cloud model is called by this demo. Cloud Run, Cloud Storage, FCM and Earth Engine are planned (`docs/plans/GLOBAL_STACK_PLAN.md`). The Gemini photo check runs only when a key is set, and gives an opinion. |
 | **Not built / not claimed** | Real IoT sensors in the demo | The code can read a USB sensor, but the demo shows simulated values. |
 
 **Accuracy figures.** 95.34% is segmentation pixel accuracy on the model's test set. It is **not** forecast accuracy. 100%
 route avoidance is a simulation result only. The classical analyser's "20 of 20" on the sample frames proves the pipeline
 runs; it does **not** prove it reads realistic water, because those frames are a drawn rectangle (see section 6).
 
-**Never say:** "live government CCTV", "verified by JPS / NADMA / APM", "powered by Huawei ModelArts" (the forecast is a
-formula), "AI verified" for a report whose AI check did not run, "certified".
+**Never say:** "live government CCTV", "verified by JPS / NADMA / APM", "powered by Google Cloud" or "runs on Cloud Run" before
+it does (the forecast is a formula), any GINKGO accuracy figure (not reproduced), "AI verified" for a report whose AI check did not run, "certified".
 
 ---
 

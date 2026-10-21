@@ -18,5 +18,4 @@ export const visionActions = {
   removeCamera: store.removeCamera,
   loadHistory: store.loadHistory,
   ackAlert: store.ackAlert,
-  commandBarrier: store.commandBarrier,
 };

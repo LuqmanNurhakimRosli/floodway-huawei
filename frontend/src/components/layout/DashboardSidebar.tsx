@@ -9,9 +9,7 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
-  ShieldCheck,
-  ShieldHalf,
-  ChevronRight
+  Phone
 } from 'lucide-react';
 
 /** `defaultCollapsed` starts in the icon rail (used by dense pages on laptop widths); the user can still expand it. */
@@ -23,7 +21,6 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
     { label: 'Map', icon: Map, path: '/map' },
     { label: 'Reports', icon: FileText, path: '/reports' },
     { label: 'Live Vision', icon: Video, path: '/live' },
-    { label: 'Control room', icon: ShieldHalf, path: '/control' },
     { label: 'Profile', icon: User, path: '/profile' },
   ];
 
@@ -42,7 +39,7 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
               <span className="font-heading font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
                 FloodWay
               </span>
-              <span className="text-xs text-blue-400/90 font-medium tracking-wider uppercase">Life-Safety Intelligence</span>
+              <span className="text-xs font-medium text-blue-300/90">Flood safety for families</span>
             </div>
           )}
         </div>
@@ -96,17 +93,18 @@ export function DashboardSidebar({ defaultCollapsed = false }: { defaultCollapse
         ))}
       </nav>
 
-      {/* System Status Footer */}
+      {/* Emergency call: the one thing a person in a flood may need from any screen */}
       {!isCollapsed && (
-        <div className="p-3.5 m-3 rounded-xl bg-[#0B1E38]/80 border border-slate-800/80">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-slate-200">LifeLine Active</span>
-          </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Real-time flood prediction & community safety dispatch.
-          </p>
-        </div>
+        <a
+          href="tel:999"
+          className="m-3 flex min-h-14 items-center gap-3 rounded-2xl border border-red-400/30 bg-red-500/10 p-3.5 text-left transition-colors hover:bg-red-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white"><Phone className="h-4 w-4" aria-hidden="true" /></span>
+          <span>
+            <span className="block text-sm font-bold text-white">Emergency? Call 999</span>
+            <span className="block text-xs text-slate-300">Malaysia emergency line</span>
+          </span>
+        </a>
       )}
     </aside>
   );

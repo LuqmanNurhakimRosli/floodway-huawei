@@ -44,7 +44,7 @@ export default function Settings() {
       <Card tone="info">
         <H2>About this version</H2>
         <Body>The cameras in the demo are sample scenes. The relief centres are a demo list. The forecast on the web app is a rule-based estimate. None of this is an official warning.</Body>
-        <Small>FloodWay {Constants.expoConfig?.version ?? ''} · Demo for the Huawei ICT Competition 2026</Small>
+        <Small>FloodWay {Constants.expoConfig?.version ?? ''} · Demo for the Sime Darby Property Hackathon 2026</Small>
       </Card>
     </Screen>
   );

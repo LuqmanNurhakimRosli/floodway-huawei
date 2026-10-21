@@ -5,8 +5,9 @@
 // blocked host, a venue firewall, a tile policy refusal). When every provider fails it draws the stored road network
 // offline, so the map is never a blank grey box.
 //
-// Terms to check before a public launch: CARTO basemaps (https://carto.com/basemaps, attribution required, usage
-// limits apply) and the OpenStreetMap tile policy (https://operations.osmfoundation.org/policies/tiles/).
+// CARTO is not used: since 2026 its basemaps answer a keyless request with an "API KEY REQUIRED" image (HTTP 200), which
+// the failover cannot tell from a real tile. Terms to check before a public launch: the OpenStreetMap tile policy
+// (https://operations.osmfoundation.org/policies/tiles/) and OSM France (https://www.openstreetmap.fr/fonds-de-carte/).
 
 export interface BasemapProvider {
   id: string;
@@ -23,19 +24,19 @@ const OSM_CREDIT = '&copy; <a href="https://www.openstreetmap.org/copyright">Ope
 
 export const BASEMAPS: BasemapProvider[] = [
   {
-    id: 'carto-voyager',
-    name: 'CARTO Voyager',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    subdomains: 'abcd',
-    attribution: `${OSM_CREDIT} &copy; <a href="https://carto.com/attributions">CARTO</a>`,
-    maxZoom: 20,
-  },
-  {
     id: 'osm',
     name: 'OpenStreetMap',
     url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     subdomains: 'a', // unused by this URL, but Leaflet needs a non-empty list
     attribution: OSM_CREDIT,
+    maxZoom: 19,
+  },
+  {
+    id: 'osm-hot',
+    name: 'OpenStreetMap HOT',
+    url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+    subdomains: 'abc',
+    attribution: `${OSM_CREDIT}, tiles by <a href="https://www.hotosm.org/">HOT</a> hosted by <a href="https://openstreetmap.fr/">OSM France</a>`,
     maxZoom: 19,
   },
 ];

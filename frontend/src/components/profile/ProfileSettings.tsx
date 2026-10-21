@@ -42,8 +42,8 @@ export function ProfileSettings() {
   const [operatorSet, setOperatorSet] = useState(hasWriteToken());
 
   const [contacts, setContacts] = useState([
-    { id: 'c1', name: 'Nurul Huda (Mother)', phone: '+60 12-987 6543' },
-    { id: 'c2', name: 'Farhan Rosli (Brother)', phone: '+60 19-321 0987' },
+    { id: 'c1', name: 'Emak (Mother)', phone: '+60 12-987 6543' },
+    { id: 'c2', name: 'Abang Ali (Brother)', phone: '+60 19-321 0987' },
   ]);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
@@ -74,27 +74,39 @@ export function ProfileSettings() {
   const name = user?.name || 'Luqman Nurhakim';
   const members = circleMembers({ ...family, circleId: 'family' }).filter((m) => !m.isYou);
 
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
   return (
-    <div className="mx-auto w-full min-w-0 max-w-2xl space-y-5 p-4 md:p-6">
+    <div className="mx-auto w-full min-w-0 max-w-4xl space-y-5 p-4 md:p-6">
       <h1 className="font-heading text-[28px]/9 font-bold text-slate-900 md:text-3xl/10">Profile</h1>
 
-      <section className={`${card} flex flex-col items-center p-6 text-center`} aria-label="Your account">
-        <span className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#4096FF] to-[#0958D9] font-heading text-3xl font-extrabold text-white shadow-lg shadow-blue-900/25 ring-4 ring-blue-100">
-          {name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
-        </span>
-        <h2 className="mt-3 font-heading text-xl font-extrabold text-slate-900">{name}</h2>
-        <p className="text-sm text-slate-600">{user?.email || 'luqman@floodway.my'}</p>
-        <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#0958D9]">
-          {user?.isDemo !== false ? 'Demo account' : 'Signed in on this device'}
-        </span>
-        <div className="mt-4 flex -space-x-3" aria-label={`${members.length} people in your family circle`}>
-          {members.map((m) => (
-            <Avatar key={m.id} member={m} size="md" />
-          ))}
-        </div>
-      </section>
+      <div className="space-y-5 lg:grid lg:grid-cols-12 lg:items-start lg:gap-6 lg:space-y-0">
+        <section className={`${card} flex flex-col items-center p-6 text-center lg:col-span-5 lg:sticky lg:top-20`} aria-label="Your account">
+          <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#4096FF] to-[#0958D9] font-heading text-3xl font-extrabold text-white shadow-lg shadow-blue-900/25 ring-4 ring-blue-100">
+            {!avatarFailed ? (
+              <img
+                src="/media/avatars/avatar-you.jpg"
+                alt={name}
+                className="h-full w-full object-cover"
+                onError={() => setAvatarFailed(true)}
+              />
+            ) : (
+              <span>{name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}</span>
+            )}
+          </div>
+          <h2 className="mt-3 font-heading text-xl font-extrabold text-slate-900">{name}</h2>
+          <p className="text-sm text-slate-600">{user?.email || 'luqman@floodway.my'}</p>
+          <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#0958D9]">
+            {user?.isDemo !== false ? 'Demo account' : 'Signed in on this device'}
+          </span>
+          <div className="mt-4 flex -space-x-3" aria-label={`${members.length} people in your family circle`}>
+            {members.map((m) => (
+              <Avatar key={m.id} member={m} size="md" />
+            ))}
+          </div>
+        </section>
 
-      <section className={`${card} overflow-hidden`} aria-label="Settings">
+        <section className={`${card} overflow-hidden lg:col-span-7`} aria-label="Settings">
         <Row icon={User} title="Personal information" sub={`${name} · ${user?.phone || '+60 12-345 6789'}`}>
           <dl className="grid gap-2 text-sm sm:grid-cols-2">
             <div className="rounded-xl bg-slate-50 p-3"><dt className="text-xs font-semibold text-slate-500">Name</dt><dd className="font-bold text-slate-900">{name}</dd></div>
@@ -192,6 +204,7 @@ export function ProfileSettings() {
           <span className="font-bold text-red-700">Log out</span>
         </button>
       </section>
+      </div>
     </div>
   );
 }

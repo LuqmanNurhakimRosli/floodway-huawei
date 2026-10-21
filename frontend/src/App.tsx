@@ -12,7 +12,6 @@ const LiveVisionPage = lazy(() => import('./pages/LiveVisionPage'));
 const ReportPage = lazy(() => import('./pages/ReportPage').then((m) => ({ default: m.ReportPage })));
 const NavigationPage = lazy(() => import('./pages/NavigationPage').then((m) => ({ default: m.NavigationPage })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
-const ControlRoomPage = lazy(() => import('./pages/ControlRoomPage'));
 // three.js is only needed by the 3D studio, so it loads with that route instead of on every page.
 const HouseStudio360 = lazy(() => import('./components/sandbox/HouseStudio360').then((m) => ({ default: m.HouseStudio360 })));
 
@@ -64,7 +63,7 @@ export function App() {
               <Route path="/live" element={<ProtectedRoute><LiveVisionPage /></ProtectedRoute>} />
               <Route path="/simulation" element={<Navigate to="/live" replace />} />
               <Route path="/studio" element={<ProtectedRoute><ErrorBoundary what="The 3D studio"><Studio /></ErrorBoundary></ProtectedRoute>} />
-              <Route path="/control" element={<ProtectedRoute><ControlRoomPage /></ProtectedRoute>} />
+              <Route path="/control" element={<Navigate to="/map" replace />} />
               <Route path="/reports" element={<ProtectedRoute><ReportPage /></ProtectedRoute>} />
               <Route path="/navigation/:shelterId" element={<ProtectedRoute><NavigationPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

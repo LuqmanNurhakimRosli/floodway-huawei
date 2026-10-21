@@ -23,8 +23,15 @@ export function ReliefList() {
           return (
             <li key={s.id}>
               <Link to={`/navigation/${s.id}`} className={`${card} flex items-center gap-3 p-3 hover:border-[#1677FF] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]`}>
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1677FF] to-[#071426] text-white">
-                  <Building2 className="h-7 w-7" aria-hidden="true" />
+                <span className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#1677FF] to-[#071426] text-white">
+                  <img
+                    src={`/media/places/${s.id}.jpg`}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                    onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                  />
+                  <Building2 className="absolute h-7 w-7 opacity-20" aria-hidden="true" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex items-start justify-between gap-2">

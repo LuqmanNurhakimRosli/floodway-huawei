@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
 import { useElementWidth } from '../../hooks/vision/useElementSize';
-import { RefreshCw, Waypoints } from 'lucide-react';
+import { Waypoints } from 'lucide-react';
 import { useForecast } from '../../hooks/useForecast';
 import type { ForecastResponse } from '../../services/api';
 import { LEVEL_PALETTE } from '../../lib/vision/levels';
 import { Skeleton } from '../live/shared/Skeleton';
-import { btnSecondary, card, cardPad, cardTitle, num } from '../../styles/tokens';
+import { card, cardPad, cardTitle, num } from '../../styles/tokens';
 
 const H = 200;
 const PAD = { l: 48, r: 14, t: 12, b: 30 };
@@ -18,7 +18,9 @@ const DANGER_M = 1.5;
  * is part of the component and cannot be hidden by a prop.
  */
 export function ForecastTimeline() {
-  const { state, retry } = useForecast();
+  const { state } = useForecast();
+  // No server forecast, no card: an apology helps no one on the home screen, and we never invent forecast numbers.
+  if (state.status === 'error') return null;
 
   return (
     <section className={`${card} ${cardPad}`} aria-labelledby="forecast-title">
@@ -30,13 +32,6 @@ export function ForecastTimeline() {
       </div>
 
       {state.status === 'loading' && <Skeleton className="mt-3 h-48 w-full" />}
-
-      {state.status === 'error' && (
-        <div className="mt-3 flex flex-col items-start gap-3 rounded-xl border border-dashed border-slate-300 p-5" role="alert">
-          <p className="text-sm/5 text-slate-800">The forecast could not be loaded from the server, so none is shown. We never show forecast numbers the server did not produce.</p>
-          <button type="button" onClick={retry} className={btnSecondary}><RefreshCw className="h-4 w-4" aria-hidden="true" /> Try again</button>
-        </div>
-      )}
 
       {state.status === 'ready' && <Chart data={state.data} />}
     </section>

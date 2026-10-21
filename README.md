@@ -1,93 +1,68 @@
-# FloodWay 2.0 — AI-Powered Urban Flash Flood & Infrastructure Warning System
-### Huawei ICT Competition 2026 · Innovation Track
+# FloodWay: flood early warning for Malaysian townships
+### Sime Darby Property University Hackathon 2026 · Township of Tomorrow
 
 > **"One glance to know if you are safe. One tap to find shelter."**
 
-FloodWay 2.0 transforms metropolitan urban flood resilience by uniting **Huawei Cloud ModelArts**, **Ascend 910 NPU AI acceleration**, **Huawei PanGu-CV multimodal computer vision**, and **Telegram Bot API** into a zero-hardware, life-safety intelligence platform.
+FloodWay warns residents of flood-prone places before the water reaches them. It turns four inputs into one four-level warning (Normal, Advisory, Warning, Danger), shows it on a map, routes people around flooded roads to an open relief centre, and sends alerts.
+
+**What is real today:** the camera water-level pipeline, photo upload, alert logic, the sensor fault filter, OpenStreetMap road routes, the Android app's offline cache and local notifications. **Simulated or sample:** the five cameras and their AI-generated frames, relief centres, flood-prone areas, reports, family members, underpass barriers and the forecast input. **Not built:** government camera feeds, agency verification, a real road barrier. Full table: `docs/ops/DEMO_RUNBOOK.md`.
 
 ---
 
-## 🏛️ System Architecture: Zero-IoT & Infrastructure-Centric
+## Architecture
 
-Unlike legacy rural river alert systems that require thousands of expensive, fragile physical IoT sensor nodes prone to fouling and subterranean signal loss, FloodWay 2.0 is **100% Cloud-Native and Vision-First**. It leverages existing urban infrastructure—municipal traffic surveillance and commercial mall basement CCTVs—processed in real time on Huawei Cloud.
+![System architecture](docs/architecture/FloodWay_System_Architecture_1920x1080.png)
 
-![System Architecture](docs/architecture/system_architecture.png)
+| Input | What it answers | Status |
+|---|---|---|
+| Model 1, flood susceptibility (GINKGO, `models/ginkgo/`) | *Where* water is likely to collect | Trained; re-test pending (`models/ginkgo/MODEL_CARD.md`) |
+| Weather forecast and rainfall trigger | *When* heavy rain is coming | Prototype; the app uses a rule-based formula today |
+| IoT river node (ultrasonic, solar, LoRa) | *How high* the river is now | Designed; firmware sketch in `firmware/` |
+| Street cameras and citizen photos | *What* is happening on the road | Built and tested on sample frames; Gemini gives an opinion on photos |
 
-### 3-Column Processing Workflow
+A small set of readable rules combines them: any single input can raise a level; two inputs at Warning together raise Danger.
 
-```
-[COLUMN 1: DATA INPUTS]               [COLUMN 2: HUAWEI CLOUD AI LAYER]           [COLUMN 3: USER OUTPUTS & INTERFACES]
-├── Urban CCTV & Visual Feeds    ──┐  ┌──────────────────────────────────────┐  ──► 3D Digital Twin (/simulation)
-├── Citizen Sentinel (Web/Mobile)──┼─►│ 1. Huawei PanGu-CV (Multimodal)      │  ──► Multi-Modal Evacuation Map (/map)
-└── Meteorological & Rain APIs   ──┘  │ 2. ModelArts Ascend 910 NPU Engine   │  ──► Citizen Sentinel Hub (/reports)
-                                      │ 3. Inundation-Weighted A* Algorithm │  ──► Telegram Emergency Siren & Check-in
-                                      └──────────────────────────────────────┘
-```
+## Stack (Google ecosystem)
 
-1. **Column 1: Multi-Source Urban Ingestion (Zero-IoT)**
-   * **Urban Traffic & Building CCTV:** IP surveillance cameras at mall parking ramps, highway dips, and major stormwater gates.
-   * **Citizen Sentinel Mobile Reports:** Geotagged, timestamped flood incident photos submitted by community members.
-   * **Meteorological APIs:** MetMalaysia Doppler radar & DID (JPS) urban stormwater runoff rates.
-2. **Column 2: Huawei Cloud Enterprise AI Layer**
-   * **Huawei PanGu-CV (Multimodal Vision):** Real-time waterline segmentation, physical object depth estimation (tires, curbs), and **image authenticity verification (anti-deepfake & anti-manipulation)**.
-   * **ModelArts Ascend 910 NPU Engine:** PyTorch GRU hydrological time-series forecaster predicting forward water levels ($h_{t+60}$) and urban flash accumulation rates.
-   * **Inundation-Weighted A\* Algorithm:** Real-time road impedance recalculation dynamically routing vehicles away from submerged corridors.
-3. **Column 3: Actionable User Interfaces**
-   * **3D Digital Twin (`/simulation`):** Three.js spatial simulation of building and underground parking ingress with critical **110 cm electrical DB breach shut-off**.
-   * **Evacuation Map (`/map`):** Turn-by-turn navigation across Drive, Bike, and Walk with geofenced shelter check-in (<50m).
-   * **Citizen Sentinel Hub (`/reports`):** Public alerting feed with two-tier validation (AI Vision + Human Authority Desk).
-   * **Telegram Emergency Siren (`@floodway_bot`):** Automated urgent warnings and safe arrival check-ins to family groups.
+| Layer | Technology | Status |
+|---|---|---|
+| Web app | React 19, TypeScript, Vite, Tailwind CSS 4, Leaflet + OpenStreetMap | Running |
+| Android app | Expo, React Native | Code done; no APK yet |
+| Backend | Python, FastAPI, OpenCV | Running locally |
+| Sign-in and data | Firebase Authentication, Cloud Firestore | In use |
+| Photo check | Gemini API (OpenRouter as fallback) | Built; live call not yet run |
+| Hosting | Cloud Run (API), Firebase Hosting (web), Cloud Storage (photos, map tiles) | Planned |
+| Push alerts | Firebase Cloud Messaging, Telegram | Telegram works; FCM planned |
+| Model 1 features | Google Earth Engine (Sentinel-2, Copernicus DEM) | Planned |
 
-*For complete architectural specifications and end-to-end Input-Process-Output flows, see [docs/architecture/SYSTEM_SPECIFICATION.md](docs/architecture/SYSTEM_SPECIFICATION.md) and [docs/architecture/URBAN_FLASH_FLOOD.md](docs/architecture/URBAN_FLASH_FLOOD.md).*
+The plan and its order: `docs/plans/GLOBAL_STACK_PLAN.md`. Every algorithm, with its parameters and limits: `docs/architecture/FLOODWAY_OVERVIEW.md`.
 
----
-
-## 🏙️ High-Impact Urban Flash Flood Scenarios
-
-* **Shopping Mall Underground Basement Carparks (e.g. Mid Valley, Suria KLCC):** Stormwater rushing down entrance ramps can submerge hundreds of cars within 15 minutes. PanGu-CV triggers an urgent *"Move Vehicles to Upper Floors"* Telegram countdown to mall patrons.
-* **Sunken Highway Underpasses (e.g. Jalan Tun Razak, NPE):** Prevents vehicle hydrolock and traffic paralysis by dynamically cutting off flooded sunken lanes and routing cars onto elevated flyovers.
-* **Critical Electrical Substations & Basements:** Automatically alerts facility teams at the 110 cm threshold to execute electrical shut-off before water causes fatal electrocution or explosion.
-
----
-
-## 📁 Repository Structure
+## Repository
 
 ```
-/Huawei
-  ├── /frontend         # React 19 + Vite 7 + Tailwind CSS v4 + Three.js UI
-  ├── /backend          # Python 3.13 FastAPI services & Huawei ModelArts endpoints
-  ├── /models           # Pre-trained models (PyTorch GRU, ModelArts package, ANN legacy)
-  ├── /datasets         # Malaysia flood river gauging datasets (CSV)
-  ├── /docs             # Technical specs, architecture diagrams & URBAN_FLASH_FLOOD_ARCHITECTURE.md
-  ├── /assets           # Shared media, 3D assets (city.glb), river terrain & CCTV photos
-  └── MIGRATION_NOTES.md # Detailed migration record & architectural log
+frontend/   React web app (pages, components, lib/ = pure rules shared with mobile)
+backend/    FastAPI: vision/ (camera pipeline), routes/, services/ (rule-based forecast, Telegram)
+mobile/     Android app (Expo)
+models/     ginkgo/ (Model 1 classifiers), ml_pipeline/ (GRU forecaster, synthetic weights), legacy_ann/
+firmware/   ESP32 depth node and bench barrier sketches
+docs/       architecture/, plans/, ops/, ai/PROGRESS.md (status board)
 ```
 
----
+## Quick start
 
-## 🚀 Quick Start Guide
-
-### 1. Run Frontend
 ```bash
-cd frontend
-npm install
-npm run dev
-```
-Open **`http://localhost:5173`** (or access from your mobile phone via `http://<your-local-ip>:5173`).
+# web app
+cd frontend && npm install && npm run dev        # http://localhost:5173
 
-### 2. Run Backend
-```bash
+# backend
 cd backend
+python -m venv .venv && .venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-python run.py
+python run.py                                    # http://localhost:8080, API docs at /docs
 ```
-API endpoints listen on **`http://localhost:8080`** (Swagger docs at `/docs`).
 
----
+All checks: `powershell -File scripts/check.ps1`. Copy `backend/.env.example` to `backend/.env` to set the Gemini key, Telegram token and write token. Never put a secret in a `VITE_` variable.
 
-## 🛡️ Key Features
-1. **Emergency Command Bar:** 4-metric real-time hazard assessment and evacuation countdown.
-2. **3D Digital Twin Simulation (`/simulation`):** Dynamic building water ingress simulation with 110 cm electrical DB shut-off alert.
-3. **Turn-by-Turn Evacuation Map (`/map`):** Inundation-weighted A* routing avoiding low-lying hazards with automated geofenced arrival check-in.
-4. **Community Sentinel Hub (`/reports`):** Crowd-sourced citizen flood alerting powered by **Huawei PanGu-CV & Gemini Flash** with deepfake verification.
-5. **Closed-Loop Telegram Bot (`@floodway_bot`):** Automated SOS dispatch and family arrival safety confirmation.
+## Honesty rules
+
+The sample cameras are AI-generated sample imagery. The demo forecast is a formula, not a trained model. No accuracy number is shown unless this repo can reproduce it. FloodWay is decision support; official warnings stay with the authorities.

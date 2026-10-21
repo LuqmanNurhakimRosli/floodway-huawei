@@ -1,0 +1,25 @@
+shot_id,scene,start,end,speaker,visual,motion_graphic,sfx,music,footage_source,status
+S01,1 Cold open,0:00,0:08,none,Rain on township road; drain begins to fill,Title card wave line draws in,Rain ambience; low rumble,Bed starts quiet,Own rain B-roll or licensed stock,todo
+S02,1 Cold open,0:08,0:15,RAKUMAN,Drain overflows; phone shows FloodWay alert,Phone UI mock-up,Splash at 0:08,Bed continues,Own screen capture; B-roll,todo
+S03,2 Problem,0:15,0:25,RAKUMAN,Counter RM0 to RM933.4 million,Animated counter with DOSM 2024 tag,Soft tick on final number,Bed low,Graphic only,todo
+S04,2 Problem,0:25,0:40,RAKUMAN,Simple map; road goes under water; question mark,Road sinks animation,Rain eases,Bed low,Graphic only,todo
+S05,3 Solution,0:40,0:55,RAKUMAN,Four-level ladder rows appear,Rows stagger 250 ms with swatches and hex codes,Soft chime per row,Bed low,Graphic only,todo
+S06,3 Solution,0:55,1:00,RAKUMAN,Phone shows map colour and route,Route line draws,Ping,Bed low,App screen capture,todo
+S07,4 Workflow,1:00,1:15,RAKUMAN,Poster animates left to right; arrows 1 to 3,Arrows 1 to 3 light up; numbers pop,Swoosh per arrow,Bed low,Architecture poster PNG layers,todo
+S08,4 Workflow,1:15,1:30,RAKUMAN,Poster arrows 4 to 6; map updates; route; alert,Arrows 4 to 6 light up; arrow 6 pulses,Swoosh; low tone on arrow 6,Bed low,Architecture poster PNG layers,todo
+S09,5 Forecast and base layer,1:30,1:42,TISYA,Forecast card flies in with cloud icon,Card whoosh; "when" label,Whoosh,Music lifts,Icon set,todo
+S10,5 Forecast and base layer,1:42,1:55,NADI,Model card with Low / Moderate / High band bar,Band bar animates; "where" label,Whoosh,Music steady,Illustrative heat map graphic,todo
+S11,6 River node and camera,1:55,2:10,LUQMAN,3D RiverNode turntable,Turntable from GLB render,Water rush under node,Bed steady,3D renders from GLB,todo
+S12,6 River node and camera,2:10,2:25,LUQMAN,Exploded view from blueprint S1,Parts separate with labels,Mechanical click,Bed steady,Blueprint S1 export,todo
+S13,6 River node and camera,2:25,2:40,LUQMAN,Beam cone to water; sample camera frame with water line and hold icon,Beam cone; formula h = H minus d; water line draws; hold icon,Click,Bed steady,Sample camera frame (labelled AI-generated),todo
+S14,7 Trained model,2:40,3:05,NADI,Full-screen AI Model 1 slide,Caption banner "Reported figures. Re-test in progress.",None under voice,Music drops out,Team slide after Appendix A fix,todo
+S15,7 Trained model,3:05,3:27,TISYA,Highlight top row and F1 cell; text card "Random pixel split. Re-test on held-out areas.",Highlight boxes 3 s; text card,None,Music drops out,Team slide; text card,todo
+S16,8 Working demo,3:27,3:40,RAKUMAN,Live Vision with five sample cameras; one at Warning,Cursor highlight; zoom on level card; caption "Sample cameras. AI-generated frames.",UI click,Music low,Screen recording of prototype,todo
+S17,8 Working demo,3:40,3:52,RAKUMAN,Citizen report: photo, description, location; AI opinion appears,Zoom on opinion card; caption "Opinion. Reviewed by a person.",Phone ping,Music low,Screen recording of prototype,todo
+S18,8 Working demo,3:52,3:59,RAKUMAN,Map with verified-report area; route avoids it; Telegram alert,Route highlight; caption "Sample relief centres",Ping on alert,Music low,Screen recording of prototype,todo
+S19,9 Comparison,3:59,4:15,TISYA,Text-only comparison table fills in,Cells fill in sequence (no logos),Soft UI tick per cell,Bed steady,Graphic only,todo
+S20,9 Comparison,4:15,4:29,TISYA,Table highlights FloodWay column,Column highlight,None,Bed steady,Graphic only,todo
+S21,10 Feasibility,4:29,4:40,LUQMAN,Cost bar "Estimate, before testing: under RM1,000 per node",Cost bar animates,Light tick,Bed steady,Graphic only,todo
+S22,10 Feasibility,4:40,4:48,LUQMAN,Growth diagram: one township to many,Nodes added one by one,Tick per node,Music lifts,Graphic only,todo
+S23,11 Close,4:48,4:54,RAKUMAN,FloodWay title card; closing line,Logo reveal,Music resolves; rain fades,Bed resolves,Own title graphic,todo
+S24,11 Close,4:54,5:00,none,Data card held 6 seconds,Data card fades in,None,Bed ends,Text only,todo

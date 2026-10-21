@@ -76,15 +76,20 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
         const info = reportStatusInfo(report.status);
         const isOfficial = info.kind === 'reviewed';
         const isAiVerified = info.kind === 'ai';
-        const isHighRisk = report.waterDepthCm >= 35;
+        const depth = report.waterDepthCm;
+        const depthTier =
+          depth >= 45
+            ? { badge: 'bg-red-600 text-white font-black shadow-xs', road: 'Impassable', roadColor: 'text-red-700 font-extrabold' }
+            : depth >= 20
+            ? { badge: 'bg-orange-100 text-orange-900 border border-orange-300 font-bold', road: 'Sedan hazard', roadColor: 'text-orange-700 font-bold' }
+            : { badge: 'bg-amber-100 text-amber-900 border border-amber-300 font-semibold', road: 'Passable', roadColor: 'text-amber-700 font-semibold' };
 
-        // Simplify location string to short readable name
         const shortLocation = report.location.split(',')[0].trim();
 
         return (
           <article
             key={report.id}
-            className={`rounded-3xl bg-white border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden flex flex-col justify-between ${
+            className={`rounded-3xl bg-white border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.99] overflow-hidden flex flex-col justify-between ${
               isOfficial
                 ? 'border-emerald-300 ring-2 ring-emerald-500/15 shadow-sm'
                 : isAiVerified
@@ -126,15 +131,13 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                 </span>
               </div>
 
-              {/* Location Bar with Clear Icon */}
+              {/* Location Bar with Clear Icon and Actionable Depth Badge */}
               <div className="px-4 py-2 bg-slate-50/40 border-b border-slate-100 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5 text-slate-700 font-semibold truncate">
                   <MapPin className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
                   <span className="truncate">{shortLocation}</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                  isHighRisk ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                }`}>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs ${depthTier.badge}`}>
                   {formatCm(report.waterDepthCm)}
                 </span>
               </div>
@@ -172,9 +175,9 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
                   </div>
 
                   <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                    <span className="text-xs font-semibold text-slate-400 block uppercase">Road Risk</span>
-                    <span className={`text-xs font-bold ${isHighRisk ? 'text-red-600' : 'text-amber-600'}`}>
-                      {isHighRisk ? 'Submerged' : 'Cautious'}
+                    <span className="text-xs font-semibold text-slate-500 block uppercase">Road Risk</span>
+                    <span className={`text-xs font-bold ${depthTier.roadColor}`}>
+                      {depthTier.road}
                     </span>
                   </div>
 

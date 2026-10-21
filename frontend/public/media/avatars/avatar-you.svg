@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg-you" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="hair-you" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2D3748"/>
+      <stop offset="60%" stop-color="#1A202C"/>
+      <stop offset="100%" stop-color="#0D1117"/>
+    </linearGradient>
+    <linearGradient id="hair-shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#60A5FA" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#93C5FD" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#60A5FA" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="eye-you" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="40%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFEED9"/>
+      <stop offset="100%" stop-color="#FCD5B5"/>
+    </linearGradient>
+    <linearGradient id="skin-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F7BA94"/>
+      <stop offset="100%" stop-color="#EAA178"/>
+    </linearGradient>
+    <linearGradient id="jacket-you" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <clipPath id="circle-clip">
+      <circle cx="128" cy="128" r="128"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#circle-clip)">
+    <!-- Background Circle -->
+    <rect width="256" height="256" fill="url(#bg-you)"/>
+    <!-- Subtle Speed / Anime Accent lines in bg -->
+    <path d="M-20 60 L140 -20" stroke="#60A5FA" stroke-width="2" opacity="0.25"/>
+    <path d="M60 270 L280 150" stroke="#60A5FA" stroke-width="3" opacity="0.2"/>
+    <circle cx="210" cy="50" r="30" fill="#38BDF8" opacity="0.15"/>
+
+    <!-- Shoulders & Clothing -->
+    <path d="M40 256 Q48 200 100 188 L128 208 L156 188 Q208 200 216 256 Z" fill="url(#jacket-you)"/>
+    <!-- Jacket Collar & Inner Tee -->
+    <path d="M102 188 L128 226 L154 188 Z" fill="#2563EB"/>
+    <path d="M112 188 L128 214 L144 188 Z" fill="#F8FAFC"/>
+    <path d="M78 205 Q128 222 178 205" stroke="#38BDF8" stroke-width="2.5" fill="none" opacity="0.8"/>
+    <!-- Lanyard / Tech ID ribbon -->
+    <path d="M120 214 L120 256 M136 214 L136 256" stroke="#38BDF8" stroke-width="3"/>
+
+    <!-- Neck -->
+    <path d="M110 162 L110 196 Q128 204 146 196 L146 162 Z" fill="url(#skin)"/>
+    <!-- Neck Shadow -->
+    <path d="M110 162 Q128 178 146 162 L146 172 Q128 186 110 172 Z" fill="url(#skin-shadow)"/>
+
+    <!-- Face Base -->
+    <path d="M82 110 Q80 155 128 178 Q176 155 174 110 Q174 74 128 74 Q82 74 82 110 Z" fill="url(#skin)"/>
+    <!-- Cheeks Blush -->
+    <ellipse cx="98" cy="138" rx="11" ry="5.5" fill="#F43F5E" opacity="0.3"/>
+    <ellipse cx="158" cy="138" rx="11" ry="5.5" fill="#F43F5E" opacity="0.3"/>
+    <path d="M93 138 L97 134 M97 139 L101 135" stroke="#F43F5E" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    <path d="M153 138 L157 134 M157 139 L161 135" stroke="#F43F5E" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+
+    <!-- Anime Nose -->
+    <path d="M127 135 L129 139 L126 140" stroke="#C27855" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- Cheerful Anime Mouth -->
+    <path d="M116 150 Q128 164 140 150 Q128 154 116 150 Z" fill="#BE123C"/>
+    <path d="M120 152 Q128 158 136 152" fill="#FFFFFF"/>
+
+    <!-- Left Eye -->
+    <g id="eye-l">
+      <!-- Upper Lash Line -->
+      <path d="M92 121 Q105 113 115 122" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <!-- Eye Iris -->
+      <ellipse cx="104" cy="126" rx="9" ry="11" fill="url(#eye-you)"/>
+      <ellipse cx="104" cy="126" rx="4.5" ry="5.5" fill="#0B132B"/>
+      <!-- Highlights -->
+      <circle cx="101" cy="121" r="3.5" fill="#FFFFFF"/>
+      <circle cx="107" cy="131" r="1.8" fill="#FFFFFF"/>
+      <!-- Lower Lash line -->
+      <path d="M96 135 Q104 139 111 135" stroke="#0F172A" stroke-width="1.5" fill="none"/>
+      <!-- Eyebrow -->
+      <path d="M90 108 Q102 101 115 107" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Right Eye -->
+    <g id="eye-r">
+      <path d="M141 122 Q151 113 164 121" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="152" cy="126" rx="9" ry="11" fill="url(#eye-you)"/>
+      <ellipse cx="152" cy="126" rx="4.5" ry="5.5" fill="#0B132B"/>
+      <circle cx="149" cy="121" r="3.5" fill="#FFFFFF"/>
+      <circle cx="155" cy="131" r="1.8" fill="#FFFFFF"/>
+      <path d="M145 135 Q152 139 160 135" stroke="#0F172A" stroke-width="1.5" fill="none"/>
+      <path d="M141 107 Q154 101 166 108" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Ears -->
+    <path d="M82 120 Q74 125 76 136 Q78 144 84 142" fill="url(#skin)" stroke="#C27855" stroke-width="1.5"/>
+    <path d="M174 120 Q182 125 180 136 Q178 144 172 142" fill="url(#skin)" stroke="#C27855" stroke-width="1.5"/>
+
+    <!-- Anime Hair (Dynamic Bangs & Layers) -->
+    <g fill="url(#hair-you)">
+      <!-- Back hair volume -->
+      <path d="M68 110 Q66 60 128 50 Q190 60 188 110 Q198 128 184 148 Q174 110 174 95 Q128 75 82 95 Q82 110 72 148 Q58 128 68 110 Z"/>
+      <!-- Front Bangs Swept Right -->
+      <path d="M72 90 Q90 98 100 114 Q94 92 115 88 Q125 106 130 118 Q128 92 148 94 Q156 108 160 120 Q160 90 180 94 Q172 82 165 74 Q128 58 72 90 Z"/>
+      <!-- Side Strands -->
+      <path d="M78 98 Q76 130 84 142 Q86 122 86 110 Z"/>
+      <path d="M178 98 Q180 130 172 142 Q170 122 170 110 Z"/>
+      <!-- Top spikes -->
+      <path d="M110 56 Q118 42 126 46 Q122 52 128 54 Z"/>
+      <path d="M130 52 Q144 42 148 50 Q140 54 142 60 Z"/>
+    </g>
+
+    <!-- Hair Specular Sheen (Anime light ring across bangs) -->
+    <path d="M88 88 Q128 80 168 88 Q128 84 88 88 Z" fill="url(#hair-shine)"/>
+    <ellipse cx="106" cy="84" rx="10" ry="3" fill="#60A5FA" opacity="0.6" transform="rotate(-6 106 84)"/>
+    <ellipse cx="146" cy="85" rx="12" ry="3" fill="#60A5FA" opacity="0.6" transform="rotate(6 146 85)"/>
+  </g>
+</svg>

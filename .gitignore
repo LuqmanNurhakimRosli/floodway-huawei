@@ -41,6 +41,10 @@ out/
 booth/**/models/
 booth/**/out/
 booth/**/audio-tts/
+# SDP video inputs: narrator recordings and third-party footage stay out of git (screenshots, logos and the script are small and kept)
+materials-demo/*.mp4
+materials-demo/*.MOV
+materials-demo/*.mov
 loop/
 
 # ============================================================

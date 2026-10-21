@@ -28,8 +28,8 @@ html,body,#map{height:100%;margin:0;background:#EEF1F5}
   var map=L.map('map',{zoomControl:false,attributionControl:true}).setView([3.155,101.69],12);
   var OSM='&copy; OpenStreetMap contributors';
   var providers=[
-    {url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',sub:'abcd',attr:OSM+' &copy; CARTO',max:20,name:'street'},
-    {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',sub:'a',attr:OSM,max:19,name:'street'}
+    {url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',sub:'a',attr:OSM,max:19,name:'street'},
+    {url:'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',sub:'abc',attr:OSM+', HOT / OSM France',max:19,name:'street'}
   ];
   var ROADS=${roads};
   var idx=0, tiles=null, offline=null, loaded=false, errors=0, timer=null;

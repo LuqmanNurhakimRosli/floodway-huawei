@@ -14,8 +14,9 @@ export interface FamilyMember {
   id: string;
   name: string;
   relation: string;
-  /** Avatar gradient, two hex colours. No photos: avatars are initials. */
+  /** Avatar gradient, two hex colours. */
   colors: [string, string];
+  avatar?: string;
   isYou?: boolean;
   lat: number;
   lon: number;

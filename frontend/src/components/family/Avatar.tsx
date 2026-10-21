@@ -3,16 +3,30 @@ import { initials, type FamilyMember } from '../../lib/family';
 
 const SIZE = { sm: 'h-8 w-8 text-xs', md: 'h-12 w-12 text-sm', lg: 'h-16 w-16 text-lg' } as const;
 
-/** Initials on the member's colour. No photos: the demo family is made up, so a face would imply a real person. */
-export function Avatar({ member, size = 'md', ring }: { member: Pick<FamilyMember, 'name' | 'colors' | 'isYou'>; size?: keyof typeof SIZE; ring?: 'sos' | 'flooded' | 'near' }) {
+/** 2D anime avatar or initials on the member's theme colour. */
+export function Avatar({ member, size = 'md', ring }: { member: Pick<FamilyMember, 'name' | 'colors' | 'isYou'> & { avatar?: string }; size?: keyof typeof SIZE; ring?: 'sos' | 'flooded' | 'near' }) {
   const ringCls = ring === 'sos' || ring === 'flooded' ? 'ring-[3px] ring-red-500' : ring === 'near' ? 'ring-[3px] ring-amber-400' : 'ring-2 ring-white';
   return (
     <span
       aria-hidden="true"
-      className={`relative inline-flex shrink-0 items-center justify-center rounded-full font-heading font-bold text-white shadow-md ${SIZE[size]} ${ringCls}`}
+      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-heading font-bold text-white shadow-md ${SIZE[size]} ${ringCls}`}
       style={{ background: `linear-gradient(135deg, ${member.colors[0]}, ${member.colors[1]})` }}
     >
-      {member.isYou ? 'You' : initials(member.name)}
+      {member.avatar ? (
+        <img
+          src={member.avatar}
+          alt={member.name}
+          className="h-full w-full object-cover transition-transform duration-200 hover:scale-105"
+          onError={(e) => {
+            (e.currentTarget as HTMLElement).style.display = 'none';
+            const fallback = (e.currentTarget.parentElement?.querySelector('.fw-avatar-fallback') as HTMLElement | null);
+            if (fallback) fallback.style.display = 'inline';
+          }}
+        />
+      ) : null}
+      <span className={member.avatar ? 'fw-avatar-fallback hidden' : ''}>
+        {member.isYou ? 'You' : initials(member.name)}
+      </span>
     </span>
   );
 }

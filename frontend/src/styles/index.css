@@ -246,37 +246,57 @@
   .fw-member, .fw-member-pulse { transition: none; animation: none; }
 }
 
-/* Welcome animation (components/brand/EvacuationLoop.tsx): ambient loops. The walk itself runs on the SVG timeline. */
-.fw-loop .fw-rain { animation: fw-rain 1.2s linear infinite; }
-.fw-loop .fw-cloud--a { animation: fw-cloud 38s linear infinite; }
-.fw-loop .fw-cloud--b { animation: fw-cloud 52s linear -26s infinite; }
-.fw-loop .fw-wave--back { animation: fw-wave 9s linear infinite; }
-.fw-loop .fw-wave--front { animation: fw-wave 6s linear infinite; }
-.fw-loop .fw-tide { animation: fw-tide 8s ease-in-out infinite; }
-.fw-loop .fw-flag { transform-box: fill-box; transform-origin: left center; animation: fw-flag 1.6s ease-in-out infinite; }
-.fw-loop .fw-toast { opacity: 0; animation: fw-toast 8s ease-out infinite; }
-.fw-loop .fw-safe { opacity: 0; animation: fw-safe 8s ease-out infinite; }
+/* Welcome logo loop (components/brand/LogoLoop.tsx): the wave mark fills with water, holds, drains; sonar rings behind.
+   Everything animates transform or opacity only. The mask is the logo file itself, so the shape always matches it. */
+.fw-logo { position: relative; aspect-ratio: 265 / 173; }
+.fw-logo-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120%;
+  aspect-ratio: 1;
+  margin: -60% 0 0 -60%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  opacity: 0;
+  animation: fw-ring 6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.fw-logo-ring:nth-child(2) { animation-delay: 2s; }
+.fw-logo-ring:nth-child(3) { animation-delay: 4s; }
+.fw-logo-glass {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-mask: url('/logo.svg') center / contain no-repeat;
+  mask: url('/logo.svg') center / contain no-repeat;
+}
+.fw-logo-water { position: absolute; inset: 0; animation: fw-fill 8s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+.fw-logo-body { position: absolute; inset: 0; background: linear-gradient(180deg, #ffffff 0%, #dceeff 100%); }
+.fw-logo-crest {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% - 1px);
+  width: calc(100% + 120px);
+  height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='18' viewBox='0 0 120 18'%3E%3Cpath d='M0 9 Q30 0 60 9 T120 9 V18 H0Z' fill='%23fff'/%3E%3C/svg%3E") repeat-x left bottom / 120px 18px;
+  animation: fw-crest 2.4s linear infinite;
+}
+.fw-logo-crest--back { opacity: 0.45; bottom: calc(100% + 4px); animation-duration: 3.6s; animation-direction: reverse; }
 
-@keyframes fw-rain { from { transform: translate(0, 0); } to { transform: translate(-16px, 320px); } }
-@keyframes fw-cloud { from { transform: translateX(-140px); } to { transform: translateX(420px); } }
-@keyframes fw-wave { from { transform: translateX(0); } to { transform: translateX(-360px); } }
-@keyframes fw-tide { 0%, 100% { transform: translateY(8px); } 45% { transform: translateY(-6px); } }
-@keyframes fw-flag { 0%, 100% { transform: skewY(0deg) scaleX(1); } 50% { transform: skewY(-6deg) scaleX(0.9); } }
-@keyframes fw-toast {
-  0% { opacity: 0; transform: translateY(-10px) scale(0.96); }
-  5%, 58% { opacity: 1; transform: translateY(0) scale(1); }
-  66%, 100% { opacity: 0; transform: translateY(-6px) scale(0.98); }
-}
-@keyframes fw-safe {
-  0%, 72% { opacity: 0; transform: translateY(8px) scale(0.92); }
-  78%, 90% { opacity: 1; transform: translateY(0) scale(1); }
-  97%, 100% { opacity: 0; transform: translateY(4px) scale(0.96); }
-}
+@keyframes fw-ring { 0% { opacity: 0; transform: scale(0.55); } 15% { opacity: 1; } 100% { opacity: 0; transform: scale(1.35); } }
+/* rise, hold full, drain: starts and ends empty so the loop has no seam */
+@keyframes fw-fill { 0% { transform: translateY(104%); } 48%, 72% { transform: translateY(-6%); } 100% { transform: translateY(104%); } }
+@keyframes fw-crest { from { transform: translateX(0); } to { transform: translateX(-120px); } }
+@keyframes fw-rise-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes fw-stage-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+.fw-stage-in { animation: fw-stage-in 700ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.fw-rise-in { animation: fw-rise-in 560ms cubic-bezier(0.23, 1, 0.32, 1) 160ms both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .fw-loop *, .fw-loop { animation: none !important; }
-  .fw-loop .fw-toast { display: none; }
-  .fw-loop .fw-safe { opacity: 1; }
+  .fw-logo-ring { display: none; }
+  .fw-logo-water, .fw-logo-crest { animation: none; transform: none; }
+  .fw-stage-in, .fw-rise-in { animation: none; }
 }
 
 /* Verified-report area label, drawn on the circle's centre (components/map/VerifiedReportLayer.tsx). */
@@ -302,3 +322,57 @@
   text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
 }
 .leaflet-tooltip.fw-place-label::before { display: none; }
+
+/* Camera picture pins on the map (components/map/VisionHazardLayer.tsx). --lvl is the reading's level colour. */
+.cam-pin-wrap { background: none; border: 0; }
+.cam-pin {
+  position: relative;
+  width: 64px;
+  height: 46px;
+  border-radius: 12px;
+  border: 3px solid var(--lvl);
+  background: #1e293b;
+  box-shadow: 0 10px 24px -10px rgba(7, 20, 38, 0.7);
+  cursor: pointer;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cam-pin::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 12px;
+  height: 12px;
+  background: var(--lvl);
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 0 0 3px 0;
+  z-index: -1;
+}
+.cam-pin img, .cam-pin-empty { display: block; width: 100%; height: 100%; border-radius: 9px; object-fit: cover; }
+.cam-pin-badge {
+  position: absolute;
+  top: -10px;
+  right: -12px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--lvl);
+  color: #fff;
+  font: 800 11px/16px 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
+  border: 2px solid #fff;
+}
+.cam-pin.is-danger { animation: cam-pin-alert 2s ease-in-out infinite; }
+@keyframes cam-pin-alert {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55), 0 10px 24px -10px rgba(7, 20, 38, 0.7); }
+  50% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0), 0 10px 24px -10px rgba(7, 20, 38, 0.7); }
+}
+.cam-pin.is-compact { width: 44px; height: 32px; border-width: 2px; border-radius: 10px; }
+.cam-pin.is-compact img { border-radius: 8px; }
+.cam-pin.is-compact::after { width: 9px; height: 9px; bottom: -6px; }
+.cam-pin.is-compact .cam-pin-badge { top: -9px; right: -10px; padding: 0 4px; font-size: 10px; line-height: 14px; }
+@media (hover: hover) { .cam-pin:hover { transform: translateY(-2px) scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .cam-pin.is-danger { animation: none; } .cam-pin { transition: none; } }
+.cam-popup .leaflet-popup-content-wrapper { border-radius: 20px; padding: 0; box-shadow: 0 24px 48px -20px rgba(7, 20, 38, 0.55); }
+.cam-popup .leaflet-popup-content { margin: 10px; font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif; }
+
+/* OSM's standard style is loud next to the app's own colours: calm it slightly so pins and flood zones lead. */
+.leaflet-tile-pane { filter: saturate(0.7) contrast(0.96) brightness(1.03); }

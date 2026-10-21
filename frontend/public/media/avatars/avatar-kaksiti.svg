@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg-siti" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#3B0764"/>
+    </linearGradient>
+    <linearGradient id="tudung-siti" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E9D5FF"/>
+      <stop offset="50%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#9333EA"/>
+    </linearGradient>
+    <linearGradient id="inner-cap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#581C87"/>
+      <stop offset="100%" stop-color="#3B0764"/>
+    </linearGradient>
+    <linearGradient id="eye-siti" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#581C87"/>
+      <stop offset="50%" stop-color="#9333EA"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF1E6"/>
+      <stop offset="100%" stop-color="#FED7AA"/>
+    </linearGradient>
+    <clipPath id="circle-clip">
+      <circle cx="128" cy="128" r="128"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#circle-clip)">
+    <!-- Background -->
+    <rect width="256" height="256" fill="url(#bg-siti)"/>
+    <!-- Cute anime sparkle background elements -->
+    <circle cx="210" cy="60" r="4" fill="#FDF4FF"/>
+    <circle cx="50" cy="70" r="3" fill="#FDF4FF"/>
+    <circle cx="200" cy="180" r="3.5" fill="#FDF4FF"/>
+    <path d="M210 50 L212 56 L218 58 L212 60 L210 66 L208 60 L202 58 L208 56 Z" fill="#F5D0FE"/>
+    <path d="M46 64 L48 68 L52 70 L48 72 L46 76 L44 72 L40 70 L44 68 Z" fill="#F5D0FE"/>
+
+    <!-- Shoulders & Hijab drape -->
+    <path d="M30 256 Q38 184 94 172 Q128 164 162 172 Q218 184 226 256 Z" fill="url(#tudung-siti)"/>
+    <!-- Hijab drape folds -->
+    <path d="M94 172 Q128 200 162 172 Q140 220 128 256 Q116 220 94 172 Z" fill="#7E22CE" opacity="0.4"/>
+    <path d="M128 178 Q144 210 152 256" stroke="#E9D5FF" stroke-width="2" fill="none" opacity="0.6"/>
+
+    <!-- Cute Gold Brooch Pin -->
+    <circle cx="128" cy="182" r="7" fill="#FBBF24"/>
+    <circle cx="128" cy="182" r="4" fill="#F59E0B"/>
+    <circle cx="128" cy="182" r="2" fill="#FEF08A"/>
+
+    <!-- Outer Hijab Framing Head -->
+    <path d="M60 114 Q56 42 128 34 Q200 42 196 114 Q196 166 160 178 Q128 184 96 178 Q60 166 60 114 Z" fill="url(#tudung-siti)"/>
+
+    <!-- Inner Tudung Cap (Anak Tudung) showing neatly on forehead -->
+    <path d="M88 88 Q128 72 168 88 Q128 80 88 88 Z" fill="url(#inner-cap)"/>
+
+    <!-- Face Opening -->
+    <path d="M88 92 Q84 136 128 166 Q172 136 168 92 Q128 84 88 92 Z" fill="url(#skin)"/>
+
+    <!-- Soft Cheeks Blush -->
+    <ellipse cx="102" cy="136" rx="12" ry="6" fill="#FB7185" opacity="0.35"/>
+    <ellipse cx="154" cy="136" rx="12" ry="6" fill="#FB7185" opacity="0.35"/>
+    <path d="M98 136 L102 132 M103 137 L107 133" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M149 136 L153 132 M154 137 L158 133" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Petite Anime Nose -->
+    <circle cx="128" cy="133" r="1.5" fill="#E11D48" opacity="0.6"/>
+
+    <!-- Sweet Anime Smile with soft lip gloss -->
+    <path d="M118 147 Q128 156 138 147" stroke="#BE123C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <ellipse cx="128" cy="150" rx="3" ry="1.2" fill="#FDA4AF"/>
+
+    <!-- Left Anime Eye (Big Shoujo style sparkling!) -->
+    <g id="siti-eye-l">
+      <!-- Eyelashes & Upper Lid -->
+      <path d="M92 118 Q105 107 118 117" stroke="#3B0764" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <path d="M115 112 L120 107" stroke="#3B0764" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M94 114 L89 110" stroke="#3B0764" stroke-width="2" stroke-linecap="round"/>
+      <!-- Iris -->
+      <ellipse cx="105" cy="123" rx="10" ry="12" fill="url(#eye-siti)"/>
+      <ellipse cx="105" cy="123" rx="5" ry="6" fill="#2E1065"/>
+      <!-- Highlights -->
+      <ellipse cx="101" cy="117" rx="4" ry="4.5" fill="#FFFFFF"/>
+      <circle cx="109" cy="127" r="2.2" fill="#FFFFFF"/>
+      <circle cx="102" cy="129" r="1.2" fill="#FDF4FF"/>
+      <!-- Lower Lid -->
+      <path d="M97 133 Q105 137 113 133" stroke="#581C87" stroke-width="1.5" fill="none"/>
+      <!-- Soft arched eyebrow -->
+      <path d="M92 103 Q104 96 116 103" stroke="#6B21A8" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Right Anime Eye -->
+    <g id="siti-eye-r">
+      <path d="M138 117 Q151 107 164 118" stroke="#3B0764" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <path d="M141 112 L136 107" stroke="#3B0764" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M162 114 L167 110" stroke="#3B0764" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="151" cy="123" rx="10" ry="12" fill="url(#eye-siti)"/>
+      <ellipse cx="151" cy="123" rx="5" ry="6" fill="#2E1065"/>
+      <ellipse cx="147" cy="117" rx="4" ry="4.5" fill="#FFFFFF"/>
+      <circle cx="155" cy="127" r="2.2" fill="#FFFFFF"/>
+      <circle cx="148" cy="129" r="1.2" fill="#FDF4FF"/>
+      <path d="M143 133 Q151 137 159 133" stroke="#581C87" stroke-width="1.5" fill="none"/>
+      <path d="M140 103 Q152 96 164 103" stroke="#6B21A8" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Hijab Front Fold Shadow around chin -->
+    <path d="M88 92 Q80 134 116 168 Q128 178 140 168 Q176 134 168 92 Q176 138 136 174 Q128 180 120 174 Q80 138 88 92 Z" fill="#6B21A8" opacity="0.3"/>
+  </g>
+</svg>

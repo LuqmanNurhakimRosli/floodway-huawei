@@ -6,9 +6,7 @@ import { useVisionStore } from '../../hooks/vision/useVisionStore';
 import { formatKm, percentOf } from '../../lib/format';
 import { isSampleCamera } from '../../lib/home';
 import { levelRank } from '../../lib/vision/levels';
-import { samplePhotoUrl } from '../../lib/vision/samplePhoto';
-import { frameUrl } from '../../services/vision/visionApi';
-import type { Camera } from '../../types/vision';
+import { cameraPhotoUrl } from '../../lib/vision/samplePhoto';
 import { StatusChip } from '../live/shared/StatusChip';
 
 type Filter = 'all' | 'cameras' | 'underpasses' | 'centres';
@@ -20,13 +18,6 @@ const FILTERS: { id: Filter; label: string }[] = [
 ];
 
 const tile = 'relative flex w-[232px] shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-slate-200/80 bg-white shadow-[0_12px_32px_-22px_rgba(7,20,38,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] md:w-[260px]';
-
-function photoFor(c: Camera, live: boolean): string | null {
-  const ratio = c.reading?.water_ratio ?? 0;
-  const sample = samplePhotoUrl(c.id, ratio);
-  if (sample) return sample;
-  return live && c.online && c.reading ? frameUrl(c.id, c.reading.timestamp) : null;
-}
 
 /** "Near you": cameras, underpasses and relief centres as swipeable cards, like a travel app's explore row. */
 export function NearYou() {
@@ -68,7 +59,7 @@ export function NearYou() {
       <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:thin] md:mx-0 md:px-0">
         {show('cameras') &&
           cameras.map((c) => {
-            const src = photoFor(c, live);
+            const src = cameraPhotoUrl(c, live);
             const r = c.reading!;
             return (
               <Link key={c.id} to={`/live?camera=${encodeURIComponent(c.id)}`} className={tile} aria-label={`${c.name}, ${r.level}, water at ${Math.round(r.water_ratio * 100)}% of bank height`}>
@@ -91,12 +82,20 @@ export function NearYou() {
         {show('underpasses') &&
           vision.barriers.map((b) => {
             const closed = b.state === 'CLOSED';
+            const img = `/media/places/underpass-${b.id}.jpg`;
             return (
-              <Link key={b.id} to="/control" className={tile} aria-label={`${b.name}, ${closed ? 'closed' : 'open'}`}>
-                <div className={`relative flex h-36 items-center justify-center ${closed ? 'bg-gradient-to-br from-red-600 to-red-800' : 'bg-gradient-to-br from-blue-600 to-blue-800'}`}>
-                  {closed ? <Ban className="h-12 w-12 text-white/90" aria-hidden="true" /> : <CircleCheck className="h-12 w-12 text-white/90" aria-hidden="true" />}
-                  <span className={`absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-extrabold ${closed ? 'bg-white text-red-800' : 'bg-white text-emerald-800'}`}>{closed ? 'CLOSED' : 'OPEN'}</span>
-                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/60 px-2 py-0.5 text-xs font-semibold text-white">Simulated barrier</span>
+              <Link key={b.id} to="/map" className={tile} aria-label={`${b.name}, ${closed ? 'closed' : 'open'}`}>
+                <div className={`relative h-36 overflow-hidden ${closed ? 'bg-gradient-to-br from-red-600 to-red-800' : 'bg-gradient-to-br from-blue-600 to-blue-800'}`}>
+                  <img
+                    src={img}
+                    alt={b.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                    onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                  <span className={`absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-extrabold shadow-sm ${closed ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`}>{closed ? 'CLOSED' : 'OPEN'}</span>
+                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/70 px-2 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">Simulated barrier</span>
                 </div>
                 <div className="flex flex-1 flex-col gap-1 p-3">
                   <p className="line-clamp-1 font-heading text-base/6 font-semibold text-slate-900">{b.name.replace(' (demo)', '')}</p>
@@ -109,12 +108,20 @@ export function NearYou() {
         {show('centres') &&
           centres.map((s) => {
             const pct = percentOf(s.currentCapacity, s.maxCapacity) ?? 0;
+            const img = `/media/places/${s.id}.jpg`;
             return (
               <Link key={s.id} to={`/navigation/${s.id}`} className={tile} aria-label={`${s.name}, ${s.status}, ${formatKm(s.distanceKm)} away`}>
-                <div className="relative flex h-36 items-center justify-center bg-gradient-to-br from-[#1677FF] to-[#071426]">
-                  <Building2 className="h-12 w-12 text-white/90" aria-hidden="true" />
-                  <span className={`absolute right-2 top-2 rounded-full bg-white px-2.5 py-0.5 text-xs font-extrabold ${s.status === 'OPEN' ? 'text-emerald-800' : 'text-amber-900'}`}>{s.status}</span>
-                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/60 px-2 py-0.5 text-xs font-semibold text-white">Demo centre</span>
+                <div className="relative h-36 overflow-hidden bg-gradient-to-br from-[#1677FF] to-[#071426]">
+                  <img
+                    src={img}
+                    alt={s.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                    onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                  <span className={`absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-extrabold shadow-sm ${s.status === 'OPEN' ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'}`}>{s.status}</span>
+                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-900/70 px-2 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">Demo centre</span>
                 </div>
                 <div className="flex flex-1 flex-col gap-1.5 p-3">
                   <p className="truncate font-heading text-base/6 font-semibold text-slate-900">{s.name.replace('Demo relief centre: ', '')}</p>

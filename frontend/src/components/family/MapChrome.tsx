@@ -11,7 +11,7 @@ import { LegendList } from '../map/MapLegend';
 import { Modal } from './FamilyDialogs';
 
 export const roundBtn =
-  'flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#0958D9] shadow-[0_8px_24px_-10px_rgba(7,20,38,0.45)] ring-1 ring-slate-200/70 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]';
+  'flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#0958D9] shadow-[0_8px_24px_-10px_rgba(7,20,38,0.45)] ring-1 ring-slate-200/70 hover:bg-slate-50 active:scale-95 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]';
 
 const SCENARIOS: { id: Scenario; label: string; sub: string }[] = [
   { id: 'normal', label: 'Normal', sub: 'Dry' },
@@ -132,7 +132,7 @@ export function MapSideButtons({ bottom, onLocate, onLayers }: SideProps) {
 }
 
 const pillBtn =
-  'flex h-12 items-center gap-2 rounded-full px-5 font-heading text-base font-bold shadow-[0_8px_24px_-10px_rgba(7,20,38,0.45)] ring-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]';
+  'flex h-12 items-center gap-2 rounded-full px-5 font-heading text-base font-bold shadow-[0_8px_24px_-10px_rgba(7,20,38,0.45)] ring-1 hover:-translate-y-0.5 active:scale-95 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]';
 
 /** "Check in" and "SOS", floating above the sheet. */
 export function MapActionPills({ bottom, sosOn, onCheckIn, onSos }: { bottom: number; sosOn: boolean; onCheckIn: () => void; onSos: () => void }) {

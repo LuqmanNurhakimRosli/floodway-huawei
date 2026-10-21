@@ -2,7 +2,7 @@
 
 Read this before you change anything. Update it before you stop (rules in `/AGENTS.md`). Keep it short: detail goes in `docs/ai/CHANGELOG.md`.
 
-**Last updated:** 2026-10-19 · **Branch:** `ccr-693c90f8-qu560k` · **Checks:** frontend 167 tests + tsc + build, backend 152 passed, mobile tsc + 16 jest tests (npm run check; pytest -q; mobile npm run check)
+**Last updated:** 2026-10-21 · **Branch:** `main` · **Checks:** frontend 166 tests + tsc + build, backend 155 passed, mobile tsc + 16 jest tests (npm run check; pytest -q; mobile npm run check)
 
 ## Status board
 
@@ -13,10 +13,11 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 | Sensor fault filter + lead-time log | Done 2026-10-18 | `vision/fault_filter.py` holds a jump larger than water can rise until the next reading agrees (also on `/ingest`). Alerts carry `detection_delay_s`; `GET /lead-times`. No threshold in `levels.py` changed |
 | Storm lab | Done 2026-10-18 | `vision/storm_lab.py`: scripted synthetic storms replayed in simulated time through the live analyser, filter, tracker and barrier rules, filter on and off. Recorded copy for offline use: `frontend/src/data/stormLabRecorded.json`. Timing behaviour only, not field accuracy |
 | Depth from photo + evidence check | Done 2026-10-18 | Report flow rebuilt (`ReportModal.tsx`): landmark or tap-to-measure depth gives a range (`lib/depthFromPhoto.ts`), compared with the nearest camera, depth node and the AI opinion. No verdict; a person still reviews |
-| Control room `/control` | Done 2026-10-18 | Barriers, log, fault filter health, storm lab, live alert timing |
+| Control room `/control` | **Removed 2026-10-20** (user: focus on flood victims, not operators) | `/control` redirects to `/map`. Page, `components/control/`, `lib/vision/stormLab.ts`, the recorded storm JSON and the frontend calls for barrier override, storm lab and lead times are gone (git history has them). Backend endpoints and the barrier loop are unchanged; barriers still show on the map and in routing |
 | PENYU robot concept | Concept only, outside the app | Shared as a standalone 3D artifact on request (not in the app). Labelled CONCEPT · NOT BUILT; all numbers are design targets |
-| Live AI photo check | Blocked here | The cloud sandbox network policy refuses openrouter.ai, so the AI check could not be exercised end to end in this session. The no-key and failure paths were exercised and say so honestly |
-| Basemap failover | Done 2026-10-19 | `components/map/BaseMap.tsx`: CARTO Voyager, then OpenStreetMap, then an offline street map drawn from the stored routes with place names (re-probes tiles every minute). Fonts are bundled with @fontsource instead of Google Fonts |
+| Live AI photo check | Gemini API path added 2026-10-20 · live call not run | `routes/ai_check.py`: Gemini API first (`GEMINI_API_KEY`, `GEMINI_MODEL` default `gemini-2.5-flash`), OpenRouter fallback; the result names the engine that ran. No key on this laptop, so no live call yet; the no-key, failure and payload paths are tested |
+| Basemap failover | Done 2026-10-20 | CARTO dropped: it now answers keyless requests with an "API KEY REQUIRED" image (HTTP 200) the failover cannot detect. `components/map/BaseMap.tsx`: OpenStreetMap, then OSM France HOT, then an offline street map drawn from the stored routes with place names (re-probes tiles every minute). Fonts are bundled with @fontsource instead of Google Fonts |
+| SDP video (final cut) | Built 2026-10-21 · 4:16 | `booth/floodway-sdp-video/`: HTML motion film (three.js river node, real app captures, coded music and effects) cut to the three narrators (Nadi, Luqman, Aniq; `narration.json`, `timing.json`), 5 s The Star montage, Team LarpGPT / FloodWay™ credits. Pipeline: `prep_media.py`, `render.mjs`, `make_audio.py`, `assemble.py` → `out/FloodWay_SDP_final.mp4` (not committed). The Star footage needs written permission before public posting; agency logos left out (text references only) |
 | App demo film | Done 2026-10-19 | `booth/floodway-app-demo/`: 1:56 walkthrough of every feature on a phone, real app captures with motion graphics and a generated score. Rebuild steps in its README; the MP4 is not committed (booth `out/` is ignored) |
 | Map and evacuation | Done | KL only: 8 demo relief centres, 16 flood-prone areas, stored OSM routes (`node frontend/scripts/build_kl_routes.mjs` to rebuild) |
 | Sample media | Done 2026-10-12 | 60 photographic frames (5 cameras x 12-rung ladder); the page shows the rung matching the reading. Read by `ReferenceDiffAnalyzer` against each camera's dry frame; `check_ladder` PASS (4 cameras 12 of 12, drain 11 of 12). Details and limits: `backend/app/vision/sample_media/README.md` |
@@ -27,10 +28,12 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 | Sample photos on the public page | Done 2026-10-12 | With no backend running, the Live page now shows each sample camera's photo for its water level (`lib/vision/samplePhoto.ts`), instead of the old drawn scene. Pushed to GitHub `live-ui-upgrade` (`295482a`) and deployed to Cloudflare Pages production with no backend address. Checked on the public `/live`: Klang shows the new frame at 61%. |
 | Live demo on Cloudflare | **Live 2026-10-12 (laptop-hosted)** | `powershell -File scripts/public-demo.ps1` starts a read-only public backend on this laptop (port 8090, no Telegram, own data folder, write token in `%LOCALAPPDATA%\floodway-public\write-token.txt`), opens a Cloudflare quick tunnel, rebuilds the frontend with that address and deploys it to `floodway-huawei.pages.dev`. Verified: /live shows "Live 5/6 online" with the new frames. The laptop must stay on; every restart gives a new tunnel address, so re-run the script (`-Stop` to stop). Earlier note, kept for history: | `https://floodway-huawei.pages.dev` serves a 2-week-old build with no backend (it calls `localhost:8080`). Newer `main` builds on Cloudflare fail. Ready: `backend/Dockerfile` + `.dockerignore`, `CORS_ORIGINS` env, production frontend build (secrets blanked, verified out of the bundle). Needs: a hosting account, then the backend URL. The QR on the poster points here |
 | Forecast | Rule-based | `backend/app/services/forecaster.py` is a formula and says so. `models/ml_pipeline` holds a synthetic-data GRU that nothing loads |
-| Huawei Cloud | Designed, not called | ModelArts package prepared in `models/ml_pipeline/modelarts_pkg`; nothing deployed |
+| Cloud stack | **Google, decided 2026-10-20** | Huawei design dropped and its code removed (`HUAWEI_*` config, ModelArts/SMN fields, `modelarts_pkg/`). In use: Firebase Auth + Firestore, Gemini API. Planned: Cloud Run, Firebase Hosting, Cloud Storage, FCM, Earth Engine. Plan and order: `docs/plans/GLOBAL_STACK_PLAN.md`. Cloudflare project still named `floodway-huawei` (renaming breaks the old QR link; user's call) |
+| GINKGO Model 1 | Files in repo 2026-10-20 · **not served, no accuracy** | `models/ginkgo/`: RF, HGB, DT, LR (scikit-learn 1.7.2), `registry.py`, `inspect_models.py` (asserts the facts), `MODEL_CARD.md`. 8 unnamed inputs (infographic lists 14+), binary output, tree root rule `x3 <= 1.5` always "no flood". Blocked on the feature list and notebook from Nadi |
 | Brand and visual design | Done 2026-10-18 (blue again) | Original logo blue restored app-wide (accent #1677FF, filled #0958D9, dark #003EB3, sidebar #071426, page #F4F7FB); the short teal refresh is gone. 20px cards, Outfit headings, Plus Jakarta Sans body. Home: greeting + search, family card (`FamilyCard`), Near you carousel, relief list. Profile rebuilt as a settings list (personal info, family circle and location, emergency contacts, Telegram, operator token, log out) |
 | Family circle (Life360-style) | Done 2026-10-18 (simulated members) | `/map` is now a full-screen family map on phones: circle switcher (Family, Neighbours), member pins with battery and flood status, Check in, hold-to-send SOS (Telegram via the backend when set up), activity feed, places with arrival/leave alerts, Safety tab (in or within 300 m of a flood area), Route tab = the evacuation planner, for you or for a member. Only "You" can be real (phone GPS, opt-in, never uploaded); everyone else, their movement and replies are simulated and labelled. `lib/family.ts`, `services/family/familyStore.ts`, `hooks/useFamily.ts`, `components/family/`. Flood scenario moved to AppContext so Home and the map agree |
-| Welcome animation | Done 2026-10-18 | `components/brand/EvacuationLoop.tsx`: 8 s seamless SVG loop (rain, rising water, a family walking the safe route to a relief centre, alert and arrival chips). Drawn shapes only, no flood photos. Reduced motion shows one still frame |
+| Welcome animation | Done 2026-10-20 | `components/brand/LogoLoop.tsx`: the logo, large, fills with water, holds and drains (8 s CSS loop, masked by `/logo.svg`), sonar rings behind. Reduced motion shows it full and still. The "About this demo" block is removed (user request) from Welcome and Profile; a one-line footer remains |
+| Camera pins on the map | Done 2026-10-20 | `VisionHazardLayer.tsx`: every online camera is a photo pin (level-coloured frame, water %), compact below zoom 14; tap for a larger photo and "Watch camera". Used by `/map` and the Home map |
 | Verified-report areas | Done 2026-10-19 (demo data) | Circles from verified reports on the map; routing, the Safety tab and Home avoid them (`useFloodZones`). Last 6 h only, fading after 1 h; AI-assessed reports named in the label. Backend does not send `createdAt` yet |
 | Phone touch targets | Done 2026-10-19 | Route audit: 0 targets under 44 px on 13 routes at 4 phone widths |
 | Route audit + audit fixes | Done 2026-10-19 | `frontend/scripts/route-audit.mjs` (13 routes x 9 viewports, 117 loads, 0 failing). Fixed: error boundary per route, malformed saved profile crash, inert bell and Share, unpkg Leaflet CSS, API timeouts, lazy pages (main chunk 782.8 -> 529.7 kB), `/ingest` signature + skew check, `/predict` bounds. Full list: `docs/FLOODWAY_FULL_AUDIT.md` |
@@ -41,7 +44,8 @@ Read this before you change anything. Update it before you stop (rules in `/AGEN
 1. User: re-deploy the frontend with `VITE_API_BASE` set to a hosted backend (or accept a sample-only demo on the QR link), then check the pages URL. Confirm the one-slide rule and team requirements by email (see `docs/product/preliminary-round/MEETING_SUMMARY.md`).
 2. User: restart the backend on :8080. The running one predates the analyser change and still reports `classical-v1` for the sample cameras.
 2. A learned water segmenter for user-added cameras: the classical analyser cannot read photographic water (see `sample_media/README.md`). Needs labelled frames and `analysis/yolo_seg.py`.
-3. User: delete `docs/_to-delete/` once happy (it holds the superseded docs, duplicate `assets/` and duplicate model folders; all are also in git history or were byte-identical copies).
+3. Team: get GINKGO Model 1's feature list (training order, units) and training notebook from Nadi, then run the re-tests in `docs/plans/GLOBAL_STACK_PLAN.md` section 5. No Model 1 number on any slide before that.
+3b. Deploy the backend to Cloud Run and the web app to Firebase Hosting (plan section 4), then run one real photo through the Gemini API path.
 4. User: rotate the OpenRouter key (`VITE_OPENROUTER_API_KEY` was in the browser bundle) and the Telegram bot token. Neither was rotated by an agent.
 5. Android: build the preview APK (`npx eas-cli build -p android --profile preview`, after setting the backend in `mobile/eas.json`) and run the device checklist in `docs/FLOODWAY_MOBILE_SETUP.md` section 6. Record the results in `docs/FLOODWAY_TEST_REPORT.md`.
 6. Before any public deploy: set `VISION_WRITE_TOKEN` and `CORS_ORIGINS`; move device HMAC secrets out of `backend/app/config.py` (audit O1-O3).
@@ -55,28 +59,31 @@ backend/app/vision/             Live Vision: engine, analysis/ (classical, water
                                 fault_filter.py, barriers.py, storm_lab.py
 backend/app/routes, services/   reports, alerts, SOS, forecast (rule-based), twin
 backend/tests/                  pytest
-frontend/src/pages, components/ React pages; components/live/ is Live Vision; components/control/ is the control room;
-                                components/family/ is the family map (pins, tabs, SOS, check-in); components/brand/ is the logo
+frontend/src/pages, components/ React pages; components/live/ is Live Vision; components/family/ is the family map (pins, tabs, SOS, check-in); components/brand/ is the logo
                                 and the Welcome animation; lib/family.ts + services/family/ hold the family circle
 frontend/public/media/live/     webp copies of the sample frames, klang-rise.mp4
 frontend/scripts/               layout-check.mjs, route-audit.mjs, map-fps.mjs, build_kl_routes.mjs
 mobile/                         Android app (Expo): src/app/ screens (expo-router), src/lib/ api, cache, data, location, notify,
                                 zones; src/map/ Leaflet WebView page (+ generated assets); src/shared.ts = code from frontend/src;
                                 app.json, app.config.js, eas.json build config
-models/ml_pipeline/             GRU forecaster code, notebooks nb1-nb4, trained weights (synthetic), ModelArts package
+models/ginkgo/                  GINKGO Model 1 classifiers (trained/*.pkl, scikit-learn 1.7.2), registry.py, inspect_models.py, MODEL_CARD.md
+models/ml_pipeline/             GRU forecaster code, notebooks nb1-nb4 (nb3 = serving smoke test for Cloud Run), trained weights (synthetic)
 models/legacy_ann/              first Keras ANN on the Malaysia rainfall CSV (datasets/)
+FloodWay_Handover/              unzipped SDP handover pack (untracked working copy; updated 2026-10-20, re-zipped as FloodWay_Handover_v2.zip)
 scripts/                        check.ps1, public-demo.ps1, public_backend.py, render-poster.mjs, make_og_image.py, generate_image.py
 docs/ai/                        this file, CHANGELOG.md (detail)
 docs/FLOODWAY_*.md              2026-10-19 audit set: FULL_AUDIT, REMEDIATION, ARCHITECTURE, MOBILE_SETUP, TEST_REPORT
-docs/architecture/              system spec, API, DB, IoT, tech stack, conventions (some FYP-era: verify before trusting)
-docs/product/                   preliminary-round/ (poster, pitch script, meeting summary, transcript), pitch deck PDFs
+docs/architecture/              FLOODWAY_OVERVIEW.md (current, code-checked), FloodWay_System_Architecture.html + _1920x1080.png (poster);
+                                older API, DB, IoT, tech stack, conventions docs (some FYP-era: verify before trusting)
+docs/product/                   preliminary-round/ (Huawei ICT round record: poster, pitch script, meeting summary, transcript,
+                                architecture/ = superseded Huawei specs and diagram), pitch deck PDFs
 docs/ops/                       DEMO_RUNBOOK.md (what is real, simulated, not built; demo script; failure table)
-docs/plans/                     active plans only
+docs/plans/                     active plans only: GLOBAL_STACK_PLAN.md (Google stack, Model 1 work order), GEMINI_LIVE_MEDIA_V2.md
 docs/reference/                 competition rules and forms, 3D house reference
 docs/screenshots/               evidence (after-c = latest, media-check = media plan, mobile-2026-10-19 = Android app renders)
-booth/                          film project (floodway-live-film/), MATA48 booth assets
+booth/                          film projects (floodway-live-film/, floodway-app-demo/, floodway-sdp-video/ = SDP final video), MATA48 booth assets
+materials-demo/                 team inputs for the SDP video: narrator recordings, script-video.md, The Star clip, news screenshots, logos
 firmware/                       ESP32 depth node sketch, ESP32 bench barrier sketch (floodway_barrier.ino)
-docs/_to-delete/                quarantine, safe to remove
 ```
 
 ## Run and check
@@ -95,9 +102,19 @@ docs/_to-delete/                quarantine, safe to remove
 
 ## Honesty ledger (one glance)
 
-Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, OSM road routes. Simulated: sample cameras and frames, rainfall and river numbers, forecast, shelters, flood-prone areas, reports. Not built or not claimed: government camera feeds, agency verification, any Huawei Cloud call, field-validated accuracy. Full table: `docs/ops/DEMO_RUNBOOK.md` section 1.
+Real: camera pipeline, user cameras and photo upload, alerts, restart recovery, OSM road routes. Simulated: sample cameras and frames, rainfall and river numbers, forecast, shelters, flood-prone areas, reports. Not built or not claimed: government camera feeds, agency verification, any cloud model call (Google services beyond Firebase and Gemini are planned), GINKGO accuracy, field-validated accuracy. Full table: `docs/ops/DEMO_RUNBOOK.md` section 1.
 
 ## Change log (newest first; one line each)
+
+- 2026-10-21 · SDP final video: `booth/floodway-sdp-video/` cut to the three narrator recordings (new `prep_media.py`, `transcribe.py`, `assemble.py`, `narration.json`; `timing.json` now takes keyframes so visuals land on the spoken words), new s00 The Star montage, s01 news + DOSM figure, s10 pilot line, s11 FloodWay™ / Team LarpGPT credits and data card (agencies as text only), presenter circle composited by ffmpeg, s04 dropped from the cut. Output `out/FloodWay_SDP_final.mp4`: 4:15.7, 1920x1080 30 fps H.264 + AAC, -17.1 LUFS, peak -1.2 dBFS, voice offset 0.1 ms. `.gitignore`: materials-demo videos. `scripts/check.ps1` not run (no app code changed).
+
+- 2026-10-20 · Huawei to Google stack: removed `HUAWEI_*` config, ModelArts/SMN fields, `models/ml_pipeline/modelarts_pkg/` (byte copy); Gemini API path in `routes/ai_check.py` (+3 tests, `.env.example`); Huawei text out of Welcome, Android About, OG image, package name, AGENTS.md, README (rewritten), DEMO_RUNBOOK, FLOODWAY_ARCHITECTURE, FLOODWAY_OVERVIEW, models/README; Huawei specs moved to `docs/product/preliminary-round/architecture/`; plan `docs/plans/GLOBAL_STACK_PLAN.md`. GINKGO Model 1 files added (`models/ginkgo/`, inspected with scikit-learn 1.7.2). Handover pack updated (poster re-rendered, deck stack lines, README_HANDOVER, model docs) and re-zipped. Check: frontend 166 + tsc + build, backend 155 passed (`scripts/check.ps1`, all passed). Mobile check not run: `npm install` in `mobile/` failed with ECONNRESET (the only mobile change is one text string in `settings.tsx`).
+- 2026-10-20 · Executed UI/UX enhancements across desktop and mobile: unified user anime avatar into Header & Profile hero, streamlined mobile header for <640px displays, implemented tiered hazard depth badges (Passable / Sedan hazard / Impassable) on citizen reports, and added tactile active press feedback on map and family controls. Check: 166 frontend tests passed; tsc & vite production build clean; browser visual verification clean on mobile (390px) and desktop (1366px).
+- 2026-10-20 · Comprehensive UI/UX audit across desktop (1366x768) and mobile (390x844); authored full implementation plan (`docs/ai/UI_UX_IMPLEMENTATION_PLAN.md`).
+- 2026-10-20 · Designed & generated 5 vibrant 2D anime-style SVG character avatars in `public/media/avatars/` for all family members (You, Abang Ali, Kakak Siti, Emak, Ayah); integrated into Avatar component and interactive Leaflet map pin bubbles. Check: frontend 166 tests + tsc + build passed; browser verification clean.
+- 2026-10-20 · Generated realistic location images for all empty underpass and relief centre cards in "Near you" and ReliefList (`frontend/public/media/places/`); renamed demo family circle to You, Abang Ali, Kakak Siti, Emak, Ayah with updated places, driver, and emergency contacts. Check: frontend 166 tests + tsc + build passed; browser verification clean.
+
+- 2026-10-20 · Map tiles: CARTO removed ("API KEY REQUIRED" images), OSM then OSM HOT, web and mobile; camera photo pins + popups on the map (`cameraPhotoUrl` shared with Home); Welcome rebuilt around `LogoLoop`; AboutDemo + EvacuationLoop + LiveCCTVModal deleted; control room removed; Reports header simplified (review desk is a secondary toggle); Home hides the forecast card when the server has none; sidebar footer is a 999 call link. Check: frontend 166 tests + tsc + build; layout check clean on / /home /map /reports /profile /live at 4 sizes. Backend not run (no venv in this clone; no backend file changed). Mobile check not run (no node_modules; only the tile list string changed).
 
 - 2026-10-19 · Android app in `mobile/` (Expo 58, RN 0.88, TypeScript strict) sharing UI-free web logic (`lib/vision/levelRules.ts` split out of `levels.ts`); preview builds allow http to a LAN backend, production https only; `scripts/check.ps1` runs the mobile check; five audit docs `docs/FLOODWAY_*.md`. Check: frontend 167 tests + tsc + build, backend 152 passed, mobile tsc + 16/16 jest, Android bundle 1273 modules, route audit 117/0. No APK: no Android SDK and build hosts blocked.
 - 2026-10-19 · Audit fixes (commit dad81a2): route-audit.mjs, ErrorBoundary + WebGL check, profile validation, live bell and Share, bundled Leaflet CSS, API timeouts, 44 px targets, lazy pages, `/ingest` signature + skew, `/predict` bounds (test_ingest_auth.py). Check: frontend 167 tests + tsc + build, backend 152 passed, route audit 117 loads 0 failing.

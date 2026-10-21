@@ -1,4 +1,6 @@
-"""AI assessment of a citizen flood photo, done server-side so the OpenRouter key never reaches the browser.
+"""AI assessment of a citizen flood photo, done server-side so the API key never reaches the browser.
+
+Provider order: the Gemini API (`GEMINI_API_KEY`, Google's own endpoint), then OpenRouter (`OPENROUTER_API_KEY`).
 
 HONESTY: this is a multimodal model's opinion of one photo. It is not verification by any agency, and the result
 names the model that actually ran. If no key is configured, or the call fails, the endpoint says so
@@ -52,13 +54,44 @@ PROMPT = (
 )
 
 
+def _prompt(body: ImageCheckRequest) -> str:
+    return PROMPT.format(description=body.description or "none", depth=body.reported_depth_cm if body.reported_depth_cm is not None else "not given")
+
+
+def _json_from_text(content: str) -> dict:
+    match = re.search(r"\{.*\}", content, re.S)
+    if not match:
+        raise ValueError("the model did not return JSON")
+    return json.loads(match.group(0))
+
+
+def _gemini_payload(body: ImageCheckRequest) -> dict:
+    header, data = body.image_data_url.split(",", 1)
+    mime = header[len("data:"):].split(";")[0].replace("image/jpg", "image/jpeg")  # "image/jpg" is not a real MIME type
+    return {
+        "contents": [{"parts": [{"text": _prompt(body)}, {"inline_data": {"mime_type": mime, "data": data}}]}],
+        "generationConfig": {"responseMimeType": "application/json"},
+    }
+
+
+async def _call_gemini(key: str, model: str, body: ImageCheckRequest) -> dict:
+    async with httpx.AsyncClient(timeout=40.0) as client:
+        res = await client.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+            headers={"x-goog-api-key": key, "Content-Type": "application/json"},
+            json=_gemini_payload(body),
+        )
+    res.raise_for_status()
+    return _json_from_text(res.json()["candidates"][0]["content"]["parts"][0]["text"])
+
+
 async def _call_openrouter(key: str, model: str, body: ImageCheckRequest) -> dict:
     payload = {
         "model": model,
         "messages": [{
             "role": "user",
             "content": [
-                {"type": "text", "text": PROMPT.format(description=body.description or "none", depth=body.reported_depth_cm if body.reported_depth_cm is not None else "not given")},
+                {"type": "text", "text": _prompt(body)},
                 {"type": "image_url", "image_url": {"url": body.image_data_url}},
             ],
         }],
@@ -70,11 +103,7 @@ async def _call_openrouter(key: str, model: str, body: ImageCheckRequest) -> dic
             json=payload,
         )
     res.raise_for_status()
-    content = res.json()["choices"][0]["message"]["content"]
-    match = re.search(r"\{.*\}", content, re.S)
-    if not match:
-        raise ValueError("the model did not return JSON")
-    return json.loads(match.group(0))
+    return _json_from_text(res.json()["choices"][0]["message"]["content"])
 
 
 def _num(v, lo=None, hi=None):
@@ -110,13 +139,16 @@ def normalise(raw: dict, engine: str) -> ImageCheckResult:
 @router.post("/flood-image-check", response_model=ImageCheckResult, dependencies=[Depends(require_write_token)])
 async def flood_image_check(body: ImageCheckRequest, request: Request):
     _limiter.check(request.client.host if request.client else "unknown")
-    key = os.getenv("OPENROUTER_API_KEY", "")
-    model = os.getenv("OPENROUTER_MODEL", "google/gemini-2.5-flash")
-    engine = f"{model} via OpenRouter (AI assessment, not an official verification)"
-    if not key:
+    if key := os.getenv("GEMINI_API_KEY", ""):
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        engine, call = f"{model} via the Gemini API (AI assessment, not an official verification)", _call_gemini
+    elif key := os.getenv("OPENROUTER_API_KEY", ""):
+        model = os.getenv("OPENROUTER_MODEL", "google/gemini-2.5-flash")
+        engine, call = f"{model} via OpenRouter (AI assessment, not an official verification)", _call_openrouter
+    else:
         return ImageCheckResult(available=False, engine="none", notes="The AI check is not configured on this server, so it was not run.")
     try:
-        return normalise(await _call_openrouter(key, model, body), engine)
+        return normalise(await call(key, model, body), engine)
     except Exception as exc:  # network, quota, bad JSON: say so, never fabricate
         logger.warning("AI image check failed: %s", exc)
         return ImageCheckResult(available=False, engine=engine, notes="The AI check could not be completed. This report has not been checked by AI.")
