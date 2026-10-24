@@ -14,7 +14,7 @@ const areas = (rs: CitizenReport[]) => buildVerifiedAreas(rs, NOW);
 describe('verified report areas', () => {
   it('counts only verified statuses', () => {
     expect(isVerified(base({ status: 'VERIFIED' }))).toBe(true);
-    expect(isVerified(base({ status: 'AI_VERIFIED' }))).toBe(true);
+    expect(isVerified(base({ status: 'AI_VERIFIED' }))).toBe(false);
     expect(isVerified(base({ status: 'OFFICIAL_VERIFIED' }))).toBe(true);
     expect(isVerified(base({ status: 'UNDER_REVIEW' }))).toBe(false);
     expect(isVerified(base({ status: 'REJECTED' }))).toBe(false);
@@ -110,12 +110,8 @@ describe('verified report areas', () => {
     expect(areaAge(mixed, NOW)).toBe('Newest report 5 min ago');
   });
 
-  it('says how many reports were only AI-assessed', () => {
-    const [a] = areas([base({ id: 'h', author: 'A', waterDepthCm: 12 }), base({ id: 'ai', author: 'B', status: 'AI_VERIFIED', waterDepthCm: 12 })]);
-    expect(a.aiOnlyCount).toBe(1);
-    expect(areaLabel(a)).toBe('2 verified reports (1 AI-assessed), 12 to 12 cm, 900 m radius');
-    const [ai] = areas([base({ status: 'AI_VERIFIED', waterDepthCm: 12 })]);
-    expect(areaLabel(ai)).toBe('1 verified report (AI-assessed), 12 to 12 cm, 500 m radius');
+  it('does not draw an area for an AI check alone', () => {
+    expect(areas([base({ status: 'AI_VERIFIED', waterDepthCm: 12 })])).toHaveLength(0);
   });
 
   it('turns areas into zones that routing avoids', () => {

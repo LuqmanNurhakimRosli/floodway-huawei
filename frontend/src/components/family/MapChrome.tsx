@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { Bell, Check, ChevronDown, Crosshair, Layers, LocateFixed, Settings, Siren, Users } from 'lucide-react';
+import { Bell, Check, ChevronDown, Crosshair, Layers, LocateFixed, Minus, Navigation, Plus, Settings, Siren, Users } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { ORIGINS } from '../../data/klDemo';
 import { familyActions } from '../../hooks/useFamily';
@@ -115,18 +115,75 @@ interface SideProps {
   bottom: number;
   onLocate: () => void;
   onLayers: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  isNavigating?: boolean;
+  onRecenter?: () => void;
+  showRecenter?: boolean;
 }
 
 /** Right-hand column: above the sheet on phones, under the activity button on wider screens (clear of the pills). */
-export function MapSideButtons({ bottom, onLocate, onLayers }: SideProps) {
+export function MapSideButtons({
+  bottom,
+  onLocate,
+  onLayers,
+  onZoomIn,
+  onZoomOut,
+  isNavigating,
+  onRecenter,
+  showRecenter,
+}: SideProps) {
   return (
-    <div className="absolute right-3 z-[650] flex flex-col gap-2.5 max-md:bottom-[var(--side-bottom)] md:right-4 md:top-[5.5rem]" style={{ '--side-bottom': `${bottom + 12}px` } as React.CSSProperties}>
+    <div
+      className="absolute right-3 z-[650] flex flex-col items-center gap-2 max-md:bottom-[var(--side-bottom)] md:right-4 md:top-[5.5rem]"
+      style={{ '--side-bottom': `${bottom + 12}px` } as React.CSSProperties}
+    >
+      {(onZoomIn || onZoomOut) && (
+        <div className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_-10px_rgba(7,20,38,0.45)] ring-1 ring-slate-200/70">
+          {onZoomIn && (
+            <button
+              type="button"
+              onClick={onZoomIn}
+              aria-label="Zoom in"
+              className="flex h-11 w-11 items-center justify-center text-[#0958D9] hover:bg-slate-50 active:scale-90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+            >
+              <Plus className="h-5 w-5" aria-hidden="true" />
+            </button>
+          )}
+          {onZoomIn && onZoomOut && <div className="h-px w-full bg-slate-100" />}
+          {onZoomOut && (
+            <button
+              type="button"
+              onClick={onZoomOut}
+              aria-label="Zoom out"
+              className="flex h-11 w-11 items-center justify-center text-[#0958D9] hover:bg-slate-50 active:scale-90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
+            >
+              <Minus className="h-5 w-5" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {isNavigating && showRecenter && onRecenter && (
+        <button
+          type="button"
+          onClick={onRecenter}
+          aria-label="Re-center on vehicle"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1677FF] text-white shadow-lg shadow-blue-500/30 hover:bg-[#0958D9] active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          <Navigation className="h-5 w-5 animate-pulse" aria-hidden="true" />
+        </button>
+      )}
+
       <button type="button" onClick={onLocate} aria-label="Centre on me" className={roundBtn}>
         <Crosshair className="h-6 w-6" aria-hidden="true" />
       </button>
-      <button type="button" onClick={onLayers} aria-label="Map layers and flood scenario" className={roundBtn}>
-        <Layers className="h-6 w-6" aria-hidden="true" />
-      </button>
+
+      {!isNavigating && (
+        <button type="button" onClick={onLayers} aria-label="Map layers and flood scenario" className={roundBtn}>
+          <Layers className="h-6 w-6" aria-hidden="true" />
+        </button>
+      )}
     </div>
   );
 }

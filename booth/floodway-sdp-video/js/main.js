@@ -9,7 +9,6 @@ import s00 from './scenes/s00-montage.js';
 import s01 from './scenes/s01-cold-open.js';
 import s02 from './scenes/s02-problem.js';
 import s03 from './scenes/s03-solution.js';
-import s05 from './scenes/s05-forecast-model.js';
 import s06 from './scenes/s06-node-camera.js';
 import s06b from './scenes/s06b-factors.js';
 import s07 from './scenes/s07-model.js';
@@ -28,8 +27,8 @@ export const TEAM = {
 };
 
 // Order follows the narration (materials-demo/script-video.md): Nadi s01 to s03, Luqman s06b to s08, Aniq s09 to s11.
-const SCENES = [s00, s01, s02, s03, s06b, s06, s05, s07, s08, s09, s10, s11];
-const LOGO_STRIP = new Set(['s02', 's03', 's05', 's06', 's06b', 's07', 's08', 's09', 's10']);
+const SCENES = [s00, s01, s02, s03, s06b, s06, s07, s08, s09, s10, s11];
+const LOGO_STRIP = new Set(['s02', 's03', 's06', 's06b', 's07', 's08', 's09', 's10']);
 const params = new URLSearchParams(location.search);
 const stage = document.getElementById('stage');
 const timeline = [];

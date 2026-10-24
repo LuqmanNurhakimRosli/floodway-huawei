@@ -1,6 +1,6 @@
 // One place that decides what a report's status means and how it is worded, so a card, a stat and a filter can never
-// disagree. HONESTY: nothing here is an official verification. The "review desk" is a demo screen, and a "published"
-// report only means someone pressed Approve in that demo (or that it came from the demo seed data).
+// disagree. HONESTY: nothing here is an official verification. The operator desk is FloodWay's own review step, and a "human verified"
+// report only means an operator pressed Verify in the app (no agency is involved); "published" can also mean demo seed data.
 import type { CitizenReport } from '../types';
 
 export type ReportKind = 'reviewed' | 'seed' | 'ai' | 'unverified' | 'rejected';
@@ -20,11 +20,11 @@ export interface ReportStatusInfo {
 export function reportStatusInfo(status: CitizenReport['status']): ReportStatusInfo {
   switch (status) {
     case 'OFFICIAL_VERIFIED':
-      return { kind: 'reviewed', pill: 'REVIEWED (DEMO DESK)', tile: 'Reviewed in demo', published: true, awaitingReview: false };
+      return { kind: 'reviewed', pill: 'HUMAN VERIFIED', tile: 'Human verified', published: true, awaitingReview: false };
     case 'VERIFIED':
       return { kind: 'seed', pill: 'DEMO DATA', tile: 'Demo data', published: true, awaitingReview: false };
     case 'AI_VERIFIED':
-      return { kind: 'ai', pill: 'AI ASSESSED', tile: 'AI assessed', published: false, awaitingReview: true };
+      return { kind: 'ai', pill: 'AI CHECKED', tile: 'AI checked', published: false, awaitingReview: true };
     case 'REJECTED':
       return { kind: 'rejected', pill: 'REJECTED', tile: 'Rejected', published: false, awaitingReview: false };
     default:

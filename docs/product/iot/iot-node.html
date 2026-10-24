@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #F4F7FB; }
+  #stage { position: relative; width: 1600px; height: 1000px; overflow: hidden; font-family: "Segoe UI", Inter, Arial, sans-serif; }
+  canvas { position: absolute; left: 0; top: 0; z-index: 0; }
+  .lab, .title, .foot { z-index: 2; }
+  .title { background: rgba(244,247,251,.92); padding: 10px 16px; border-radius: 12px; }
+  .foot { background: rgba(244,247,251,.92); padding: 8px 14px; border-radius: 10px; }
+  .lab { position: absolute; background: #fff; border: 1.5px solid #CBD5E1; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 18px rgba(11,27,51,.12); }
+  .lab b { display: block; font-size: 20px; color: #0B1B33; }
+  .lab small { font-size: 16px; color: #475569; }
+  .chip { display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+  .built { background: #DCF3E4; color: #14633A; }
+  .plan { background: #FDECC8; color: #8A5A00; }
+  .bench { background: #E0E9FF; color: #1E3A8A; }
+  .title { position: absolute; left: 60px; top: 40px; }
+  .title h1 { margin: 0; font-size: 40px; color: #0B1B33; }
+  .title p { margin: 6px 0 0; font-size: 20px; color: #475569; }
+  .foot { position: absolute; left: 60px; bottom: 30px; font-size: 16px; color: #475569; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/frontend/node_modules/three/build/three.module.js", "three/addons/": "/frontend/node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" width="1600" height="1000"></canvas>
+  <div class="title">
+    <h1>FloodWay river node (IoT water depth)</h1>
+    <p>Ultrasonic sensor above the water, reads the distance to the surface. The server turns distance into depth.</p>
+  </div>
+
+  <div class="lab" style="left: 1080px; top: 170px; width: 430px;">
+    <b>1 · Ultrasonic sensor (JSN-SR04T)</b>
+    <small>Waterproof, mounted above the water, pointing down. Reads the distance to the surface.</small><br>
+    <span class="chip bench">Firmware written · bench-tested</span>
+  </div>
+  <div class="lab" style="left: 1080px; top: 380px; width: 430px;">
+    <b>2 · ESP32 controller and Wi-Fi</b>
+    <small>Takes the median of 9 readings, signs the packet, sends it over HTTPS to /api/v1/ingest.</small><br>
+    <span class="chip bench">Firmware written · Wi-Fi link</span>
+  </div>
+  <div class="lab" style="left: 1080px; top: 590px; width: 430px;">
+    <b>3 · Solar panel and battery</b>
+    <small>Off-grid power for the node. Battery sizing and weatherproofing still to be tested.</small><br>
+    <span class="chip plan">Planned · not built</span>
+  </div>
+  <div class="lab" style="left: 60px; top: 690px; width: 470px;">
+    <b>4 · Server converts distance to depth</b>
+    <small>Depth = mount height − measured distance. Mount height is set on the server, so the sensor can be recalibrated without reflashing.</small><br>
+    <span class="chip built">In the backend</span>
+  </div>
+
+  <div class="foot">Design render for documentation, not a photo of a deployed node. Dimensions are illustrative. No field accuracy is claimed; the sensor has not been field-tested.</div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(1600, 1000);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0xF4F7FB, 1);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(34, 1600 / 1000, 0.1, 200);
+camera.position.set(-1.0, 7.8, 19.5);
+camera.lookAt(0.6, 2.4, 0);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xB7C4D6, 1.1));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(-6, 12, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 40 });
+scene.add(sun);
+
+const mat = (color, rough = 0.7, metal = 0) => new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+const add = (geo, m, x, y, z, parent = scene) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; parent.add(o); return o; };
+
+// banks: left bank (concrete, where the mount stands) and right bank, river channel between them
+const concrete = mat(0xB9B4AA, 0.9);
+const soil = mat(0x8A7B64, 1);
+add(new THREE.BoxGeometry(6.5, 2.6, 16), concrete, -6.2, 1.3, 0);
+add(new THREE.BoxGeometry(6.5, 1.6, 16), soil, 6.4, 0.8, 0);
+// river bed and water
+add(new THREE.BoxGeometry(6.2, 0.2, 16), mat(0x6B5E4A, 1), 0, -0.1, 0);
+const water = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.9, 16),
+  new THREE.MeshStandardMaterial({ color: 0x2F6FB0, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.78 }));
+water.position.set(0, 0.45, 0); water.receiveShadow = true; scene.add(water);
+// water surface line
+add(new THREE.BoxGeometry(6.2, 0.04, 16), mat(0xBFE3FF, 0.2), 0, 0.92, 0);
+
+// mount: steel pole on the concrete bank, arm over the river
+const steel = mat(0x5B6675, 0.45, 0.6);
+add(new THREE.CylinderGeometry(0.11, 0.11, 5.9, 24), steel, -3.0, 2.95, 0);
+// horizontal arm: from pole over the river
+const armH = add(new THREE.BoxGeometry(5.8, 0.14, 0.14), steel, -0.1, 4.7, 0);
+// cross-brace
+add(new THREE.BoxGeometry(0.1, 1.9, 0.1), steel, -1.5, 4.1, 0).rotation.z = 0.6;
+
+// node enclosure hanging under the arm end, over the water
+const box = add(new THREE.BoxGeometry(1.1, 0.7, 0.8), mat(0xF8FAFC, 0.4), 2.2, 4.25, 0);
+const lid = add(new THREE.BoxGeometry(1.12, 0.12, 0.82), mat(0x1677FF, 0.35), 2.2, 4.66, 0);
+// ultrasonic sensor: transducer pointing down
+const sensorBody = add(new THREE.CylinderGeometry(0.34, 0.34, 0.5, 32), mat(0x111827, 0.4), 2.2, 3.7, 0);
+const face = add(new THREE.CylinderGeometry(0.26, 0.26, 0.06, 32), mat(0xC9CED6, 0.3, 0.5), 2.2, 3.4, 0);
+// measurement beam (cone from sensor to surface)
+const beamGeo = new THREE.ConeGeometry(0.9, 2.5, 40, 1, true);
+const beamMat = new THREE.MeshBasicMaterial({ color: 0x1677FF, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false });
+const beam = new THREE.Mesh(beamGeo, beamMat);
+beam.position.set(2.2, 2.15, 0); beam.rotation.x = Math.PI; scene.add(beam);
+// distance marker: line from sensor face to surface
+const lineMat = new THREE.LineDashedMaterial({ color: 0x0B1B33, dashSize: 0.14, gapSize: 0.1 });
+const ptsGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(2.9, 3.4, 0.6), new THREE.Vector3(2.9, 0.92, 0.6)]);
+const dist = new THREE.Line(ptsGeo, lineMat); dist.computeLineDistances(); scene.add(dist);
+// depth marker: from surface down to bed
+const bedGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(3.3, 0.92, 0.6), new THREE.Vector3(3.3, -0.05, 0.6)]);
+const bedLine = new THREE.Line(bedGeo, new THREE.LineBasicMaterial({ color: 0xDC2626 })); scene.add(bedLine);
+
+// solar panel on a short mast at the top of the pole, angled to the sky
+add(new THREE.BoxGeometry(2.4, 0.07, 1.5), mat(0x1E3A5F, 0.25, 0.3), -3.0, 6.0, 0).rotation.x = -0.35;
+// battery box on the pole
+add(new THREE.BoxGeometry(0.7, 0.9, 0.5), mat(0x0F766E, 0.5), -3.0, 2.5, -0.5);
+
+// water-level reference: warning and danger lines on the bank (drawn on the concrete)
+const lineWarn = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.6), new THREE.MeshBasicMaterial({ color: 0xF97316 }));
+lineWarn.position.set(-2.9, 2.0, 0.0); scene.add(lineWarn);
+
+// ground plane (subtle)
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.12 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.21; ground.receiveShadow = true; scene.add(ground);
+
+renderer.render(scene, camera);
+window.READY = true;
+</script>
+</body>
+</html>

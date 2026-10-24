@@ -23,7 +23,7 @@ SHOTS = {
     "S2": (28.4, 2.15, "427:720:426:0", "640:1080"),
     "S3": (43.3, 2.15, "427:720:427:0", "640:1080"),
 }
-NARRATORS = ["1.Nadi.MOV", "2-Luqman.mp4", "3.aniq.mp4"]
+NARRATORS = ["1.Nadi.MOV", "2-Luqman.mp4", "pitch-worflow.mp4", "3.aniq.mp4"]
 
 
 def ff(*args):

@@ -37,21 +37,47 @@ import { LayersDialog, MapActionPills, MapSideButtons, MapTopBar, SharingDialog 
 
 type RoutesDb = Record<string, Parameters<typeof toRoadRoute>[0][]>;
 
-/** Length of the simulated drive on screen, whatever the real route length. */
-const DRIVE_MS = 30000;
+/** Length of the simulated drive on screen, whatever the real route length. Adjusted to 5s demo. */
+const DRIVE_MS = 5000;
 const KL_CENTER: LatLon = [3.155, 101.69];
 const PEEK_PX = 150;
 
-/** Fits the chosen route in the visible part of the map (the phone sheet covers the bottom). */
+/** Captures the Leaflet map instance for external zoom/pan controls. */
+function MapController({ onMap }: { onMap: (map: L.Map) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    onMap(map);
+  }, [map, onMap]);
+  return null;
+}
+
+/** Fits the chosen route in the visible part of the map. Only fits once when route changes, preserving user manual zoom/pan. */
 function FitRoute({ line, bottomPad, enabled }: { line: LatLon[] | null; bottomPad: number; enabled: boolean }) {
   const map = useMap();
+  const lastKeyRef = useRef<string>('');
+  const lastEnabledRef = useRef(false);
   const key = line ? `${line[0]}|${line[line.length - 1]}|${line.length}` : '';
+
   useEffect(() => {
-    if (!line || !enabled) return;
-    map.fitBounds(L.latLngBounds(line), { paddingTopLeft: [32, 120], paddingBottomRight: [32, bottomPad + 24], maxZoom: 16, animate: true });
-    // refit when the route changes or the sheet height settles, not on every render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, bottomPad, enabled, map]);
+    if (!line || !enabled) {
+      lastEnabledRef.current = enabled;
+      return;
+    }
+    const becameEnabled = enabled && !lastEnabledRef.current;
+    const keyChanged = key !== lastKeyRef.current;
+    lastEnabledRef.current = enabled;
+
+    if (keyChanged || becameEnabled) {
+      lastKeyRef.current = key;
+      map.fitBounds(L.latLngBounds(line), {
+        paddingTopLeft: [32, 120],
+        paddingBottomRight: [32, bottomPad + 24],
+        maxZoom: 16,
+        animate: true,
+      });
+    }
+  }, [key, bottomPad, enabled, line, map]);
+
   return null;
 }
 
@@ -80,11 +106,65 @@ function FitCircle({ points, circleId, bottomPad, ready }: { points: LatLon[]; c
   return null;
 }
 
-function FollowCar({ pos, active }: { pos: LatLon | null; active: boolean }) {
+function FollowCar({
+  pos,
+  active,
+  userPanned,
+  onUserPan,
+}: {
+  pos: LatLon | null;
+  active: boolean;
+  userPanned: boolean;
+  onUserPan: () => void;
+}) {
   const map = useMap();
+  const startedRef = useRef(false);
+  const isZoomingRef = useRef(false);
+
+  // Detect when user manually drags or touches the map to pan away, or when zoom starts/ends
   useEffect(() => {
-    if (active && pos) map.setView(pos, 16, { animate: true, duration: 0.25 });
-  }, [pos, active, map]);
+    if (!active) {
+      startedRef.current = false;
+      return;
+    }
+
+    const handleDragStart = () => {
+      onUserPan();
+    };
+    const onZoomStart = () => {
+      isZoomingRef.current = true;
+    };
+    const onZoomEnd = () => {
+      isZoomingRef.current = false;
+    };
+
+    map.on('dragstart', handleDragStart);
+    map.on('zoomstart', onZoomStart);
+    map.on('zoomend', onZoomEnd);
+    return () => {
+      map.off('dragstart', handleDragStart);
+      map.off('zoomstart', onZoomStart);
+      map.off('zoomend', onZoomEnd);
+    };
+  }, [active, map, onUserPan]);
+
+  useEffect(() => {
+    if (!active || !pos) return;
+
+    if (!startedRef.current) {
+      startedRef.current = true;
+      // Initial zoom in to navigation focus
+      map.flyTo(pos, 16, { duration: 0.5 });
+      return;
+    }
+
+    // Only pan to vehicle if user hasn't panned away to explore and isn't actively zooming
+    // Uses panTo with animate: false to preserve zoom level and avoid blocking input gestures
+    if (!userPanned && !isZoomingRef.current) {
+      map.panTo(pos, { animate: false });
+    }
+  }, [pos, active, userPanned, map]);
+
   return null;
 }
 
@@ -116,6 +196,8 @@ export function ShelterMapView() {
   const [sheetH, setSheetH] = useState(0);
   const [routesDb, setRoutesDb] = useState<RoutesDb | null>(null);
   const [arrival, setArrival] = useState<{ when: string; telegram: TelegramResult | null } | null>(null);
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  const [userPanned, setUserPanned] = useState(false);
 
   const members = circleMembers(family);
   const you = family.members[YOU_ID];
@@ -184,8 +266,24 @@ export function ShelterMapView() {
   const step = route && sim.active ? stepAt(route, travelled) : null;
   const nextText = step ? (step.next ? `${step.next.text}` : 'Arrive at the relief centre') : '';
 
+  const handleZoomIn = useCallback(() => {
+    mapInstance?.zoomIn();
+  }, [mapInstance]);
+
+  const handleZoomOut = useCallback(() => {
+    mapInstance?.zoomOut();
+  }, [mapInstance]);
+
+  const handleRecenter = useCallback(() => {
+    setUserPanned(false);
+    if (car && mapInstance) {
+      mapInstance.flyTo(car, Math.max(16, mapInstance.getZoom()), { duration: 0.4 });
+    }
+  }, [car, mapInstance]);
+
   const start = () => {
     if (!route || route.blockedBy.length > 0 || !selected || selected.status === 'FULL' || selected.status === 'CLOSED') return;
+    setUserPanned(false);
     setSnap('peek');
     setArrival(null);
     sim.start();
@@ -193,6 +291,7 @@ export function ShelterMapView() {
 
   const planRoute = (memberId: string) => {
     sim.stop();
+    setUserPanned(false);
     setRouteFor(memberId === YOU_ID ? null : memberId);
     openTab('route');
   };
@@ -219,6 +318,7 @@ export function ShelterMapView() {
       selectedId={selected?.id ?? ''}
       onSelect={(id) => {
         sim.stop();
+        setUserPanned(false);
         setSelectedId(id);
       }}
       filter={filter}
@@ -229,6 +329,7 @@ export function ShelterMapView() {
       chosen={Math.min(chosen, Math.max(0, alternatives.length - 1))}
       onChoose={(i) => {
         sim.stop();
+        setUserPanned(false);
         setChosen(i);
       }}
       navigating={sim.active}
@@ -264,6 +365,7 @@ export function ShelterMapView() {
     <div className="relative flex h-[calc(100dvh-var(--nav-h))] w-full flex-col overflow-hidden bg-slate-100 md:h-[calc(100vh-64px)] md:flex-row">
       <div className="relative min-h-[350px] flex-1">
         <MapContainer center={KL_CENTER} zoom={12} scrollWheelZoom preferCanvas zoomControl={false} className="z-0 h-full w-full">
+          <MapController onMap={setMapInstance} />
           <BaseMap />
           <VisionHazardLayer />
           <FloodProneLayer scenario={floodScenario} />
@@ -272,7 +374,7 @@ export function ShelterMapView() {
           <FitCircle points={memberPoints} circleId={circle.id} bottomPad={bottomPad} ready={desktop || sheetH > 0} />
           <FitRoute line={showRoute ? (route?.line ?? null) : null} bottomPad={bottomPad} enabled={showRoute && !sim.active} />
           <FlyTo target={fly} bottomPad={bottomPad} />
-          <FollowCar pos={car} active={sim.active} />
+          <FollowCar pos={car} active={sim.active} userPanned={userPanned} onUserPan={() => setUserPanned(true)} />
 
           {showRoute &&
             alternatives.map((r, i) =>
@@ -349,16 +451,27 @@ export function ShelterMapView() {
           </div>
         )}
 
-        {!sim.active && (desktop || snap !== 'full') && (
+        {(desktop || snap !== 'full' || sim.active) && (
           <>
-            <MapActionPills bottom={bottomPad} sosOn={sosOn} onCheckIn={() => setDialog('checkin')} onSos={() => setDialog('sos')} />
+            {!sim.active && (
+              <MapActionPills bottom={bottomPad} sosOn={sosOn} onCheckIn={() => setDialog('checkin')} onSos={() => setDialog('sos')} />
+            )}
             <MapSideButtons
-              bottom={bottomPad + 60}
+              bottom={bottomPad + (sim.active ? 10 : 60)}
               onLocate={() => {
-                flyTo([you.lat, you.lon], 15);
-                setSelectedMember(YOU_ID);
+                if (sim.active && car) {
+                  handleRecenter();
+                } else {
+                  flyTo([you.lat, you.lon], 15);
+                  setSelectedMember(YOU_ID);
+                }
               }}
               onLayers={() => setDialog('layers')}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              isNavigating={sim.active}
+              onRecenter={handleRecenter}
+              showRecenter={userPanned}
             />
           </>
         )}
@@ -371,7 +484,10 @@ export function ShelterMapView() {
             remainingMin={Math.max(0, etaMin(route, mode) * (1 - sim.progress))}
             progress={sim.progress}
             speedup={speedup}
-            onCancel={sim.stop}
+            onCancel={() => {
+              sim.stop();
+              setUserPanned(false);
+            }}
           />
         )}
 

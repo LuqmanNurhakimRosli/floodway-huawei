@@ -47,6 +47,12 @@ materials-demo/*.MOV
 materials-demo/*.mov
 loop/
 
+# Presentations, slide decks, PDFs & unformatted notes
+/*.pdf
+/*.pptx
+documents.txt
+
+
 # ============================================================
 # Agent Workspace Customizations & Local Tooling
 # ============================================================

@@ -23,7 +23,7 @@ interface AppContextType {
   setFloodScenario: (s: Scenario) => void;
   addReport: (r: CitizenReport) => void;
   upvoteReport: (id: string) => void;
-  approveReport: (id: string, reviewerName: string, role: string, notes?: string) => void;
+  approveReport: (id: string, reviewerName: string, role: string, notes?: string, depthCm?: number) => void;
   rejectReport: (id: string, reason?: string) => void;
 }
 
@@ -69,19 +69,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const approveReport = (id: string, reviewerName: string, role: string, notes?: string) => {
+  const approveReport = (id: string, reviewerName: string, role: string, notes?: string, depthCm?: number) => {
     setReports((prev) =>
       prev.map((item) =>
         item.id === id
           ? {
               ...item,
               status: 'OFFICIAL_VERIFIED',
+              ...(depthCm === undefined ? {} : { waterDepthCm: depthCm, depthRangeCm: undefined, depthMethod: 'Adjusted by the operator' }),
               humanVerification: {
                 verifiedBy: reviewerName,
-                role: (role as any) || 'Demo reviewer',
+                role: (role as any) || 'Operator',
                 reviewedAt: 'Just now',
                 verdict: 'APPROVED',
-                officialNotes: notes || 'Approved in the demo review desk. No agency was involved.',
+                officialNotes: notes || 'Verified by an operator in FloodWay. No agency was involved.',
               },
             }
           : item
@@ -97,11 +98,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               ...item,
               status: 'REJECTED',
               humanVerification: {
-                verifiedBy: 'Demo reviewer',
-                role: 'Demo reviewer' as any,
+                verifiedBy: 'Operator',
+                role: 'Operator' as any,
                 reviewedAt: 'Just now',
                 verdict: 'REJECTED',
-                officialNotes: reason || 'Rejected in the demo review desk.',
+                officialNotes: reason || 'Rejected by an operator in FloodWay.',
               },
             }
           : item

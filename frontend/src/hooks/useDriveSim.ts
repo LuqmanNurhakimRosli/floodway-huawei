@@ -18,7 +18,7 @@ export function useDriveSim(totalMs: number, onArrive: () => void) {
         setActive(false);
         arrive.current();
       }
-    }, 100);
+    }, 30);
     return () => clearInterval(id);
   }, [active, totalMs]);
 

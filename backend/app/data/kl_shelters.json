@@ -6,8 +6,8 @@
     "lat": 3.165,
     "lon": 101.705,
     "address": "Kampung Baru, Kuala Lumpur (demo location)",
-    "status": "OPEN",
-    "current_capacity": 180,
+    "status": "FULL",
+    "current_capacity": 220,
     "max_capacity": 220,
     "contact": "Not available (demo)",
     "facilities": [

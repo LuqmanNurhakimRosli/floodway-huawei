@@ -40,6 +40,8 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
     }
   };
   const { reports, upvoteReport, approveReport, rejectReport } = useApp();
+  // Operator's depth adjustment per report (cm), applied when they press Verify.
+  const [adjusted, setAdjusted] = React.useState<Record<string, number>>({});
 
   const filteredReports = reports.filter((r) => {
     const info = reportStatusInfo(r.status);
@@ -194,20 +196,30 @@ export function ReportFeed({ filter, viewMode = 'public' }: Props) {
             {/* Card Footer Actions */}
             <div className="p-4 pt-2 border-t border-slate-100 flex items-center justify-between">
               {viewMode === 'authority' && !report.humanVerification ? (
-                <div className="flex items-center gap-2 w-full">
-                  <button
-                    onClick={() => approveReport(report.id, 'Demo reviewer', 'Demo reviewer')}
-                    className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer transition-colors"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Publish to Live Feed</span>
-                  </button>
-                  <button
-                    onClick={() => rejectReport(report.id, 'Insufficient water depth evidence')}
-                    className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 text-xs font-bold transition-colors cursor-pointer"
-                  >
-                    Reject
-                  </button>
+                <div className="flex w-full flex-col gap-2">
+                  <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
+                    <span>Water depth</span>
+                    <span className="flex items-center gap-2">
+                      <button type="button" aria-label="Lower depth by 5 cm" onClick={() => setAdjusted((a) => ({ ...a, [report.id]: Math.max(0, (a[report.id] ?? report.waterDepthCm) - 5) }))} className="flex h-9 w-9 items-center justify-center rounded-lg bg-white font-bold shadow-xs">−5</button>
+                      <span className="w-14 text-center font-mono font-bold text-slate-900">{formatCm(adjusted[report.id] ?? report.waterDepthCm)}</span>
+                      <button type="button" aria-label="Raise depth by 5 cm" onClick={() => setAdjusted((a) => ({ ...a, [report.id]: (a[report.id] ?? report.waterDepthCm) + 5 }))} className="flex h-9 w-9 items-center justify-center rounded-lg bg-white font-bold shadow-xs">+5</button>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 w-full">
+                    <button
+                      onClick={() => approveReport(report.id, 'Operator', 'Operator', undefined, adjusted[report.id])}
+                      className="flex-1 min-h-11 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer transition-colors"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Verify</span>
+                    </button>
+                    <button
+                      onClick={() => rejectReport(report.id, 'Not enough evidence in the photo')}
+                      className="min-h-11 py-2 px-3 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-600 text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <>

@@ -111,7 +111,8 @@ ring.save(OUT / "audio" / "pip_ring.png")
 # ── video ──
 args = ["-i", OUT / "FloodWay_SDP_motion_silent.mp4", "-i", OUT / "audio" / "final_mix.wav"]
 graph, last = [], "0:v"
-for k, b in enumerate(beats):
+# a beat whose presenter circle is over before it starts (the demo, voice only) has no video to draw
+for k, b in enumerate(x for x in beats if x["pip_end"] - x["t0"] > 0.1):
     d = b["pip_end"] - b["t0"]
     vi, mi, ri = 2 + 3 * k, 3 + 3 * k, 4 + 3 * k
     args += ["-ss", b["a"], "-t", d, "-i", SRC / b["file"], "-loop", 1, "-t", d, "-i", OUT / "audio" / "pip_mask.png",

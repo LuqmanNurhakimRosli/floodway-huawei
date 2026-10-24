@@ -13,7 +13,7 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { shelters, setFamilySafetyStatus } = useApp();
-  const [progressPct, setProgressPct] = useState(15);
+  const [progressPct, setProgressPct] = useState(0);
   const [isSimulating, setIsSimulating] = useState(true);
   const [hasArrived, setHasArrived] = useState(false);
 
@@ -47,9 +47,9 @@ export function TurnByTurnEvacuation({ shelterId }: Props) {
           setFamilySafetyStatus('ARRIVED_SAFE');
           return 100;
         }
-        return prev + 12;
+        return prev + 2;
       });
-    }, 1200);
+    }, 100);
 
     return () => clearInterval(interval);
   }, [isSimulating, hasArrived, shelter.name, user?.name]);

@@ -209,9 +209,8 @@ export default {
     const wl = svgEl('path', { stroke: '#fff', 'stroke-width': 5, 'stroke-linecap': 'round' }, fs);
     const wlGlow = svgEl('path', { stroke: '#1677FF', 'stroke-width': 13, 'stroke-linecap': 'round', opacity: 0.55 }, fs);
     fs.insertBefore(wlGlow, wl);
-    el('div', 's6-hud', '<span class="rec"></span>CAM · underpass culvert (sample)', frame);
+    el('div', 's6-hud', '<span class="rec"></span>CAM · underpass culvert', frame);
     const clock = el('div', 's6-clock num', '', frame);
-    el('div', 'pill sample s6-samplepill', 'SAMPLE · AI-generated frame', frame);
     const dPanel = el('div', 's6-dpanel', `
       <div class="label">Factor · street camera</div>
       <div class="h2">Finds the water line</div>
@@ -220,7 +219,6 @@ export default {
       <div class="s6-level"><i></i><b id="s6lvl">NORMAL</b></div>
       <div class="s6-rd r1">${icon('hold', 34, '#B45309')}<div><b>Reading 1: above the warning line</b><span>Held. A level needs two readings.</span></div></div>
       <div class="s6-rd r2">${icon('check', 34, '#15803D', 3)}<div><b>Reading 2: still above</b><span>Now the level changes to Warning.</span></div></div>`, D);
-    const noclaim = el('div', 'pill sample s6-noclaim', 'Sample frames today · no field accuracy claim yet', D);
     const ratioEl = dPanel.querySelector('#s6ratio'), lvlEl = dPanel.querySelector('#s6lvl'), lvlBox = dPanel.querySelector('.s6-level');
     const [dl0, dh0, ds0, dread, dlvl, rd1, rd2] = [...dPanel.children];
 
@@ -348,7 +346,6 @@ export default {
           lvlBox.style.setProperty('--c', level[1]);
           show(rd1, t, 36.0, { d: 0.4, x: 24, y: 0 });
           show(rd2, t, 38.3, { d: 0.4, x: 24, y: 0 });
-          show(noclaim, t, 40.6, { d: 0.4, y: 12 });
         }
       },
     };

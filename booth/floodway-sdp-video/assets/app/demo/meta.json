@@ -1,0 +1,61 @@
+{
+ "crops": {
+  "live": {
+   "x": 16,
+   "y": 400,
+   "w": 358,
+   "h": 128
+  },
+  "full": {
+   "x": 10,
+   "y": 527,
+   "w": 370,
+   "h": 154
+  },
+  "chosen": {
+   "x": 10,
+   "y": 591,
+   "w": 370,
+   "h": 186
+  },
+  "ai": {
+   "x": 10,
+   "y": 446,
+   "w": 370,
+   "h": 230
+  },
+  "aipill": {
+   "x": 259,
+   "y": 511,
+   "w": 105,
+   "h": 48
+  },
+  "adjust": {
+   "x": 29,
+   "y": 627,
+   "w": 332,
+   "h": 108
+  },
+  "humanpill": {
+   "x": 231,
+   "y": 417,
+   "w": 133,
+   "h": 48
+  },
+  "maplabel": {
+   "x": 0,
+   "y": 60,
+   "w": 390,
+   "h": 320
+  }
+ },
+ "alert": {
+  "camera": "Sg. Klang @ Masjid Jamek",
+  "level": "WARNING",
+  "pct": "58%"
+ },
+ "camera": "Kampung Baru Drain",
+ "level": "WARNING",
+ "pct": "78%",
+ "navFrames": 53
+}

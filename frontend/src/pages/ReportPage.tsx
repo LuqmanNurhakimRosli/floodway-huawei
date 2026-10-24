@@ -77,7 +77,7 @@ export function ReportPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm font-bold text-amber-900">Review desk (demo)</p>
+              <p className="text-sm font-bold text-amber-900">Operator desk</p>
             )}
             <button
               type="button"
@@ -86,7 +86,7 @@ export function ReportPage() {
               className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
             >
               <UserCheck className="h-4 w-4" aria-hidden="true" />
-              {viewMode === 'public' ? `Review desk (${pendingCount})` : 'Back to reports'}
+              {viewMode === 'public' ? `Operator desk (${pendingCount})` : 'Back to reports'}
             </button>
           </div>
 
@@ -95,9 +95,9 @@ export function ReportPage() {
             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
               <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold block">Review desk (demo screen)</span>
+                <span className="font-bold block">Operator desk</span>
                 <span>
-                  This is a demo of how a review step could work. No agency uses it. Reports here are <b>unverified</b> until you press <b>Approve</b> or <b>Reject</b>; Approve only moves a report to the published list in this demo.
+                  An AI check only assists. A report stays <b>unverified</b> until an operator checks the photo, adjusts the depth if needed and presses <b>Verify</b> or <b>Reject</b>. Verified reports then shape the map and routes. This is FloodWay's own review step, not an agency verification.
                 </span>
               </div>
             </div>

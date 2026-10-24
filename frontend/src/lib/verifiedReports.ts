@@ -15,12 +15,12 @@ import { STREET_LEVELS } from './depthFromPhoto';
  * - Opacity follows the number of independent reporters, capped, so the map gets brighter only with more people.
  * - Age: only reports from the last FRESH_H hours count. An area fades after FULL_H hours and is gone at FRESH_H.
  *   A report with no readable time counts as stale, because an old flood shown as current is the worse mistake.
- * - AI-assessed reports count (product decision), but the label says how many were AI-assessed, not reviewed.
+ * - Only human-verified reports (an operator pressed Verify) and the demo seed data count. An AI check alone never reaches the map.
  *
  * Nothing here is an official flood map. The areas show what verified reports say, and the copy must say so.
  */
 
-export const VERIFIED_STATUSES: ReadonlyArray<CitizenReport['status']> = ['VERIFIED', 'AI_VERIFIED', 'OFFICIAL_VERIFIED'];
+export const VERIFIED_STATUSES: ReadonlyArray<CitizenReport['status']> = ['VERIFIED', 'OFFICIAL_VERIFIED'];
 
 export const CLUSTER_M = 1000;
 export const BASE_RADIUS_M = 500;
@@ -54,7 +54,6 @@ export interface VerifiedArea {
   /** Time of the newest report (ms). */
   newestAt: number;
   /** Reports in the area that only passed the AI check, not a human review. */
-  aiOnlyCount: number;
   reportIds: string[];
 }
 
@@ -163,7 +162,6 @@ export function buildVerifiedAreas(reports: CitizenReport[], now = Date.now()): 
       intensity: intensityFor(reporters.size),
       freshness: freshnessFor(now - newestAt),
       newestAt,
-      aiOnlyCount: group.filter((r) => r.status === 'AI_VERIFIED').length,
       reportIds: group.map((r) => r.id),
     };
   });
@@ -171,8 +169,7 @@ export function buildVerifiedAreas(reports: CitizenReport[], now = Date.now()): 
 
 /** The line shown on the circle, e.g. "3 verified reports, 35 to 50 cm, 1.5 km". */
 export function areaLabel(a: VerifiedArea): string {
-  const ai = a.aiOnlyCount === 0 ? '' : a.aiOnlyCount === a.reportCount ? ' (AI-assessed)' : ` (${a.aiOnlyCount} AI-assessed)`;
-  const reports = `${a.reportCount} verified ${a.reportCount === 1 ? 'report' : 'reports'}${ai}`;
+  const reports = `${a.reportCount} verified ${a.reportCount === 1 ? 'report' : 'reports'}`;
   const who = a.reporterCount === a.reportCount ? '' : ` from ${a.reporterCount} ${a.reporterCount === 1 ? 'person' : 'people'}`;
   const km = a.radiusM >= 1000 ? `${(a.radiusM / 1000).toFixed(1)} km` : `${a.radiusM} m`;
   return `${reports}${who}, ${a.depthLoCm} to ${a.depthHiCm} cm, ${km} radius`;

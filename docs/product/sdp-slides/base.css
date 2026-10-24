@@ -1,0 +1,7 @@
+*{box-sizing:border-box;margin:0}
+html,body{background:transparent}
+body{width:1340px;height:540px;font-family:Outfit,Inter,"Segoe UI",sans-serif;color:#14213d;position:relative;overflow:hidden}
+:root{--red:#c8102e;--navy:#14213d;--card:#e9edf4;--pink:#fbe4e8;--mute:#4a5568}
+.chip{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:99px}
+.built{background:#dcf3e4;color:#14633a}.plan{background:#fdecc8;color:#8a5a00}.sim{background:#e3e8f2;color:#33415c}
+.c{position:absolute;left:53px;top:0;width:1340px;height:585px;zoom:.92}

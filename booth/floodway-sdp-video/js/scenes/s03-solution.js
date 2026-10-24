@@ -39,7 +39,6 @@ export default {
     const shots = ['home', 'map', 'map-route'].map((n) => { const im = el('img', 'phone-img', null, scr); im.src = `assets/app/${n}.png`; return im; });
     const banner = el('div', 's3-banner', `<div class="s1-app"><img src="assets/logo.svg" alt=""></div>
       <div><div class="s1-nh">FloodWay · now</div><div class="s1-nt">WARNING · Kampung Baru Drain</div><div class="s1-nb">Water at 78% of bank height.</div></div>`, scr);
-    const capt = el('div', 's3-capt small', 'Real app screens · sample data', root);
     const seeHead = el('div', 'label s3-seeh', 'What residents see', root);
     const SEE = [['map', 'A map colour', 8.4], ['route', 'A route around flooded roads', 11.2], ['bell', 'A push alert or a Telegram message', 13.8]];
     const see = SEE.map(([ic, txt, t], i) => {
@@ -68,7 +67,6 @@ export default {
         rows.forEach((r, i) => show(r, t, ROWS_T[i], { d: 0.35, x: -30, y: 0, ...out }));
         // phone: home (warning card) -> map colour -> route; then the push banner
         show(ph, t, 3.4, { d: 0.7, y: 120, ...out });
-        show(capt, t, 3.9, { d: 0.4, y: 8, ...out });
         shots[0].style.opacity = 1;
         shots[1].style.opacity = eio(t, 8.2, 8.7).toFixed(3);
         shots[2].style.opacity = eio(t, 11.0, 11.5).toFixed(3);

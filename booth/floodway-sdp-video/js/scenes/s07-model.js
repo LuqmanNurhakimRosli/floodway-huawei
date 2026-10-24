@@ -54,7 +54,7 @@ export default {
     const mag = el('div', 's7-mag', '<div></div><span>neighbours look the same</span>', pa);
     const stmt = el('div', 's7-stmt', `${icon('warn', 40, '#B45309', 2.4)}<span>Random pixel split. Re-test on held-out areas.</span>`, root);
     const rf = el('div', 's7-rf', `<div><div class="label">Rainfall trigger · Random Forest</div><div class="small">on a first split</div></div>
-      <div class="s7-rfn num">74.55%</div><span class="pill sample">Prototype</span>`, root);
+      <div class="s7-rfn num">74.55%</div>`, root);
     let geo = null;
 
     return {

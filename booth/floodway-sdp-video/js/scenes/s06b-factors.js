@@ -5,10 +5,10 @@
 import { el, show, prog, icon, chapter, animChapter, ease, lerp, lowerThird, animLowerThird } from '../lib.js';
 
 const CARDS = [
-  ['river', 'River node', 'design', 'Reading: 1.95 m above the bed (example)', 'Warning', '#EA580C', 4.2],
-  ['camera', 'Street camera', 'sample frame', 'Water above the warning line', 'Warning', '#EA580C', 6.0],
+  ['river', 'River node', 'bench node', 'Reading: 1.95 m above the bed (example)', 'Warning', '#EA580C', 4.2],
+  ['camera', 'Street camera', 'working', 'Water above the warning line', 'Warning', '#EA580C', 6.0],
   ['rain', 'Forecast', 'open data', 'Heavy rain warning for the district', 'when', '#1677FF', 7.8],
-  ['chip', 'Model 1 map', 'illustrative', 'Area sits in the High band (65 to 100)', 'where', '#B91C1C', 9.6],
+  ['chip', 'Model 1 map', 'being re-tested', 'Area sits in the High band (65 to 100)', 'where', '#B91C1C', 9.6],
 ];
 
 export default {

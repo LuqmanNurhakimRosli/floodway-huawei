@@ -38,8 +38,6 @@ export const OVERLAYS = Object.fromEntries([
       };
     },
   },
-  pill('tag-sample', 'SAMPLE · AI-generated frame', 'ov-tl', 5, 'position:absolute;left:96px;bottom:96px;font-size:28px;padding:10px 22px'),
-  pill('tag-demo', 'Sample cameras · AI-generated frames · Sample relief centres', 'ov-tr', 6, 'position:absolute;right:96px;top:56px;font-size:26px;padding:10px 22px'),
   {
     id: 'logo-strip', title: 'UiTM, FloodWay and Sime Darby Property logos', dur: 6,
     async build(root) {

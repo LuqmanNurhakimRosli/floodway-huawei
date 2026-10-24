@@ -14,9 +14,9 @@ const CELLS = [
   [0, 0, 'Yes', 'crowd hazard and closure reports', 15.4], [2, 0, 'Partial', 'reroutes around reported closures; no relief-centre routing found', 16.6],
   [1, 0, 'Yes', 'Flood Hub: river basins, up to 7 days', 17.6], [3, 0, 'Not found', 'flash-flood model is a 20 km grid', 18.4],
   [3, 3, 'Target', 'our sensors and cameras; the pilot will test it', 19.9], [2, 3, 'Yes', 'routes avoid flooded areas to a relief centre (simulation)', 22.6],
-  [0, 3, 'Yes', 'photo reports, AI opinion, a person reviews', 24.4], [1, 3, 'Prototype', 'district level, being validated', 25.6],
+  [0, 3, 'Yes', 'photo reports, AI opinion, a person reviews', 24.4], [1, 3, 'Building', 'district level, being validated', 25.6],
 ];
-const TONE = { Yes: 'yes', Partial: 'part', 'Not found': 'nf', Target: 'fw', Prototype: 'fw' };
+const TONE = { Yes: 'yes', Partial: 'part', 'Not found': 'nf', Target: 'fw', Building: 'fw' };
 
 export default {
   id: 's09', title: 'Compared with JPS and others', dur: 30,
