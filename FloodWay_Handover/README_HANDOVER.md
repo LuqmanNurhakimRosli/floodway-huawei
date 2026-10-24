@@ -2,7 +2,7 @@
 
 **Date:** 20 October 2026 · **Updated:** 20 October 2026, late: stack moved to Google (section 8a), GINKGO Model 1 files added to the repo and inspected (section 4), poster and deck stack lines updated
 **For:** Rakuman (team lead), and Claude Code on the laptop
-**Project:** FloodWay flood early warning, entered in the Sime Darby Property "Township of Tomorrow" university hackathon (Oct to Nov 2026)
+**Project:** FloodWay flood early warning, entered in the Huawei ICT Competition 2026–2027
 
 This one file explains everything in the zip: what FloodWay is, how the four prediction inputs work together (with a worked story), the river sensor device, the trained models and their status, the architecture poster, and what still needs checking. Read it first. The folders below hold the files it refers to.
 

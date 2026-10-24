@@ -1,5 +1,5 @@
-# FloodWay: flood early warning for Malaysian townships
-### Sime Darby Property University Hackathon 2026 · Township of Tomorrow
+# FloodWay: flood early warning for Malaysian cities
+### Huawei ICT Competition 2026–2027 · Innovation Track (Cloud & AI)
 
 > **"One glance to know if you are safe. One tap to find shelter."**
 

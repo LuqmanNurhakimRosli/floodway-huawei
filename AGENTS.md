@@ -1,6 +1,6 @@
 # AGENTS.md: FloodWay (any AI agent reads this first)
 
-FloodWay: AI flood early warning for Malaysia. Live Vision reads river and drain camera water levels, the map routes around flooded roads. Entered in the Sime Darby Property University Hackathon 2026 ("Township of Tomorrow"). Stack: Google ecosystem (Firebase, Gemini API, Cloud Run planned); plan in `docs/plans/GLOBAL_STACK_PLAN.md`. The earlier Huawei ICT round material (`docs/product/preliminary-round/`, `booth/`) is kept as a record; do not extend it.
+FloodWay: AI flood early warning for Malaysia. Live Vision reads river and drain camera water levels, the map routes around flooded roads. Entered in the Huawei ICT Competition 2026–2027 (Cloud & AI Track). Stack & architecture in `docs/product/preliminary-round/architecture/SYSTEM_SPECIFICATION.md`.
 
 ## The loop (every task, every agent)
 

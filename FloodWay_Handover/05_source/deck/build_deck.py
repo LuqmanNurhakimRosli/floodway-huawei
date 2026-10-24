@@ -207,7 +207,7 @@ s.shapes[-1].text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 tb(s, 1.4, 3.3, 10.5, 0.6, ['Predict. Verify. Evacuate safely.'], size=28, color=WHITE, bold=True, align='c', name='Tagline')
 tb(s, 1.4, 4.2, 10.5, 1.2, [
     {'text': 'AI flood preparedness and evacuation for Malaysian townships', 'size': 18, 'space_after': 8},
-    {'text': 'Sime Darby Property University Hackathon 2026  ·  Township of Tomorrow  ·  Planet track', 'size': 14},
+    {'text': 'Huawei ICT Competition 2026–2027  ·  Cloud & AI Track', 'size': 14},
 ], color=WHITE, align='c', name='Subtitle')
 tb(s, 1.4, 6.35, 10.5, 0.4, ['Live prototype: floodways.netlify.app'], size=14, color=WHITE, align='c', name='Prototype link')
 set_notes(s, (

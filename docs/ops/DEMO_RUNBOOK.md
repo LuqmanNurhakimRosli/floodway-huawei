@@ -1,6 +1,6 @@
 # FloodWay demo runbook
 
-For the Sime Darby Property University Hackathon 2026 (first written for the Huawei ICT preliminary round). Written from the app as it is on branch
+For the Huawei ICT Competition 2026–2027. Written from the app as it is on branch
 `demo-polish`. Everything here was checked against the running app; where something was not, it says so.
 
 ---

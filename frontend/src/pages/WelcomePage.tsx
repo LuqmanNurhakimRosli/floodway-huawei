@@ -54,7 +54,7 @@ export function WelcomePage() {
       <main className="fw-rise-in relative -mt-8 rounded-t-[32px] bg-[#F4F7FB] px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-7 md:mt-0 md:flex md:flex-col md:justify-center md:rounded-none md:px-14 md:py-12">
         <div className="mx-auto w-full max-w-sm">
           <p className="inline-flex items-center gap-1.5 rounded-full bg-blue-100/70 px-3 py-1 text-xs font-semibold text-[#0958D9]">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Sime Darby Property Hackathon 2026 demo
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Huawei ICT Competition 2026–2027 demo
           </p>
           <h1 className="mt-3 font-heading text-[32px]/[38px] font-extrabold tracking-tight text-slate-900 md:text-[42px]/[48px]">Know before the water rises</h1>
           <p className="mt-2 text-base/6 text-slate-600">Flood alerts, safe routes and your family close, in one app.</p>
