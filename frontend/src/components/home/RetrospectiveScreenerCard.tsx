@@ -105,7 +105,7 @@ export function RetrospectiveScreenerCard() {
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-slate-100 pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <History className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+            <History className="h-5 w-5 text-blue-600" aria-hidden="true" />
             <h2 id="retrospective-title" className={cardTitle}>
               Retrospective Incident Screening Demonstration
             </h2>
@@ -120,7 +120,7 @@ export function RetrospectiveScreenerCard() {
             <ShieldAlert className="h-3.5 w-3.5 text-amber-700" />
             Historical demonstration only · Not an operational forecast or safety warning
           </span>
-          <span className="text-[11px] text-slate-500 font-medium">
+          <span className="text-xs text-slate-500 font-medium">
             Inputs: Historical ERA5 reanalysis (D-7..D-1) · Not live weather forecasts
           </span>
         </div>
@@ -130,7 +130,7 @@ export function RetrospectiveScreenerCard() {
       <div className="rounded-xl bg-slate-50/80 p-3.5 border border-slate-200/70 space-y-2">
         <div className="flex items-center justify-between">
           <label htmlFor="example-select" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+            <Sparkles className="h-3.5 w-3.5 text-blue-500" />
             Load Authentic 2020 Historical Test Record:
           </label>
         </div>
@@ -141,7 +141,7 @@ export function RetrospectiveScreenerCard() {
             const ex = examples.find((item) => item.id === e.target.value);
             if (ex) applyExample(ex);
           }}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-800 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm focus:border-[#1677FF] focus:outline-none focus:ring-1 focus:ring-[#1677FF]"
         >
           {examples.map((ex) => (
             <option key={ex.id} value={ex.id}>
@@ -155,7 +155,7 @@ export function RetrospectiveScreenerCard() {
       {/* 5 Approved Predictors Inputs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div className="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm">
-          <label className="block text-[11px] font-bold text-slate-600 truncate" title="Antecedent 1-Day Rainfall (D-1)">
+          <label className="block text-xs font-bold text-slate-600 truncate" title="Antecedent 1-Day Rainfall (D-1)">
             Rain (D-1) [mm]
           </label>
           <input
@@ -165,13 +165,13 @@ export function RetrospectiveScreenerCard() {
             max="1500"
             value={rain1d}
             onChange={(e) => setRain1d(parseFloat(e.target.value) || 0)}
-            className="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm font-semibold tabular-nums text-slate-900 focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full min-h-11 rounded-lg border border-slate-200 px-2 py-2 text-base sm:text-sm font-semibold tabular-nums text-slate-900 focus:border-[#1677FF] focus:outline-none"
           />
-          <span className="text-[10px] text-slate-500">ERA5 1-day prior</span>
+          <span className="text-xs text-slate-500">ERA5 1-day prior</span>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm">
-          <label className="block text-[11px] font-bold text-slate-600 truncate" title="Antecedent 3-Day Cumulative Rainfall (D-3..D-1)">
+          <label className="block text-xs font-bold text-slate-600 truncate" title="Antecedent 3-Day Cumulative Rainfall (D-3..D-1)">
             Rain (D-3..D-1) [mm]
           </label>
           <input
@@ -181,13 +181,13 @@ export function RetrospectiveScreenerCard() {
             max="3000"
             value={rain3d}
             onChange={(e) => setRain3d(parseFloat(e.target.value) || 0)}
-            className="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm font-semibold tabular-nums text-slate-900 focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full min-h-11 rounded-lg border border-slate-200 px-2 py-2 text-base sm:text-sm font-semibold tabular-nums text-slate-900 focus:border-[#1677FF] focus:outline-none"
           />
-          <span className="text-[10px] text-slate-500">ERA5 3-day sum</span>
+          <span className="text-xs text-slate-500">ERA5 3-day sum</span>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm">
-          <label className="block text-[11px] font-bold text-slate-600 truncate" title="Antecedent 7-Day Cumulative Rainfall (D-7..D-1)">
+          <label className="block text-xs font-bold text-slate-600 truncate" title="Antecedent 7-Day Cumulative Rainfall (D-7..D-1)">
             Rain (D-7..D-1) [mm]
           </label>
           <input
@@ -197,13 +197,13 @@ export function RetrospectiveScreenerCard() {
             max="5000"
             value={rain7d}
             onChange={(e) => setRain7d(parseFloat(e.target.value) || 0)}
-            className="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm font-semibold tabular-nums text-slate-900 focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full min-h-11 rounded-lg border border-slate-200 px-2 py-2 text-base sm:text-sm font-semibold tabular-nums text-slate-900 focus:border-[#1677FF] focus:outline-none"
           />
-          <span className="text-[10px] text-slate-500">ERA5 7-day sum</span>
+          <span className="text-xs text-slate-500">ERA5 7-day sum</span>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm">
-          <label className="block text-[11px] font-bold text-slate-600 truncate" title="Copernicus DEM 30m Elevation">
+          <label className="block text-xs font-bold text-slate-600 truncate" title="Copernicus DEM 30m Elevation">
             Elevation [m]
           </label>
           <input
@@ -213,13 +213,13 @@ export function RetrospectiveScreenerCard() {
             max="4500"
             value={elevation}
             onChange={(e) => setElevation(parseFloat(e.target.value) || 0)}
-            className="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm font-semibold tabular-nums text-slate-900 focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full min-h-11 rounded-lg border border-slate-200 px-2 py-2 text-base sm:text-sm font-semibold tabular-nums text-slate-900 focus:border-[#1677FF] focus:outline-none"
           />
-          <span className="text-[10px] text-slate-500">Copernicus DEM 30m</span>
+          <span className="text-xs text-slate-500">Copernicus DEM 30m</span>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm">
-          <label className="block text-[11px] font-bold text-slate-600 truncate" title="Copernicus DEM 30m Slope">
+          <label className="block text-xs font-bold text-slate-600 truncate" title="Copernicus DEM 30m Slope">
             Slope [degrees]
           </label>
           <input
@@ -229,22 +229,22 @@ export function RetrospectiveScreenerCard() {
             max="90"
             value={slope}
             onChange={(e) => setSlope(parseFloat(e.target.value) || 0)}
-            className="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm font-semibold tabular-nums text-slate-900 focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full min-h-11 rounded-lg border border-slate-200 px-2 py-2 text-base sm:text-sm font-semibold tabular-nums text-slate-900 focus:border-[#1677FF] focus:outline-none"
           />
-          <span className="text-[10px] text-slate-500">Copernicus DEM 30m</span>
+          <span className="text-xs text-slate-500">Copernicus DEM 30m</span>
         </div>
       </div>
 
       {/* Model Selection and Action Buttons */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-bold text-slate-700">Model Pipeline:</span>
           <button
             type="button"
             onClick={() => setModelId('benchmark_a_logistic_regression')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+            className={`min-h-11 rounded-lg px-3 py-2 text-left text-xs font-semibold transition-colors ${
               modelId === 'benchmark_a_logistic_regression'
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-[#0958D9] text-white shadow-sm'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -253,9 +253,9 @@ export function RetrospectiveScreenerCard() {
           <button
             type="button"
             onClick={() => setModelId('benchmark_b_random_forest')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+            className={`min-h-11 rounded-lg px-3 py-2 text-left text-xs font-semibold transition-colors ${
               modelId === 'benchmark_b_random_forest'
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-[#0958D9] text-white shadow-sm'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
           >
@@ -263,12 +263,12 @@ export function RetrospectiveScreenerCard() {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleRunScreening}
             disabled={loading}
-            className={`inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-indigo-700 disabled:opacity-50 ${interactive}`}
+            className={`inline-flex items-center gap-1.5 min-h-11 rounded-xl bg-[#0958D9] px-4 py-2 text-sm font-bold text-white shadow-md hover:bg-[#003EB3] disabled:opacity-50 ${interactive}`}
           >
             <Cpu className="h-4 w-4" />
             {loading ? 'Screening…' : 'Run Screening'}
@@ -277,9 +277,9 @@ export function RetrospectiveScreenerCard() {
             type="button"
             onClick={handleCompare}
             disabled={loading}
-            className={`inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 ${interactive}`}
+            className={`inline-flex items-center gap-1.5 min-h-11 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 ${interactive}`}
           >
-            <Scale className="h-4 w-4 text-indigo-600" />
+            <Scale className="h-4 w-4 text-blue-600" />
             Compare Both Benchmarks
           </button>
         </div>
@@ -293,10 +293,10 @@ export function RetrospectiveScreenerCard() {
 
       {/* Single Model Result */}
       {singleResult && (
-        <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 space-y-3">
+        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">
                 Screening Result · {singleResult.model_name}
               </span>
               <p className="text-xs text-slate-600">{singleResult.benchmark_type}</p>
@@ -313,7 +313,7 @@ export function RetrospectiveScreenerCard() {
               >
                 {singleResult.screening_tier}
               </span>
-              <span className="text-[10px] text-slate-500 font-medium">Illustrative demo tier (not official risk)</span>
+              <span className="text-xs text-slate-500 font-medium">Illustrative demo tier (not official risk)</span>
             </div>
           </div>
 
@@ -326,12 +326,12 @@ export function RetrospectiveScreenerCard() {
             </span>
           </div>
 
-          <p className="text-xs/5 text-slate-700 font-medium bg-white/70 rounded-lg p-2.5 border border-indigo-100">
-            <Info className="inline h-3.5 w-3.5 mr-1 text-indigo-600" />
+          <p className="text-xs/5 text-slate-700 font-medium bg-white/70 rounded-lg p-2.5 border border-blue-100">
+            <Info className="inline h-3.5 w-3.5 mr-1 text-blue-600" />
             {singleResult.score_interpretation}
           </p>
           {singleResult.tier_basis && (
-            <p className="text-[11px] text-slate-500 italic">
+            <p className="text-xs text-slate-500 italic">
               * Note: {singleResult.tier_basis}
             </p>
           )}
@@ -342,7 +342,7 @@ export function RetrospectiveScreenerCard() {
       {compareResult && (
         <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <Scale className="h-4 w-4 text-indigo-600" />
+            <Scale className="h-4 w-4 text-blue-600" />
             <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
               Side-by-Side Benchmark Sensitivity Comparison
             </span>
@@ -353,7 +353,7 @@ export function RetrospectiveScreenerCard() {
             <div className="rounded-lg border border-slate-200 bg-white p-3.5 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900">Benchmark A (Logistic Regression)</span>
-                <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
                   Uniform Background
                 </span>
               </div>
@@ -365,7 +365,7 @@ export function RetrospectiveScreenerCard() {
                   ({compareResult.comparison.benchmark_a_logistic_regression.relative_score_percent}%)
                 </span>
               </div>
-              <p className="text-[11px] text-slate-600">
+              <p className="text-xs text-slate-600">
                 Illustrative Tier: <b>{compareResult.comparison.benchmark_a_logistic_regression.screening_tier}</b>
               </p>
             </div>
@@ -374,7 +374,7 @@ export function RetrospectiveScreenerCard() {
             <div className="rounded-lg border border-slate-200 bg-white p-3.5 shadow-sm space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900">Benchmark B (Random Forest)</span>
-                <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
                   Terrain-Restricted
                 </span>
               </div>
@@ -386,7 +386,7 @@ export function RetrospectiveScreenerCard() {
                   ({compareResult.comparison.benchmark_b_random_forest.relative_score_percent}%)
                 </span>
               </div>
-              <p className="text-[11px] text-slate-600">
+              <p className="text-xs text-slate-600">
                 Illustrative Tier: <b>{compareResult.comparison.benchmark_b_random_forest.screening_tier}</b>
               </p>
             </div>

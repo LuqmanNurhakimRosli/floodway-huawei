@@ -111,3 +111,7 @@ booth/floodway-app-demo/cap/
 booth/floodway-app-demo/index.html
 catboost_info/
 **/catboost_info/
+
+# Local-only notes and PDFs stay on this machine, never pushed
+*.local.md
+*.pdf

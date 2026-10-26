@@ -52,7 +52,7 @@ export function StormNotices({ notices }: { notices: StormNotice[] }) {
             </span>
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-2 text-sm/5 font-semibold text-slate-900">
-                <span className="rounded border border-slate-300 bg-slate-100 px-1 text-[11px]/4 font-bold tracking-wide text-slate-700">DEMO</span>
+                <span className="rounded border border-slate-300 bg-slate-100 px-1 text-xs/4 font-bold tracking-wide text-slate-700">DEMO</span>
                 <span className="truncate">{n.title}</span>
               </p>
               <p className="mt-0.5 text-sm/5 text-slate-600">{n.body}</p>

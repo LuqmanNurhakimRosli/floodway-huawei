@@ -42,7 +42,7 @@ export const FactorTile = forwardRef<HTMLDivElement, Props>(function FactorTile(
             <p className="truncate text-xs/4 text-slate-500">{role}</p>
           </div>
         </div>
-        <span className={`shrink-0 rounded-md border px-1.5 py-0.5 text-[11px]/4 font-bold tracking-wide ${SOURCE_STYLE[state.source]}`}>{state.source}</span>
+        <span className={`shrink-0 rounded-md border px-1.5 py-0.5 text-xs/4 font-bold tracking-wide ${SOURCE_STYLE[state.source]}`}>{state.source}</span>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
         <span className={`${num} text-2xl/8 font-semibold text-slate-900`}>{state.value}</span>
