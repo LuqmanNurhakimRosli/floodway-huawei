@@ -2,8 +2,9 @@
 // React reads it through hooks/vision/useVisionStore (useSyncExternalStore).
 import type { AlertEvent, Barrier, BarrierEvent, Camera, CameraDraft, Reading, ServerMessage } from '../../types/vision';
 import { evaluateBarrier, SEED_BARRIERS } from '../../lib/vision/barriers';
+import { levelRank } from '../../lib/vision/levelRules';
 import { FORCE_MOCK } from './config';
-import { mockCameras, startMockFeed } from './mockVision';
+import { calmRatio, mockCameras, readingAtRatio, setDemoRatio, startMockFeed } from './mockVision';
 import * as api from './visionApi';
 import { openVisionSocket } from './visionSocket';
 
@@ -257,6 +258,27 @@ export async function addCamera(draft: CameraDraft): Promise<Camera> {
 export async function removeCamera(cameraId: string): Promise<void> {
   if (!state.usingMock) await api.deleteCamera(cameraId);
   setState({ cameras: state.cameras.filter((c) => c.id !== cameraId) });
+}
+
+/** Storm scenario: drive a sample camera to a water ratio (null puts it back to its calm level). Sample data only. */
+export function demoCameraRatio(cameraId: string, ratio: number | null): void {
+  if (!state.usingMock) return;
+  setDemoRatio(cameraId, ratio);
+  const cam = state.cameras.find((c) => c.id === cameraId);
+  const reading = readingAtRatio(cameraId, ratio ?? calmRatio(cameraId), cam?.reading ?? null);
+  if (!cam || !reading) return;
+  const before = cam.reading?.level ?? 'NORMAL';
+  applyMessage({ type: 'reading', reading });
+  if (levelRank(reading.level) >= 2 && levelRank(reading.level) > levelRank(before)) {
+    applyMessage({
+      type: 'alert',
+      alert: {
+        id: `demo-${cameraId}-${reading.level}`, camera_id: cameraId, camera_name: cam.name, level: reading.level,
+        water_ratio: reading.water_ratio, timestamp: reading.timestamp,
+        message: `${cam.name} reached ${reading.level} (${Math.round(reading.water_ratio * 100)}% of bank height)`,
+      },
+    });
+  }
 }
 
 export function ackAlert(alertId: string): void {

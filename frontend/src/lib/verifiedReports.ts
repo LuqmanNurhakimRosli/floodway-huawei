@@ -153,7 +153,7 @@ export function buildVerifiedAreas(reports: CitizenReport[], now = Date.now()): 
       id: `area-${i}-${group[0].id}`,
       lat,
       lon,
-      radiusM: radiusFor(reporters.size, medianCm),
+      radiusM: Math.max(radiusFor(reporters.size, medianCm), ...group.map((r) => r.crowdRadiusM ?? 0)),
       reportCount: group.length,
       reporterCount: reporters.size,
       depthLoCm: Math.round(Math.min(...depths.map((d) => d.lo))),

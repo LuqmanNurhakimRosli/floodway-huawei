@@ -17,7 +17,7 @@ export function useStormScenario(autoStart = false) {
         setElapsed(STORM_DURATION_S);
         setPhase('done');
       } else setElapsed(t);
-    }, 250);
+    }, 200);
     return () => clearInterval(id);
   }, [phase]);
 

@@ -37,8 +37,8 @@ import { LayersDialog, MapActionPills, MapSideButtons, MapTopBar, SharingDialog 
 
 type RoutesDb = Record<string, Parameters<typeof toRoadRoute>[0][]>;
 
-/** Length of the simulated drive on screen, whatever the real route length. Adjusted to 5s demo. */
-const DRIVE_MS = 5000;
+/** Length of the simulated drive on screen, whatever the real route length. Set to 8 s for the demo. */
+const DRIVE_MS = 8000;
 const KL_CENTER: LatLon = [3.155, 101.69];
 const PEEK_PX = 150;
 

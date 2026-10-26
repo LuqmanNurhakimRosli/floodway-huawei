@@ -89,10 +89,10 @@ export function Header() {
 
         <Link
           to="/profile"
-          className="hidden sm:flex items-center gap-2 pl-2 border-l border-slate-200 hover:opacity-90 transition-opacity"
+          className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF] sm:justify-start sm:border-l sm:border-slate-200 sm:rounded-none sm:pl-2"
           aria-label="View your profile"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] overflow-hidden flex items-center justify-center text-white text-xs font-bold shadow-xs">
+          <div className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#1677FF] to-[#0958D9] overflow-hidden flex items-center justify-center text-white text-xs font-bold shadow-xs">
             {!avatarFailed ? (
               <img
                 src="/media/avatars/avatar-you.jpg"

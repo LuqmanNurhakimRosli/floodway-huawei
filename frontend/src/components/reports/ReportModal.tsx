@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Camera, Info, MapPin, Send, ShieldCheck, Sparkles, UploadCloud, X } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { originForLocation } from '../../data/klDemo';
+import { FLOOD_PRONE, originForLocation } from '../../data/klDemo';
 import { useNearbySensors } from '../../hooks/useNearbySensors';
 import { compareAi, compareSensor, formatRange, midpoint, summarise } from '../../lib/depthFromPhoto';
 import { analyzeFloodImage } from '../../services/geminiVisionService';
@@ -43,8 +43,16 @@ function Step({ n, title, hint, children }: { n: number; title: string; hint?: s
   );
 }
 
+/** A report posted in this session lands at a random flood-prone spot in Kuala Lumpur, so the crowd area is easy to find on the map. */
+const CROWD_RADIUS_M = 2000;
+const OPERATOR_DELAY_MS = 3000;
+function randomSpot() {
+  const a = FLOOD_PRONE[Math.floor(Math.random() * FLOOD_PRONE.length)];
+  return { name: a.name, lat: a.lat + (Math.random() - 0.5) * 0.004, lon: a.lon + (Math.random() - 0.5) * 0.004 };
+}
+
 export function ReportModal({ isOpen, onClose }: Props) {
-  const { addReport, selectedLocation } = useApp();
+  const { addReport, approveReport, selectedLocation } = useApp();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -102,12 +110,21 @@ export function ReportModal({ isOpen, onClose }: Props) {
       compareAi(estimate.range, ai?.ran ? ai.estimatedDepthCm : null),
     ]).text;
     const author = user?.name || 'Citizen Responder';
+    const id = `rep-${Date.now()}`;
+    const spot = randomSpot();
+    // An AI check that ran and found no flooding stops here. Otherwise the operator desk approves it a moment later
+    // (simulated in this demo), and a 2 km crowd area appears on the map until the page is refreshed.
+    const aiRejected = Boolean(ai?.ran && !ai.verified);
+    if (!aiRejected) {
+      setTimeout(() => approveReport(id, 'FloodWay operator desk (demo auto-approval)', 'Operator', 'Demo: approved automatically so the crowd-sourced area can be shown. No agency was involved.'), OPERATOR_DELAY_MS);
+    }
     addReport({
-      id: `rep-${Date.now()}`,
+      id,
       title: title || 'Water rising on the road',
-      location,
-      lat: position.lat,
-      lon: position.lon,
+      location: `${spot.name} (${location})`,
+      lat: spot.lat,
+      lon: spot.lon,
+      crowdRadiusM: CROWD_RADIUS_M,
       waterDepthCm: depth,
       depthRangeCm: estimate.range,
       depthMethod: estimate.label,
@@ -205,7 +222,7 @@ export function ReportModal({ isOpen, onClose }: Props) {
                 <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} className={`${input} mt-1`} />
               </label>
               <p className="flex items-center gap-1.5 text-xs/4 text-slate-600">
-                <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> Placed on the map at your demo position, {position.label}.
+                <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> Once approved, a 2 km area appears on the map for everyone until you refresh (demo: placed at a random flood-prone spot).
               </p>
             </div>
           </Step>

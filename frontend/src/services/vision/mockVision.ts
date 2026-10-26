@@ -9,21 +9,33 @@ const CAL = {
   lines: { normal: 0.806, warning: 0.639, danger: 0.361 },
 };
 
-interface Spec { id: string; name: string; provider: Camera['provider']; lat: number; lon: number; lo: number; hi: number; period: number; phase: number; offline?: boolean }
+// `base` is the calm water level (share of bank height). Every sample camera stays below the danger line; only the
+// storm scenario raises one (see setDemoRatio).
+interface Spec { id: string; name: string; provider: Camera['provider']; lat: number; lon: number; base: number; period: number; phase: number; offline?: boolean }
 
 const SPECS: Spec[] = [
-  { id: 'sample-klang-jamek', name: 'Sg. Klang @ Masjid Jamek', provider: 'city', lat: 3.149, lon: 101.696, lo: 0.4, hi: 1.1, period: 240, phase: 0 },
-  { id: 'sample-gombak-tun-razak', name: 'Sg. Gombak @ Jln Tun Razak', provider: 'city', lat: 3.162, lon: 101.72, lo: 0.12, hi: 0.5, period: 300, phase: 0.3 },
-  { id: 'sample-smart-tunnel', name: 'SMART Tunnel entrance', provider: 'public', lat: 3.138, lon: 101.703, lo: 0.03, hi: 0.18, period: 360, phase: 0.55 },
-  { id: 'sample-batu-sentul', name: 'Sg. Batu @ Sentul', provider: 'public', lat: 3.184, lon: 101.693, lo: 0.05, hi: 0.3, period: 330, phase: 0.8 },
-  { id: 'sample-kampung-baru-drain', name: 'Kampung Baru Drain', provider: 'mine', lat: 3.1642, lon: 101.7031, lo: 0.18, hi: 0.55, period: 270, phase: 0.15 },
-  { id: 'sample-backyard-stream', name: 'Backyard Stream', provider: 'mine', lat: 3.17, lon: 101.71, lo: 0.1, hi: 0.2, period: 300, phase: 0, offline: true },
+  { id: 'sample-klang-jamek', name: 'Sg. Klang @ Masjid Jamek', provider: 'city', lat: 3.149, lon: 101.696, base: 0.43, period: 240, phase: 0 },
+  { id: 'sample-gombak-tun-razak', name: 'Sg. Gombak @ Jln Tun Razak', provider: 'city', lat: 3.162, lon: 101.72, base: 0.27, period: 300, phase: 0.3 },
+  { id: 'sample-smart-tunnel', name: 'SMART Tunnel entrance', provider: 'public', lat: 3.138, lon: 101.703, base: 0.11, period: 360, phase: 0.55 },
+  { id: 'sample-batu-sentul', name: 'Sg. Batu @ Sentul', provider: 'public', lat: 3.184, lon: 101.693, base: 0.19, period: 330, phase: 0.8 },
+  { id: 'sample-kampung-baru-drain', name: 'Kampung Baru Drain', provider: 'mine', lat: 3.1642, lon: 101.7031, base: 0.17, period: 270, phase: 0.15 },
+  { id: 'sample-backyard-stream', name: 'Backyard Stream', provider: 'mine', lat: 3.17, lon: 101.71, base: 0.15, period: 300, phase: 0, offline: true },
 ];
 
-const ratioAt = (s: Spec, tSec: number) => (s.lo + s.hi) / 2 + ((s.hi - s.lo) / 2) * Math.sin(2 * Math.PI * (tSec / s.period + s.phase));
+/** Ratios the storm scenario forces on a camera, by id. */
+const forced = new Map<string, number>();
+export const KAMPUNG_BARU_CAMERA = 'sample-kampung-baru-drain';
+export const calmRatio = (id: string): number => SPECS.find((s) => s.id === id)?.base ?? 0.2;
+export function setDemoRatio(id: string, ratio: number | null): void {
+  if (ratio === null) forced.delete(id);
+  else forced.set(id, ratio);
+}
 
-function makeReading(s: Spec, previous: Reading | null): Reading {
-  const ratio = Math.max(0, ratioAt(s, Date.now() / 1000));
+// Calm water with a small ripple so the number is not frozen.
+const ratioAt = (s: Spec, tSec: number) => forced.get(s.id) ?? s.base + 0.015 * Math.sin(2 * Math.PI * (tSec / s.period + s.phase));
+
+function makeReading(s: Spec, previous: Reading | null, ratioOverride?: number): Reading {
+  const ratio = Math.max(0, ratioOverride ?? ratioAt(s, Date.now() / 1000));
   const level = ratioToLevel(ratio);
   const delta = previous ? ratio - previous.water_ratio : 0;
   const lines: string[] = [];
@@ -38,6 +50,12 @@ function makeReading(s: Spec, previous: Reading | null): Reading {
     trend: delta > 0.004 ? 'rising' : delta < -0.004 ? 'falling' : 'steady',
     model: 'sample-data', latency_ms: 780, action: levelRank(level) >= 1 ? 'show_on_map' : 'none',
   };
+}
+
+/** A reading for a sample camera at a chosen water ratio (used to drive a camera from the storm scenario). */
+export function readingAtRatio(id: string, ratio: number, previous: Reading | null): Reading | null {
+  const s = SPECS.find((x) => x.id === id);
+  return s && !s.offline ? makeReading(s, previous, ratio) : null;
 }
 
 export function mockCameras(): Camera[] {

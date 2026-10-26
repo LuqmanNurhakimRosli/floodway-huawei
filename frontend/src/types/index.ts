@@ -106,6 +106,8 @@ export interface CitizenReport {
   depthMethod?: string;
   /** Plain summary of how the photo compared with nearby sensors and the AI check. Not a verification. */
   evidenceSummary?: string;
+  /** Crowd-sourced area radius (m) drawn on the map once the report is human-verified. Set for reports posted in this session. */
+  crowdRadiusM?: number;
 }
 
 export interface SosEvent {

@@ -2,10 +2,12 @@ import { BrainCircuit, Cctv, ChevronDown, CloudRain, Cpu, Play, RotateCcw } from
 import type { LucideIcon } from 'lucide-react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useStormScenario } from '../../../hooks/useStormScenario';
+import { visionActions } from '../../../hooks/vision/useVisionStore';
+import { calmRatio, KAMPUNG_BARU_CAMERA } from '../../../services/vision/mockVision';
 import type { FactorKey } from '../../../lib/fusion';
 import { floodProneModel } from '../../../lib/fusion';
 import type { FactorStates } from '../../../lib/stormScenario';
-import { fuseStates, modelFactor, STORM_DURATION_S, stormStateAt } from '../../../lib/stormScenario';
+import { cameraFactor, fuseStates, idleIot, idleMet, modelFactor, STORM_DURATION_S, stormCameraRatio, stormStateAt } from '../../../lib/stormScenario';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import { notificationPermission, requestNotificationPermission } from '../../../lib/vision/notify';
 import type { Camera } from '../../../types/vision';
@@ -15,7 +17,7 @@ import { FactorTile } from './FactorTile';
 import { RiskRing } from './RiskRing';
 import { StormNotices } from './StormNotices';
 
-const SITE_CAMERA = 'sample-kampung-baru-drain';
+const SITE_CAMERA = KAMPUNG_BARU_CAMERA;
 const ORDER: FactorKey[] = ['model', 'met', 'iot', 'cctv'];
 const LEFT: FactorKey[] = ['model', 'met'];
 const FACTOR: Record<FactorKey, { icon: LucideIcon; name: string; role: string }> = {
@@ -30,11 +32,9 @@ function idleFactors(cameras: Camera[]): FactorStates {
   const reading = cam?.online ? cam.reading : null;
   return {
     model: modelFactor(floodProneModel.reference[0].rain as [number, number, number]),
-    met: { level: null, value: '-', detail: 'Live MET warning feed is planned; the storm demo scripts it', source: 'PLANNED' },
-    iot: { level: null, value: '-', detail: 'Bench node fw-bench-01 is not connected', source: 'REAL' },
-    cctv: reading
-      ? { level: reading.level, value: `${Math.round(reading.water_ratio * 100)}%`, detail: `Kampung Baru Drain camera at ${Math.round(reading.water_ratio * 100)}% of bank`, source: 'SAMPLE' }
-      : { level: null, value: '-', detail: 'Kampung Baru Drain camera is offline', source: 'SAMPLE' },
+    met: idleMet(),
+    iot: idleIot(),
+    cctv: reading ? cameraFactor(reading.water_ratio) : { level: null, value: '-', detail: 'Kampung Baru Drain camera is offline' },
   };
 }
 
@@ -50,6 +50,13 @@ export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; 
     [storm.phase, storm.elapsed, base],
   );
   const fusion = fuseStates(factors);
+
+  // The Kampung Baru camera in the feed below rises with the storm, then goes back to calm when it stops.
+  const calm = calmRatio(SITE_CAMERA);
+  useEffect(() => {
+    visionActions.demoCameraRatio(SITE_CAMERA, storm.phase === 'idle' ? null : stormCameraRatio(storm.elapsed, calm));
+  }, [storm.phase, storm.elapsed, calm]);
+  useEffect(() => () => visionActions.demoCameraRatio(SITE_CAMERA, null), []);
 
   // A tile pulses and a dash runs down its line whenever its reading changes.
   const [pulses, setPulses] = useState<Record<FactorKey, number>>({ model: 0, met: 0, iot: 0, cctv: 0 });
@@ -107,7 +114,7 @@ export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; 
         <div className="min-w-0">
           <h2 id="fusion-title" className={cardTitle}>Flood risk from four factors</h2>
           <p className="text-sm/5 text-slate-600">
-            Kampung Baru, near {floodProneModel.site.place}. FloodWay alerts when independent sources agree.
+            Kampung Baru, Kuala Lumpur. FloodWay alerts when independent sources agree.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -126,7 +133,7 @@ export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; 
       {storm.phase !== 'idle' && (
         <div className="mt-3">
           <div className="flex items-center justify-between gap-2 text-xs/4 text-slate-600">
-            <span>DEMO: scripted storm. The model scores the rain recorded before the {floodProneModel.site.flood_date} flood here.</span>
+            <span>DEMO: scripted storm. The flood-prone score uses rain recorded before the 18 Dec 2021 flood nearby.</span>
             <span className={num}>{Math.floor(storm.elapsed)}s / {STORM_DURATION_S}s</span>
           </div>
           <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-slate-100">
@@ -175,7 +182,7 @@ export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; 
         ) : (
           <p>No factor is at warning. Watching {fusion.reporting} of {ORDER.length} sources.</p>
         )}
-        <p className="mt-1.5 text-xs/4 text-slate-500">Rule-based fusion, not a trained model. Model: {floodProneModel.result}.</p>
+        <p className="mt-1.5 text-xs/4 text-slate-500">Rule-based fusion, not a trained model. Flood-prone model: {floodProneModel.result}. Terrain from the nearest held-out flood record ({floodProneModel.site.place}, about 1 km away). Rain and sensor values are demo numbers until those feeds connect.</p>
       </div>
 
       <details className="group mt-3">

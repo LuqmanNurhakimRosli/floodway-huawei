@@ -1,15 +1,14 @@
 import { NavLink } from 'react-router-dom';
-import { FileText, LayoutDashboard, Map, User, Video } from 'lucide-react';
+import { FileText, LayoutDashboard, Map, Video } from 'lucide-react';
 
 const TABS = [
   { label: 'Home', icon: LayoutDashboard, path: '/home' },
   { label: 'Map', icon: Map, path: '/map' },
   { label: 'Reports', icon: FileText, path: '/reports' },
   { label: 'Live', icon: Video, path: '/live' },
-  { label: 'Profile', icon: User, path: '/profile' },
 ];
 
-/** Phone tab bar. The active tab gets a blue pill behind its icon, so the current place reads at a glance. */
+/** Phone tab bar: four places. Profile is reached from the avatar in the header. The active tab gets a blue pill behind its icon, so the current place reads at a glance. */
 export function BottomNav() {
   return (
     <nav

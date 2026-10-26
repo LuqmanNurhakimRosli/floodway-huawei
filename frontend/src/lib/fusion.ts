@@ -6,8 +6,6 @@ import { LEVELS, levelRank } from './vision/levelRules';
 
 export type FactorKey = 'model' | 'met' | 'iot' | 'cctv';
 export type MetWarning = 'none' | 'yellow' | 'orange' | 'red';
-/** Where a tile's value comes from. Shown on every tile so a scripted value is never mistaken for a live one. */
-export type FactorSource = 'REAL' | 'SAMPLE' | 'SCRIPTED' | 'MODEL' | 'PLANNED';
 
 export const LIVE_FACTORS: FactorKey[] = ['iot', 'cctv'];
 const CONTEXT_FACTORS: FactorKey[] = ['model', 'met'];

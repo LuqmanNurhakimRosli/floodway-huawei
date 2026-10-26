@@ -1,18 +1,9 @@
 import type { LucideIcon } from 'lucide-react';
 import { forwardRef } from 'react';
-import type { FactorSource } from '../../../lib/fusion';
 import type { FactorState } from '../../../lib/stormScenario';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import { num } from '../shared/ui';
 import { OfflineChip, StatusChip } from '../shared/StatusChip';
-
-const SOURCE_STYLE: Record<FactorSource, string> = {
-  REAL: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-  MODEL: 'border-blue-200 bg-blue-50 text-blue-800',
-  SAMPLE: 'border-amber-200 bg-amber-50 text-amber-900',
-  SCRIPTED: 'border-slate-300 bg-slate-100 text-slate-700',
-  PLANNED: 'border-dashed border-slate-300 bg-white text-slate-600',
-};
 
 interface Props {
   icon: LucideIcon;
@@ -42,7 +33,6 @@ export const FactorTile = forwardRef<HTMLDivElement, Props>(function FactorTile(
             <p className="truncate text-xs/4 text-slate-500">{role}</p>
           </div>
         </div>
-        <span className={`shrink-0 rounded-md border px-1.5 py-0.5 text-xs/4 font-bold tracking-wide ${SOURCE_STYLE[state.source]}`}>{state.source}</span>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
         <span className={`${num} text-2xl/8 font-semibold text-slate-900`}>{state.value}</span>

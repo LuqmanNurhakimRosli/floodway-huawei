@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { floodProneModel, floodProneScore, fuse, modelLevel } from '../lib/fusion';
 import type { FactorStates } from '../lib/stormScenario';
-import { fuseStates, STORM_DURATION_S, STORM_STEPS, stormStateAt } from '../lib/stormScenario';
+import { cameraFactor, fuseStates, idleIot, idleMet, STORM_DURATION_S, STORM_STEPS, stormCameraRatio, stormStateAt } from '../lib/stormScenario';
 
 // Same cases as backend/tests/test_fusion.py: the two copies of the rule must agree.
 describe('fuse', () => {
@@ -53,35 +53,46 @@ describe('floodProneScore', () => {
 
 describe('storm scenario', () => {
   const idle: FactorStates = {
-    model: { level: 'NORMAL', value: '0.25', detail: 'dry week', source: 'MODEL' },
-    met: { level: null, value: '-', detail: 'no feed', source: 'SCRIPTED' },
-    iot: { level: null, value: '-', detail: 'offline', source: 'REAL' },
-    cctv: { level: 'NORMAL', value: '20%', detail: 'sample', source: 'SAMPLE' },
+    model: { level: 'NORMAL', value: '0.25', detail: 'dry week' },
+    met: idleMet(),
+    iot: idleIot(),
+    cctv: cameraFactor(0.17),
   };
-  const levelsAt = (t: number) => fuseStates(stormStateAt(t, idle).factors);
+  const at = (frac: number) => stormStateAt(frac * STORM_DURATION_S, idle);
+  const fused = (frac: number) => fuseStates(at(frac).factors);
 
-  it('starts from the idle state and ends in DANGER with every factor agreeing', () => {
-    expect(levelsAt(-1).level).toBe('NORMAL');
-    const end = levelsAt(STORM_DURATION_S);
+  it('runs for 15 seconds, set by one constant', () => {
+    expect(STORM_DURATION_S).toBe(15);
+    expect(STORM_STEPS.every((s) => s.at >= 0 && s.at <= 1)).toBe(true);
+  });
+
+  it('starts calm, and ends in DANGER with every factor agreeing', () => {
+    expect(fuseStates(idle).level).toBe('NORMAL');
+    const end = fused(1);
     expect(end.level).toBe('DANGER');
     expect(end.agreeing.sort()).toEqual(['cctv', 'iot', 'met', 'model']);
   });
 
   it('only watches (ADVISORY) while context alone is raised', () => {
-    expect(levelsAt(20).level).toBe('ADVISORY');
+    expect(fused(0.3).level).toBe('ADVISORY');
   });
 
-  it('warns on the first agreeing live reading and says leave before the camera sees it', () => {
-    expect(levelsAt(24).level).toBe('WARNING');
-    expect(levelsAt(32).level).toBe('DANGER');
-    expect(stormStateAt(32, idle).factors.cctv.level).toBe('NORMAL');
+  it('says leave (DANGER) on the sensor warning, before the camera reaches warning', () => {
+    expect(fused(0.53).level).toBe('DANGER');
+    expect(at(0.53).factors.cctv.level).toBe('ADVISORY');
   });
 
-  it('labels every scripted value and emits notices in time order', () => {
-    const { factors, notices } = stormStateAt(STORM_DURATION_S, idle);
-    expect(factors.met.source).toBe('SCRIPTED');
-    expect(factors.iot.source).toBe('SCRIPTED');
-    expect(factors.model.source).toBe('MODEL');
+  it('raises the Kampung Baru camera slowly from calm to the danger line', () => {
+    const calm = 0.17;
+    expect(stormCameraRatio(0, calm)).toBeCloseTo(calm, 5);
+    const ratios = [0, 0.35, 0.5, 0.65, 0.8, 0.9, 1].map((f) => stormCameraRatio(f * STORM_DURATION_S, calm));
+    expect(ratios).toEqual([...ratios].sort((a, b) => a - b));
+    expect(ratios[ratios.length - 1]).toBeGreaterThanOrEqual(0.97);
+    expect(at(1).factors.cctv.level).toBe('DANGER');
+  });
+
+  it('emits notices in time order, the last one at DANGER', () => {
+    const { notices } = at(1);
     expect(notices.map((n) => n.title)).toEqual(STORM_STEPS.filter((s) => s.notice).map((s) => s.notice!.title));
     expect(notices.at(-1)?.level).toBe('DANGER');
   });

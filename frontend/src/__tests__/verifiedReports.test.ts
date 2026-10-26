@@ -21,6 +21,14 @@ describe('verified report areas', () => {
     expect(areas([base({ status: 'UNDER_REVIEW' }), base({ status: 'REJECTED', id: 'x' })])).toEqual([]);
   });
 
+  it('a report posted in this session draws a 2 km crowd area once an operator verifies it', () => {
+    const posted = base({ crowdRadiusM: 2000, status: 'AI_VERIFIED' });
+    expect(areas([posted])).toEqual([]);
+    const [a] = areas([{ ...posted, status: 'OFFICIAL_VERIFIED' }]);
+    expect(a.radiusM).toBe(2000);
+    expect(verifiedZones([{ ...posted, status: 'OFFICIAL_VERIFIED' }], NOW)[0].radiusM).toBe(2000);
+  });
+
   it('a single verified report gives a small circle of about 500 m', () => {
     const [a] = areas([base({ waterDepthCm: 12 })]);
     expect(a.radiusM).toBe(500);
