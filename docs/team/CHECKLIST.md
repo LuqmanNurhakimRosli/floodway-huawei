@@ -80,3 +80,18 @@ Status key: [ ] not started, [~] in progress, [x] done. Owners are placeholders;
 - [ ] Must all three members be on screen?
 - [ ] Who is the point of contact?
 - [ ] Is an "EP" (or MVP or prototype) required? (Transcript unclear.)
+
+## 10. Malaysia flood benchmark (owner: Tisya; plan from `RESEARCH_MALAYSIA_FLOOD_BENCHMARK.md`)
+
+- [ ] 24–25 Oct: send written requests to DID (station list, levels, daily rainfall, flood event register) and MET Malaysia (station list, licence, fees). Ask the organiser for the 2026-27 rulebook and whether teams get a Huawei Cloud account or quota.
+- [ ] 24–25 Oct: check the Huawei console for AP-Kuala Lumpur and whether ModelArts runs there.
+- [ ] 24–26 Oct: inventory the 825-row set and the keanteng incident set (schema, label definition, years, provenance). Check whether the 825 rows come from Omdena (Omdena's licence is unclear).
+- [ ] 25–26 Oct: read the full keanteng LICENSE. Copy no code; reimplement from the public method if needed.
+- [ ] 26–27 Oct: fix the spec in the README: unit of analysis, flood label, non-flood rule (buffer and lookback), split protocol (leave-one-region-out and year holdout), metrics, seeds.
+- [ ] 26–28 Oct: assemble open inputs (ERA5 via CDS with DOI; Dynamic World and JRC GSW with attribution). Record each licence in a register. Checksums on each file.
+- [ ] 27–29 Oct: build the pipeline in DVC with pinned requirements and a seed config; produce `expected/metrics.json`.
+- [ ] 28–30 Oct: run logistic regression, random forest and gradient boosting under spatial and year splits, same seeds. Bootstrap intervals by region.
+- [ ] 29–30 Oct: if the region is confirmed, one OBS bucket, one notebook, one preset-image training job, logs to OBS, stop the notebook. If not, document the local run and the gap.
+- [ ] 30–31 Oct: write model card v1 (intended use, out-of-scope, splits, metrics, per-region results, limitations, leakage checklist).
+- [ ] 1 Nov: code freeze. A teammate who did not write the pipeline reruns it from a clean clone and matches `expected/metrics.json`.
+- [ ] 2 Nov: update slides and limitations to the frozen results. Attach DID or MET replies only as an upgrade.

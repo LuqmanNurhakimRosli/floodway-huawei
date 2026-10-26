@@ -1,0 +1,276 @@
+{
+  "stage": "5.4",
+  "description": "Baseline Evaluation Validation and Robustness Audit",
+  "leakage_checks": {
+    "sample_id_overlap": "0 (PASSED)",
+    "temporal_separation": "Train <= 2019, Test >= 2020 (PASSED)",
+    "scaler_fitted_on_train_only": "Verified (PASSED)",
+    "shared_test_set_isolation": "Verified (PASSED)",
+    "predictor_matrix": "Strictly 5 features (PASSED)"
+  },
+  "tied_score_correction_note": "DummyClassifier previously reported Recall@Top10% = 0.0000 due to stable sorting placing background first. Corrected expected recall under tied predictions is exactly 10.0% (8.5 / 85).",
+  "spatial_subgroup_base_rate_note": "Average Precision baseline shifts with class prevalence (base rate = n_pos / (n_pos + n_bg)). When testing smaller positive subsets against all 85 background points, raw AP drops naturally due to class imbalance, even while relative ranking (ROC-AUC) remains stable (0.75 - 0.86).",
+  "benchmark_a_own_test": [
+    {
+      "model_name": "Dummy Classifier (Prior)",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.5,
+      "roc_auc_95_ci": [
+        0.5,
+        0.5
+      ],
+      "average_precision_pr_auc": 0.5,
+      "recall_at_top_10_percent": 0.1,
+      "top_10_positives_captured": "8.5 / 85 (expected under ties)",
+      "tie_condition": "ALL_SCORES_TIED"
+    },
+    {
+      "model_name": "Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8357,
+      "roc_auc_95_ci": [
+        0.7766,
+        0.892
+      ],
+      "average_precision_pr_auc": 0.8233,
+      "recall_at_top_10_percent": 0.2,
+      "top_10_positives_captured": "17.00 / 85",
+      "tie_condition": "NO_TIE"
+    },
+    {
+      "model_name": "Random Forest (depth=5)",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8058,
+      "roc_auc_95_ci": [
+        0.7418,
+        0.8664
+      ],
+      "average_precision_pr_auc": 0.7809,
+      "recall_at_top_10_percent": 0.1765,
+      "top_10_positives_captured": "15.00 / 85",
+      "tie_condition": "NO_TIE"
+    }
+  ],
+  "benchmark_b_own_test": [
+    {
+      "model_name": "Dummy Classifier (Prior)",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.5,
+      "roc_auc_95_ci": [
+        0.5,
+        0.5
+      ],
+      "average_precision_pr_auc": 0.5,
+      "recall_at_top_10_percent": 0.1,
+      "top_10_positives_captured": "8.5 / 85 (expected under ties)",
+      "tie_condition": "ALL_SCORES_TIED"
+    },
+    {
+      "model_name": "Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.7186,
+      "roc_auc_95_ci": [
+        0.6431,
+        0.7943
+      ],
+      "average_precision_pr_auc": 0.7073,
+      "recall_at_top_10_percent": 0.1529,
+      "top_10_positives_captured": "13.00 / 85",
+      "tie_condition": "NO_TIE"
+    },
+    {
+      "model_name": "Random Forest (depth=5)",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.7727,
+      "roc_auc_95_ci": [
+        0.6971,
+        0.8425
+      ],
+      "average_precision_pr_auc": 0.7129,
+      "recall_at_top_10_percent": 0.1529,
+      "top_10_positives_captured": "13.00 / 85",
+      "tie_condition": "NO_TIE"
+    }
+  ],
+  "shared_fixed_test": [
+    {
+      "model_name": "Model A - Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8357,
+      "roc_auc_95_ci": [
+        0.7766,
+        0.892
+      ],
+      "average_precision_pr_auc": 0.8233,
+      "recall_at_top_10_percent": 0.2,
+      "top_10_positives_captured": "17.00 / 85",
+      "tie_condition": "NO_TIE"
+    },
+    {
+      "model_name": "Model A - Random Forest",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8058,
+      "roc_auc_95_ci": [
+        0.7418,
+        0.8664
+      ],
+      "average_precision_pr_auc": 0.7809,
+      "recall_at_top_10_percent": 0.1765,
+      "top_10_positives_captured": "15.00 / 85",
+      "tie_condition": "NO_TIE"
+    },
+    {
+      "model_name": "Model B - Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8008,
+      "roc_auc_95_ci": [
+        0.7375,
+        0.8642
+      ],
+      "average_precision_pr_auc": 0.7896,
+      "recall_at_top_10_percent": 0.1647,
+      "top_10_positives_captured": "14.00 / 85",
+      "tie_condition": "NO_TIE"
+    },
+    {
+      "model_name": "Model B - Random Forest",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.7632,
+      "roc_auc_95_ci": [
+        0.6865,
+        0.8392
+      ],
+      "average_precision_pr_auc": 0.7189,
+      "recall_at_top_10_percent": 0.1294,
+      "top_10_positives_captured": "11.00 / 85",
+      "tie_condition": "NO_TIE"
+    }
+  ],
+  "spatial_subgroup_analysis_rf_a": [
+    {
+      "subgroup": "All Test Positives (Full Cohort)",
+      "n_positives": 85,
+      "n_background": 85,
+      "base_rate": 0.5,
+      "roc_auc": 0.8058,
+      "roc_auc_95_ci": [
+        0.7418,
+        0.8664
+      ],
+      "average_precision": 0.7809,
+      "ap_vs_baseline_ratio": 1.56,
+      "recall_top10": 0.1765,
+      "pos_in_top10": "15.00 / 85"
+    },
+    {
+      "subgroup": "Exact Seen Coordinates (0.0 km)",
+      "n_positives": 7,
+      "n_background": 85,
+      "base_rate": 0.0761,
+      "roc_auc": 0.8622,
+      "roc_auc_95_ci": [
+        0.7412,
+        0.9612
+      ],
+      "average_precision": 0.386,
+      "ap_vs_baseline_ratio": 5.07,
+      "recall_top10": 0.2857,
+      "pos_in_top10": "2.00 / 7"
+    },
+    {
+      "subgroup": "Exact Novel Coordinates (> 0.0 km)",
+      "n_positives": 78,
+      "n_background": 85,
+      "base_rate": 0.4785,
+      "roc_auc": 0.8008,
+      "roc_auc_95_ci": [
+        0.7407,
+        0.8708
+      ],
+      "average_precision": 0.7621,
+      "ap_vs_baseline_ratio": 1.59,
+      "recall_top10": 0.1795,
+      "pos_in_top10": "14.00 / 78"
+    },
+    {
+      "subgroup": "Proximal Positives (< 3.0 km)",
+      "n_positives": 26,
+      "n_background": 85,
+      "base_rate": 0.2342,
+      "roc_auc": 0.8104,
+      "roc_auc_95_ci": [
+        0.7238,
+        0.8918
+      ],
+      "average_precision": 0.5476,
+      "ap_vs_baseline_ratio": 2.34,
+      "recall_top10": 0.2308,
+      "pos_in_top10": "6.00 / 26"
+    },
+    {
+      "subgroup": "Distal Positives (>= 3.0 km)",
+      "n_positives": 59,
+      "n_background": 85,
+      "base_rate": 0.4097,
+      "roc_auc": 0.8038,
+      "roc_auc_95_ci": [
+        0.731,
+        0.8695
+      ],
+      "average_precision": 0.7198,
+      "ap_vs_baseline_ratio": 1.76,
+      "recall_top10": 0.2034,
+      "pos_in_top10": "12.00 / 59"
+    },
+    {
+      "subgroup": "Meso-Proximal Positives (< 10.0 km)",
+      "n_positives": 51,
+      "n_background": 85,
+      "base_rate": 0.375,
+      "roc_auc": 0.839,
+      "roc_auc_95_ci": [
+        0.77,
+        0.8973
+      ],
+      "average_precision": 0.7359,
+      "ap_vs_baseline_ratio": 1.96,
+      "recall_top10": 0.1961,
+      "pos_in_top10": "10.00 / 51"
+    },
+    {
+      "subgroup": "Meso-Distal Positives (>= 10.0 km)",
+      "n_positives": 34,
+      "n_background": 85,
+      "base_rate": 0.2857,
+      "roc_auc": 0.7561,
+      "roc_auc_95_ci": [
+        0.662,
+        0.8433
+      ],
+      "average_precision": 0.5361,
+      "ap_vs_baseline_ratio": 1.88,
+      "recall_top10": 0.1765,
+      "pos_in_top10": "6.00 / 34"
+    }
+  ]
+}

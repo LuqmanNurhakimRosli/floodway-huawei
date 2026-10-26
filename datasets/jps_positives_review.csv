@@ -1,0 +1,359 @@
+excel_row_num,original_index,raw_year,raw_date_temp,raw_date,raw_state,raw_region,raw_place,raw_name,issue_category,issue_detail
+137,135,2015.0,10/11,10/11/2015,Kedah,Baling,Kg. Bukit Sebelah,"Kg. Bukit Sebelah, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+173,171,2015.0,22/11,22/11/2015,Kedah,Kuala Muda,Taman Berlian,"Taman Berlian, Kuala Muda, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+438,436,2015.0,2/6,2/6/2015,Penang,Seberang Perai Selantan,Taman Sri Bayu,"Taman Sri Bayu, Seberang Perai Selantan, Penang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+558,556,2015.0,4/13,4/13/2015,Perak,Kinta,Simpang Pulai,"Simpang Pulai, Kinta, Perak",INVALID_MONTH,Month 13 in date '4/13/2015' is out of range (1-12); possibly swapped MM/DD or typo
+919,917,2015.0,14/1,14/1/2015,Sarawak,Bintulu,Jalan Sibiew,"Jalan Sibiew, Bintulu, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+1317,1315,2015.0,30/11,30/11/2015,Sarawak,Sri Aman,Lidong,"Lidong, Sri Aman, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+1414,1412,2015.0,31/12,31/12/2015,Sarawak,Kuching,Jln. Batu Kawa,"Jln. Batu Kawa, Kuching, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+1696,1694,2015.0,16/11,16/11/2015,Selangor,Petaling Jaya,KTM Petaling Stesen,"KTM Petaling Stesen, Petaling Jaya, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+1793,1791,2017.0,23/1,23/1/2017,Johor,Tangkak,Kg. Sri Jaya,"Kg. Sri Jaya, Tangkak, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+1814,1812,2017.0,24/1,24/1/2017,Johor,Kota Tinggi,Kg. Mawai Lama,"Kg. Mawai Lama, Kota Tinggi, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2144,2142,2016.0,2/12,2/12/2016,Kelantan,Pasir Mas,Kg. Pengkalan Telok,"Kg. Pengkalan Telok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2274,2272,2017.0,20/1,20/1/2017,Kelantan,Pasir Mas,Repek,"Repek, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2580,2578,2017.0,28/1,28/1/2017,Pahang,Termerloh,Kg. Paya Luas,"Kg. Paya Luas, Termerloh, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2840,2838,2016.0,22/5,22/5/2016,Sabah,Kota Belud,Kg. Menunggui,"Kg. Menunggui, Kota Belud, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2890,2888,2016.0,20/2,20/2/2016,Sarawak,Bau,Kpg. Peninjau Baru,"Kpg. Peninjau Baru, Bau, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2941,2939,2016.0,27/2,27/2/2016,Sarawak,Samarahan,Taman Samarindah Lorong 28,"Taman Samarindah Lorong 28, Samarahan, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+2942,2940,2016.0,27/2,27/2/2016,Sarawak,Samarahan,Kampung Rembus,"Kampung Rembus, Samarahan, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3275,3273,2017.0,23/1,23/1/2017,Johor,Segamat,Kg. Seberang Batu Badak,"Kg. Seberang Batu Badak, Segamat, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3277,3275,2017.0,23/1,23/1/2017,Johor,Segamat,Kg. Jabi,"Kg. Jabi, Segamat, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3292,3290,2017.0,24/1,24/1/2017,Johor,Mersing,Kg. Peta,"Kg. Peta, Mersing, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3308,3306,2017.0,18.1,18.1/2017,Kedah,Mukim,Kg. Paya Jemerli,"Kg. Paya Jemerli, Mukim, Kedah",DOT_DATE_SYNTAX,Date '18.1/2017' uses dot separator syntax
+3309,3307,2017.0,27.2,27.2/2017,Kedah,Bandar Baharu,Kg. Tepus,"Kg. Tepus, Bandar Baharu, Kedah",DOT_DATE_SYNTAX,Date '27.2/2017' uses dot separator syntax
+3310,3308,2017.0,27.3,27.3/2017,Kedah,Kubang Pasu,Jalan Felda Bukit Tangga,"Jalan Felda Bukit Tangga, Kubang Pasu, Kedah",DOT_DATE_SYNTAX,Date '27.3/2017' uses dot separator syntax
+3515,3513,2017.0,4/11,4/11/2017,Kedah,Kulim,Kg. Jeram,"Kg. Jeram, Kulim, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3584,3582,2017.0,14/11,14/11/2017,Kedah,Kubang Pasu,Kg. Sg. Petani,"Kg. Sg. Petani, Kubang Pasu, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3617,3615,2017.0,27/1,27/1/2017,Kelantan,Jeli,Kg. Jeli Lama,"Kg. Jeli Lama, Jeli, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3618,3616,2017.0,27/1,27/1/2017,Kelantan,Jeli,Kg. Lakota,"Kg. Lakota, Jeli, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3619,3617,2017.0,27/1,27/1/2017,Kelantan,Jeli,Kg. Gemang,"Kg. Gemang, Jeli, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3621,3619,2017.0,27/1,27/1/2017,Kelantan,Jeli,Kg. Kuala Balah,"Kg. Kuala Balah, Jeli, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3622,3620,2017.0,27/1,27/1/2017,Kelantan,Jeli,Kg. Lubok Bongor,"Kg. Lubok Bongor, Jeli, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3624,3622,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3625,3623,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3626,3624,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3627,3625,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3628,3626,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3629,3627,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3630,3628,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3632,3630,2017.0,28/11,28/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3634,3632,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3635,3633,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3636,3634,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3637,3635,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3638,3636,2017.0,28/11,28/11/2017,Kelantan,Pasir Mas,Rantau Panjang,"Rantau Panjang, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3640,3638,2017.0,27/11,27/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3642,3640,2017.0,27/11,27/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3643,3641,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3644,3642,2017.0,27/11,27/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3645,3643,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3647,3645,2017.0,28/11,28/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3648,3646,2017.0,27/11,27/11/2017,Kelantan,Pasir Mas,Kangkong,"Kangkong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3651,3649,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3654,3652,2017.0,28/11,28/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3655,3653,2017.0,28/11,28/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3656,3654,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3657,3655,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3659,3657,2017.0,27/11,27/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3660,3658,2017.0,28/11,28/11/2017,Kelantan,Pasir Mas,Gual Periok,"Gual Periok, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3670,3668,2017.0,29/11,29/11/2017,Kelantan,Pasir Mas,Kubang Gadong,"Kubang Gadong, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3717,3715,2017.0,27/11,27/11/2017,Kelantan,Kota Bharu,Peringat,"Peringat, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3720,3718,2017.0,28/11,28/11/2017,Kelantan,Kota Bharu,Kadok,"Kadok, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3721,3719,2017.0,28/11,28/11/2017,Kelantan,Kota Bharu,Kadok,"Kadok, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3722,3720,2017.0,28/11,28/11/2017,Kelantan,Kota Bharu,Kadok,"Kadok, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3725,3723,2017.0,28/11,28/11/2017,Kelantan,Kota Bharu,Ketereh,"Ketereh, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3728,3726,2017.0,28/11,28/11/2017,Kelantan,Kota Bharu,Pendek,"Pendek, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3731,3729,2017.0,29/11,29/11/2017,Kelantan,Kota Bharu,Kadok,"Kadok, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3732,3730,2017.0,29/11,29/11/2017,Kelantan,Kota Bharu,Kadok,"Kadok, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3733,3731,2017.0,29/11,29/11/2017,Kelantan,Kota Bharu,Kadok,"Kadok, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3737,3735,2017.0,29/11,29/11/2017,Kelantan,Kota Bharu,Ketereh,"Ketereh, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3740,3738,2017.0,29/11,29/11/2017,Kelantan,Kota Bharu,Pendek,"Pendek, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3745,3743,2017.0,30/11,30/11/2017,Kelantan,Kota Bharu,Pendek,"Pendek, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3748,3746,2017.0,1/12,1/12/2017,Kelantan,Kota Bharu,Pendek,"Pendek, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3750,3748,2017.0,2/12,2/12/2017,Kelantan,Kota Bharu,Pendek,"Pendek, Kota Bharu, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3767,3765,2017.0,25/5,25/5/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3771,3769,2017.0,25/5,25/5/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3772,3770,2017.0,25/5,25/5/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3777,3775,2017.0,30/5,30/5/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3779,3777,2017.0,30/5,30/5/2017,Kuala Lumpur,Kuala Lumpur,Kolej Telekom Jalan Semarak,"Kolej Telekom Jalan Semarak, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3782,3780,2017.0,2/9,2/9/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3784,3782,2017.0,2/9,2/9/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3786,3784,2017.0,2/9,2/9/2017,Kuala Lumpur,Kuala Lumpur,0,"0, Kuala Lumpur, Kuala Lumpur",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3790,3788,2017.0,19/1,19/1/2017,Melaka,Jasin,Kg. Relau Asahan,"Kg. Relau Asahan, Jasin, Melaka",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3925,3923,2017.0,8/2,8/2/2017,Negeri Sembilan,Jelebu,Kg. Batu Serambai,"Kg. Batu Serambai, Jelebu, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+3982,3980,2017.0,10/6,10/6/2017,Negeri Sembilan,Rembau,Kg. Pedas Hilir,"Kg. Pedas Hilir, Rembau, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4052,4050,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Gali Tengah,"Kg. Gali Tengah, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4053,4051,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Peruas,"Kg. Peruas, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4054,4052,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Pamah Rawas,"Kg. Pamah Rawas, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4055,4053,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Pamah Kulat,"Kg. Pamah Kulat, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4056,4054,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Keloi,"Kg. Keloi, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4058,4056,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Lechar,"Kg. Lechar, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4059,4057,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Tg. Putus,"Kg. Tg. Putus, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4060,4058,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Pasir Bayam,"Kg. Pasir Bayam, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4061,4059,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Kuala Gali,"Kg. Kuala Gali, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4062,4060,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Ajai/K. Temau,"Kg. Ajai/K. Temau, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4063,4061,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Pia/Kuala Dong,"Kg. Pia/Kuala Dong, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4064,4062,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Kuala Semantan,"Kg. Kuala Semantan, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4066,4064,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Sengkela,"Kg. Sengkela, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4067,4065,2017.0,25/1,25/1/2017,Pahang,Raub,Kg. Chenua,"Kg. Chenua, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4068,4066,2017.0,25/1,25/1/2017,Pahang,Raub,Tok Machang,"Tok Machang, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4069,4067,2017.0,25/1,25/1/2017,Pahang,Raub,Ulu Atok,"Ulu Atok, Raub, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4137,4135,2017.0,27/1,27/1/2017,Pahang,Maran,Kg. Sembai,"Kg. Sembai, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4138,4136,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Sentang,"Kg. Sentang, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4139,4137,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Nyak,"Kg. Nyak, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4140,4138,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Telok,"Kg. Telok, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4142,4140,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Paya Ladang,"Kg. Paya Ladang, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4144,4142,2017.0,27/1,27/1/2017,Pahang,Maran,Kg. Pesagi,"Kg. Pesagi, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4145,4143,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Pejing,"Kg. Pejing, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4148,4146,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Lubuk Paku,"Kg. Lubuk Paku, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4150,4148,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Paya Pasir,"Kg. Paya Pasir, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4151,4149,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Sekara,"Kg. Sekara, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4152,4150,2017.0,28/1,28/1/2017,Pahang,Maran,Kg. Lanting,"Kg. Lanting, Maran, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4204,4202,2018.0,1/1,1/1/2018,Pahang,Kuantan,Kg. Pandan 2,"Kg. Pandan 2, Kuantan, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4303,4301,2017.0,4/11,4/11/2017,Penang,Seberang Perai Utara,Kg. Maklom,"Kg. Maklom, Seberang Perai Utara, Penang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4377,4375,2017.0,4/11,4/11/2017,Penang,Seberang Perai Tengah,Taman Mangga,"Taman Mangga, Seberang Perai Tengah, Penang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4378,4376,2017.0,4/11,4/11/2017,Penang,Seberang Perai Tengah,Taman Sentul,"Taman Sentul, Seberang Perai Tengah, Penang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4379,4377,2017.0,4/11,4/11/2017,Penang,Seberang Perai Tengah,Taman Pinang,"Taman Pinang, Seberang Perai Tengah, Penang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4669,4667,2017.0,23/1,23/1/2017,Perak,Larut Matang dan Selama,Kg. Matang Merbau,"Kg. Matang Merbau, Larut Matang dan Selama, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4670,4668,2017.0,23/1,23/1/2017,Perak,Larut Matang dan Selama,Kg. Jawa,"Kg. Jawa, Larut Matang dan Selama, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4671,4669,2017.0,23/1,23/1/2017,Perak,Larut Matang dan Selama,Kg. Batu Hampar,"Kg. Batu Hampar, Larut Matang dan Selama, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+4980,4978,2017.0,15/2,15/2/2017,Sarawak,Kuching,Jalan Matang Baru,"Jalan Matang Baru, Kuching, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5052,5050,2017.0,25/11,25/11/2017,Sarawak,Roban/Betong,Rh. Steward,"Rh. Steward, Roban/Betong, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5145,5143,2017.0,26/11,26/11/2017,Sarawak,Sibu,Jln Utama dan Persisiran Sg. Assan,"Jln Utama dan Persisiran Sg. Assan, Sibu, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5363,5361,2017.0,20/12,20/12/2017,Sarawak,Limbang,Kg. Malagangai,"Kg. Malagangai, Limbang, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5366,5364,2017.0,20/12,20/12/2017,Sarawak,Limbang,Kg. Buangsiol,"Kg. Buangsiol, Limbang, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5367,5365,2017.0,20/12,20/12/2017,Sarawak,Limbang,Taman Damai A,"Taman Damai A, Limbang, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5510,5508,2017.0,8/4,8/4/2017,Selangor,Hulu Langat,Kg. Rinching Hulu,"Kg. Rinching Hulu, Hulu Langat, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5596,5594,2017.0,27/1,27/1/2017,Selangor,Kuala Selangor,Kg. Harmoni Ijok,"Kg. Harmoni Ijok, Kuala Selangor, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5758,5756,2018.0,14/11,14/11/2018,Kedah,Kulim, Kg Wang Pinang," Kg Wang Pinang, Kulim, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5759,5757,2018.0,14/11,14/11/2018,Kedah,Kulim,Taman Harmoni,"Taman Harmoni, Kulim, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5803,5801,2018.0,15/5,15/5/2018,Kedah,Baling, K.Pegang," K.Pegang, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5806,5804,2018.0,15/5,15/5/2018,Kedah,Baling,K.Pegang,"K.Pegang, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5842,5840,2018.0,9/10,9/10/2018,Kedah,Baling,Kg. Kejai Atas,"Kg. Kejai Atas, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5942,5940,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Jeram Perdah,"Kg Jeram Perdah, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5943,5941,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Banggol Kong,"Kg Banggol Kong, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5945,5943,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Jejawi,"Kg Jejawi, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5947,5945,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Lanchang,"Kg Lanchang, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5948,5946,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Kelawar,"Kg Kelawar, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5949,5947,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Bongor,"Kg Bongor, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5950,5948,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Bendang Nyior,"Kg Bendang Nyior, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5951,5949,2018.0,13/12,13/12/2018,Perak,Pasir Mas,Kg Tersang,"Kg Tersang, Pasir Mas, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+6436,6434,2018.0,23/10,23/10/2018,Penang,Barat Daya,Depan Sekolah Mutiara Perdana,"Depan Sekolah Mutiara Perdana, Barat Daya, Penang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+6486,6484,2018.0,15/11,15/11/2018,Perak,Kuala Kangsar/ Hulu Perak,Kg. Bendang Ujib,"Kg. Bendang Ujib, Kuala Kangsar/ Hulu Perak, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+6589,6587,,3-7/01,3-7/01/,,Membakut,Kg. Ulu Mawao,"Kg. Ulu Mawao, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6591,6589,,3-7/01,3-7/01/,,Membakut,Kg Baru,"Kg Baru, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6593,6591,,3-7/01,3-7/01/,,Membakut,Kg. Bingkulas,"Kg. Bingkulas, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6594,6592,,3-7/01,3-7/01/,,Membakut,Kg. Membakut Jaya,"Kg. Membakut Jaya, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6595,6593,,3-7/01,,,Membakut,Taman Emas,"Taman Emas, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6597,6595,,3-7/01,,,Membakut,Sg. Damit,"Sg. Damit, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6598,6596,,3-7/01,,,Membakut,Kg. Biau,"Kg. Biau, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6599,6597,,3-7/01,,,Membakut,Taman Desa Jaya,"Taman Desa Jaya, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6601,6599,,3-7/01,,,Membakut,Kg. Tomoi,"Kg. Tomoi, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6602,6600,,3-7/01,,,Membakut,SK. Sinoko,"SK. Sinoko, Membakut, ",MISSING_YEAR,Year is NaN; requires verification from JPS report
+6836,6834,2018.0,15-16/04,15-16/04/2018,Sarawak,Sri Aman,Rumah Panjang Grain,"Rumah Panjang Grain, Sri Aman, Sarawak",DATE_RANGE,Date '15-16/04/2018' specifies a multi-day range rather than a single event date
+6837,6835,2018.0,15-16/04,15-16/04/2018,Sarawak,Sri Aman,San Munggur,"San Munggur, Sri Aman, Sarawak",DATE_RANGE,Date '15-16/04/2018' specifies a multi-day range rather than a single event date
+6914,6912,2018.0,08/12,08/12/2018,Sarawak,Selangau/ Sibu,Jalan utama ke Tabalong Nanga Tamin,"Jalan utama ke Tabalong Nanga Tamin, Selangau/ Sibu, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7223,7221,2018.0,23/6,23/6/2018,Selangor,Hulu Langat,Dusun Tua,"Dusun Tua, Hulu Langat, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7367,7365,2018.0,13/12,13/12/2018,Terengganu,Hulu Terengganu,Kg. Tok Lawit,"Kg. Tok Lawit, Hulu Terengganu, Terengganu",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7475,7473,2019.0,14/12,14/12/2019,Johor,Kota Tinggi,Kg. Changi,"Kg. Changi, Kota Tinggi, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7631,7629,2019.0,24/10,24/10/2019,Kedah,Baling,"Kg. Bukit Sebelah,Weng","Kg. Bukit Sebelah,Weng, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7632,7630,2019.0,24/10,24/10/2019,Kedah,Baling,"Kg.Batu 60,Weng","Kg.Batu 60,Weng, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7641,7639,2019.0,24/10,24/10/2019,Kedah,Baling,"Kg.Tandop Keling, Siong","Kg.Tandop Keling, Siong, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7642,7640,2019.0,24/10,24/10/2019,Kedah,Baling,"Kg. Batu 48, Bongor","Kg. Batu 48, Bongor, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7643,7641,2019.0,24/10,24/10/2019,Kedah,Baling,"Kg. Batu 48, Bongor","Kg. Batu 48, Bongor, Baling, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7673,7671,2019.0,28/10,28/10/2019,Kedah,Kubang Pasu,Bkt. Kayu Hitam,"Bkt. Kayu Hitam, Kubang Pasu, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+7734,7732,2019.0,43477/,43477//2019,Kelantan,Bachok,Taman Bator Harmoni,"Taman Bator Harmoni, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7735,7733,2019.0,43477/,43477//2019,Kelantan,Bachok,Kg. Seneng,"Kg. Seneng, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7736,7734,2019.0,43477/,43477//2019,Kelantan,Bachok,Kg. Tasik,"Kg. Tasik, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7737,7735,2019.0,43477/,43477//2019,Kelantan,Bachok,Kg. Pak Koja,"Kg. Pak Koja, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7738,7736,2019.0,43477/,43477//2019,Kelantan,Bachok,Kg. Pelunggur,"Kg. Pelunggur, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7739,7737,2019.0,43477/,43477//2019,Kelantan,Bachok,Kg. Gajah Mati,"Kg. Gajah Mati, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7740,7738,2019.0,43477/,43477//2019,Kelantan,Bachok,Kg. Mahligai,"Kg. Mahligai, Bachok, Kelantan",EXCEL_SERIAL_DATE,Date '43477//2019' contains an unformatted Excel serial number
+7748,7746,2019.0,43508/,43508//2019,Kelantan,Kota Bahru,Kg Hutan Pasir,"Kg Hutan Pasir, Kota Bahru, Kelantan",EXCEL_SERIAL_DATE,Date '43508//2019' contains an unformatted Excel serial number
+7749,7747,2019.0,43508/,43508//2019,Kelantan,Kota Bahru,Kg. Tok Akil,"Kg. Tok Akil, Kota Bahru, Kelantan",EXCEL_SERIAL_DATE,Date '43508//2019' contains an unformatted Excel serial number
+7750,7748,2019.0,43508/,43508//2019,Kelantan,Kota Bahru,Kg. Tiong Dalam,"Kg. Tiong Dalam, Kota Bahru, Kelantan",EXCEL_SERIAL_DATE,Date '43508//2019' contains an unformatted Excel serial number
+7751,7749,2019.0,43508/,43508//2019,Kelantan,Kota Bahru,Kg Tiong,"Kg Tiong, Kota Bahru, Kelantan",EXCEL_SERIAL_DATE,Date '43508//2019' contains an unformatted Excel serial number
+7752,7750,2019.0,43508/,43508//2019,Kelantan,Kota Bahru,"Kg. Tunjung,","Kg. Tunjung,, Kota Bahru, Kelantan",EXCEL_SERIAL_DATE,Date '43508//2019' contains an unformatted Excel serial number
+7852,7850,2019.0,30/11,30/11/2019,Kelantan,Pasir Mas,Kg.Kolam,"Kg.Kolam, Pasir Mas, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+8009,8007,2019.0,20/12,20/12/2019,Kelantan,Tumpat,Kg Naga Ibu,"Kg Naga Ibu, Tumpat, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+8153,8151,2019.0,13/11,13/11/2019,Kelantan,Gua Musang,Kg. Chalil,"Kg. Chalil, Gua Musang, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+8878,8876,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Gumisi Laut,"Kg. Gumisi Laut, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8879,8877,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Gumisi Ulu,"Kg. Gumisi Ulu, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8880,8878,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Maugus,"Kg. Maugus, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8881,8879,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Enubai,"Kg. Enubai, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8882,8880,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Ponontomon,"Kg. Ponontomon, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8883,8881,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Pantongan Saga,"Kg. Pantongan Saga, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8884,8882,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Belumbung Seberang,"Kg. Belumbung Seberang, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8885,8883,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Pulungan,"Kg. Pulungan, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8886,8884,2019.0,20/19,20/19/2019,Sabah,Tenom,Labut 1,"Labut 1, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8887,8885,2019.0,20/19,20/19/2019,Sabah,Tenom,Labut 2,"Labut 2, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8888,8886,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Angalor,"Kg. Angalor, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8889,8887,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Lalandang,"Kg. Lalandang, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8890,8888,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Sindungon,"Kg. Sindungon, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8891,8889,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Tumantalik,"Kg. Tumantalik, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8892,8890,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Mandalom Lama,"Kg. Mandalom Lama, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+8893,8891,2019.0,20/19,20/19/2019,Sabah,Tenom,Kg. Batu-Batu,"Kg. Batu-Batu, Tenom, Sabah",INVALID_MONTH,Month 19 in date '20/19/2019' is out of range (1-12); possibly swapped MM/DD or typo
+9304,9302,2019.0,03/04,03/04/2019,Selangor,Klang,Kg Jalan Kebun,"Kg Jalan Kebun, Klang, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9312,9310,2019.0,15/06,15/06/2019,Selangor,Klang,Taman Klang Utama,"Taman Klang Utama, Klang, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9474,9472,2019.0,23/10,23/10/2019,Selangor,Gombak,Sekitar Kg Damai,"Sekitar Kg Damai, Gombak, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9523,9521,2020.0,26/4,26/4/2020,Johor,BATU PAHAT,Jalan Lorong Bahagia,"Jalan Lorong Bahagia, BATU PAHAT, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9575,9573,2020.0,4/6,4/6/2020,Johor,JOHOR BAHRU,"Jalan Rosmerah, Johor Jaya","Jalan Rosmerah, Johor Jaya, JOHOR BAHRU, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9576,9574,2020.0,4/6,4/6/2020,Johor,JOHOR BAHRU,Kg Plentong,"Kg Plentong, JOHOR BAHRU, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9577,9575,2020.0,4/6,4/6/2020,Johor,JOHOR BAHRU,"Jalan Johor Bahru Ke Ulu Tiram, Desa Cemerlang.","Jalan Johor Bahru Ke Ulu Tiram, Desa Cemerlang., JOHOR BAHRU, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+9940,9938,2020.0,28/11,28/11/2020,Kedah,KUALA MUDA,Kg. Bukit Belah,"Kg. Bukit Belah, KUALA MUDA, Kedah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+10231,10229,2020.0,19/12,19/12/2020,Kelantan,PASIR MAS,Kg.Kolam,"Kg.Kolam, PASIR MAS, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+10552,10550,2020.0,19/11,19/11/2020,Negeri Sembilan,KUALA PILAH,"Batu 10,Kepis","Batu 10,Kepis, KUALA PILAH, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+10553,10551,2020.0,19/11,19/11/2020,Negeri Sembilan,KUALA PILAH,"Batu 12, Kepis","Batu 12, Kepis, KUALA PILAH, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+10554,10552,2020.0,19/11,19/11/2020,Negeri Sembilan,KUALA PILAH,Kg Malan,"Kg Malan, KUALA PILAH, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+10555,10553,2020.0,19/11,19/11/2020,Negeri Sembilan,KUALA PILAH,Kg Air Taling,"Kg Air Taling, KUALA PILAH, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+10556,10554,2020.0,19/11,19/11/2020,Negeri Sembilan,JEMPOL,Kg Org Asli Langkap,"Kg Org Asli Langkap, JEMPOL, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11233,11231,2020.0,27/6,27/6/2020,Sabah,MEMBAKUT,Kg. Jambatan Baru,"Kg. Jambatan Baru, MEMBAKUT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11523,11521,2020.0,19/10,19/10/2020,Sabah,MEMBAKUT,Jalan Kg. Baitam Laut,"Jalan Kg. Baitam Laut, MEMBAKUT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11669,11667,2020.0,27/2,27/2/2020,Sarawak,SIBU,Rh Watson,"Rh Watson, SIBU, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11672,11670,2020.0,27/2,27/2/2020,Sarawak,SIBU,,", SIBU, Sarawak",MISSING_PLACE,Place/Locality name is missing or empty
+11968,11966,2020.0,15/9,15/9/2020,Sarawak,MIRI,SK Long Jegan,"SK Long Jegan, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11969,11967,2020.0,15/9,15/9/2020,Sarawak,MIRI,Klinik Long Jegan,"Klinik Long Jegan, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11970,11968,2020.0,15/9,15/9/2020,Sarawak,MIRI,Rh. Long Jegan,"Rh. Long Jegan, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11971,11969,2020.0,15/9,15/9/2020,Sarawak,MIRI,Long Batan,"Long Batan, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11972,11970,2020.0,15/9,15/9/2020,Sarawak,MIRI,Kuala Bok,"Kuala Bok, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11973,11971,2020.0,15/9,15/9/2020,Sarawak,MIRI,Sungai Bong,"Sungai Bong, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11974,11972,2020.0,15/9,15/9/2020,Sarawak,MIRI,Long Loyang,"Long Loyang, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11975,11973,2020.0,15/9,15/9/2020,Sarawak,MIRI,SK Long Teran kanan,"SK Long Teran kanan, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11976,11974,2020.0,15/9,15/9/2020,Sarawak,MIRI,SK Long Teru,"SK Long Teru, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11977,11975,2020.0,15/9,15/9/2020,Sarawak,MIRI,Klinik Long Teru,"Klinik Long Teru, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11978,11976,2020.0,15/9,15/9/2020,Sarawak,MIRI,SK Long Sobeng,"SK Long Sobeng, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11979,11977,2020.0,15/9,15/9/2020,Sarawak,MIRI,Rh. Unsam Anak Ancha,"Rh. Unsam Anak Ancha, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11980,11978,2020.0,15/9,15/9/2020,Sarawak,MIRI,Rh. Kalong Anak Goh,"Rh. Kalong Anak Goh, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11981,11979,2020.0,15/9,15/9/2020,Sarawak,MIRI,Rh. Manggi Ak Andam,"Rh. Manggi Ak Andam, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11982,11980,2020.0,15/9,15/9/2020,Sarawak,MIRI,Rh. Dullah Anak Tawas,"Rh. Dullah Anak Tawas, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+11983,11981,2020.0,15/9,15/9/2020,Sarawak,MIRI,Long Sepiling,"Long Sepiling, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12152,12150,2020.0,4/4,4/4/2020,Selangor,GOMBAK,Jalan 11C Selayang Baru,"Jalan 11C Selayang Baru, GOMBAK, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12158,12156,2020.0,3/4,3/4/2020,Selangor,SEPANG,Taman Salak Budi,"Taman Salak Budi, SEPANG, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12330,12328,2020.0,4/9,4/9/2020,Selangor,GOMBAK,Sekitar Fasa 4 Taman Rahmat Jaya,"Sekitar Fasa 4 Taman Rahmat Jaya, GOMBAK, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12331,12329,2020.0,4/9,4/9/2020,Selangor,GOMBAK,Sekitar kawasan persimpangan Bukit Botak,"Sekitar kawasan persimpangan Bukit Botak, GOMBAK, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12404,12402,2020.0,24/11,24/11/2020,Selangor,,Jalan Derahman,"Jalan Derahman, , Selangor",MISSING_REGION,District/Region is missing or empty
+12408,12406,2020.0,24/11,24/11/2020,Selangor,,Taman Klang Jaya,"Taman Klang Jaya, , Selangor",MISSING_REGION,District/Region is missing or empty
+12422,12420,2020.0,28/11,28/11/2020,Selangor,KLANG,Kawasan Industri Jalan Teratai,"Kawasan Industri Jalan Teratai, KLANG, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12563,12561,2021.0,2/1,2/1/2021,Johor,KOTA TINGGI,Kg Bukit Raja,"Kg Bukit Raja, KOTA TINGGI, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12575,12573,2021.0,3/1,3/1/2021,Johor,MERSING,Kg Baru Jemari,"Kg Baru Jemari, MERSING, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+12596,12594,2021.0,10/1,10/1/2021,Johor,KOTA TINGGI,Kg Semanggar Luar,"Kg Semanggar Luar, KOTA TINGGI, Johor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+13251,13249,2021.0,6/1,6/1/2021,Kelantan,PASIR MAS,Kg.Kolam,"Kg.Kolam, PASIR MAS, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+13319,13317,2021.0,7/1,7/1/2021,Kelantan,PASIR MAS,Kg.Kolam,"Kg.Kolam, PASIR MAS, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+13397,13395,2021.0,19/11,19/11/2021,Kelantan,JELI,Kg. Lubok Bongor,"Kg. Lubok Bongor, JELI, Kelantan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+13517,13515,2021.0,17/5,17/5/2021,Melaka,MELAKA TENGAH,Kg Sungai Putat,"Kg Sungai Putat, MELAKA TENGAH, Melaka",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+13762,13760,2021.0,18/12,18/12/2021,Negeri Sembilan,JELEBU,Kg. Kemin,"Kg. Kemin, JELEBU, Negeri Sembilan",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14134,14132,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Kuala Keloi,"Kg. Kuala Keloi, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14135,14133,2021.0,17/12,17/12/2021,Pahang,RAUB,Bukit Pampong,"Bukit Pampong, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14136,14134,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Gali Tengah,"Kg. Gali Tengah, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14137,14135,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Gali Hilir,"Kg. Gali Hilir, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14138,14136,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Sg. Pasu,"Kg. Sg. Pasu, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14139,14137,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Durian Sebatang,"Kg. Durian Sebatang, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14140,14138,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Ajai,"Kg. Ajai, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14141,14139,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Kuala Gali,"Kg. Kuala Gali, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14142,14140,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Temau,"Kg. Temau, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14143,14141,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Sega Lama,"Kg. Sega Lama, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14144,14142,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Pamah Rawas,"Kg. Pamah Rawas, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14145,14143,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Peruas,"Kg. Peruas, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14146,14144,2021.0,17/12,17/12/2021,Pahang,RAUB,Kg. Kuala Keloi,"Kg. Kuala Keloi, RAUB, Pahang",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+14467,14465,2021.0,5/5,5/5/2021,Perak,KINTA,"Kg. Tengku Husien Hujung, Manjoi","Kg. Tengku Husien Hujung, Manjoi, KINTA, Perak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15482,15480,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Bakalau,"Kg. Bakalau, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15483,15481,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Simpang 4 Chan Furniture,"Simpang 4 Chan Furniture, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15484,15482,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Binunuk,"Kg. Binunuk, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15485,15483,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Balibata,"Kg. Balibata, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15486,15484,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Bingkul,"Kg. Bingkul, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15487,15485,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lumatai,"Kg. Lumatai, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15488,15486,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Suasa,"Kg. Suasa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15489,15487,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Kangsa,"Kg. Kangsa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15490,15488,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lago,"Kg. Lago, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15491,15489,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lawa,"Kg. Lawa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15492,15490,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Berumbai,"Kg. Berumbai, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15493,15491,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Betandok Lubak,"Kg. Betandok Lubak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15494,15492,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Mempagar,"Kg. Mempagar, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15495,15493,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Sungkadan Tuhu Lupak,"Kg. Sungkadan Tuhu Lupak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15496,15494,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Melulugus,"Kg. Melulugus, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15497,15495,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Melati,"Kg. Melati, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15498,15496,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kuarters SESB Beaufort,"Kuarters SESB Beaufort, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15499,15497,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kuarters Kereta Api,"Kuarters Kereta Api, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15500,15498,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Bangkalalak,"Kg. Bangkalalak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15501,15499,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Labi,"Kg. Labi, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15502,15500,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,"Kg. Kitalabak, Lumatai","Kg. Kitalabak, Lumatai, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15503,15501,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Luagan Sanginan,"Kg. Luagan Sanginan, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15504,15502,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Laboi,"Kg. Laboi, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15505,15503,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Limbawang,"Kg. Limbawang, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15506,15504,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lajau,"Kg. Lajau, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15507,15505,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lubak,"Kg. Lubak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15508,15506,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Poring Lupak,"Kg. Poring Lupak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15509,15507,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lupak,"Kg. Lupak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15510,15508,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Tuhu,"Kg. Tuhu, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15511,15509,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Selinsing,"Kg. Selinsing, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15512,15510,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Beringin,"Kg. Beringin, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15513,15511,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Gadong,"Kg. Gadong, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15514,15512,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Kebajang Ulu,"Kg. Kebajang Ulu, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15515,15513,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Kukup,"Kg. Kukup, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15516,15514,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Jabang,"Kg. Jabang, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15517,15515,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Mentulud,"Kg. Mentulud, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15518,15516,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Kuala Balik,"Kg. Kuala Balik, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15519,15517,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Batu 65,"Kg. Batu 65, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15520,15518,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Lupak Seberang,"Kg. Lupak Seberang, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15521,15519,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Gerama,"Kg. Gerama, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15522,15520,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Kurian Padas Damit,"Kg. Kurian Padas Damit, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15523,15521,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Kg. Kuridak Gadong,"Kg. Kuridak Gadong, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15524,15522,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,SK. Lago,"SK. Lago, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15525,15523,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,SK. Suasa,"SK. Suasa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15526,15524,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,SK. Bangkalalak,"SK. Bangkalalak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15527,15525,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,SAN Limbawang,"SAN Limbawang, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15528,15526,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Middle School,"Middle School, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15531,15529,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Simpang Empat Chan Furniture,"Jalan Simpang Empat Chan Furniture, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15532,15530,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Binunuk,"Jalan Kg. Binunuk, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15533,15531,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Balibata,"Jalan Kg. Balibata, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15534,15532,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Melulugus,"Jalan Kg. Melulugus, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15535,15533,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Bangkalalak,"Jalan Kg. Bangkalalak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15536,15534,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Mahkamah,"Jalan Mahkamah, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15537,15535,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Suasa,"Jalan Kg. Suasa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15538,15536,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Lago,"Jalan Kg. Lago, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15539,15537,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Lawa,"Jalan Kg. Lawa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15540,15538,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Betandok Lubak,"Jalan Kg. Betandok Lubak, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15541,15539,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Laboi,"Jalan Kg. Laboi, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15542,15540,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Luagan Sanginan,"Jalan Kg. Luagan Sanginan, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15543,15541,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Kangsa,"Jalan Kg. Kangsa, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15544,15542,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Berumbai,"Jalan Kg. Berumbai, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15545,15543,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Jempangah,"Jalan Kg. Jempangah, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15546,15544,2021.0,12/1,12/1/2021,Sabah,BEAUFORT,Jalan Kg. Batu 60,"Jalan Kg. Batu 60, BEAUFORT, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15920,15918,2021.0,20/10,20/10/2021,Sabah,PAPAR,Kampung Suangon,"Kampung Suangon, PAPAR, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15921,15919,2021.0,20/10,20/10/2021,Sabah,PAPAR,Jalan Utama Lokawi Papar,"Jalan Utama Lokawi Papar, PAPAR, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15922,15920,2021.0,20/10,20/10/2021,Sabah,PAPAR,Jalan Industries Langkuas,"Jalan Industries Langkuas, PAPAR, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+15975,15973,2021.0,11/12,11/12/2021,Sabah,KOTA MARUDU,Kg.Popok Laut,"Kg.Popok Laut, KOTA MARUDU, Sabah",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16007,16005,2021.0,12/1,12/1/2021,Sarawak,KUCHING,"Kampung Sinar Budi, Batu Kawah","Kampung Sinar Budi, Batu Kawah, KUCHING, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16408,16406,2021.0,7/2,7/2/2021,Sarawak,KUCHING,Kampung Sebat Melayu,"Kampung Sebat Melayu, KUCHING, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16495,16493,2021.0,19/2,19/2/2021,Sarawak,KUCHING,Jalan Penrissen,"Jalan Penrissen, KUCHING, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16496,16494,2021.0,19/2,19/2/2021,Sarawak,KUCHING,Jalan Liu Shan Bang,"Jalan Liu Shan Bang, KUCHING, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16607,16605,2021.0,23/5,23/5/2021,Sarawak,MIRI,Kampung Narum,"Kampung Narum, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16608,16606,2021.0,23/5,23/5/2021,Sarawak,MIRI,Kampung Dagang,"Kampung Dagang, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16609,16607,2021.0,23/5,23/5/2021,Sarawak,MIRI,Kampung Baru,"Kampung Baru, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16610,16608,2021.0,23/5,23/5/2021,Sarawak,MIRI,Pekan Marudi,"Pekan Marudi, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16611,16609,2021.0,23/5,23/5/2021,Sarawak,MIRI,Kampung Dato Zain Galau,"Kampung Dato Zain Galau, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16612,16610,2021.0,23/5,23/5/2021,Sarawak,MIRI,SK Benawa,"SK Benawa, MIRI, Sarawak",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+16905,16903,2021.0,14/4,14/4/2021,Selangor,GOMBAK,Susur keluar dari Tol Rawang ke Jalan B27,"Susur keluar dari Tol Rawang ke Jalan B27, GOMBAK, Selangor",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+17132,17130,2022.0,19/12,19/12/2022,Selangor,HULU LANGAT,"Kg. Jalan Enam Kaki, Beranang","Kg. Jalan Enam Kaki, Beranang, HULU LANGAT, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17133,17131,2022.0,19/12,19/12/2022,Selangor,KUALA SELANGOR,Jalan Sempadan Kota Puteri,"Jalan Sempadan Kota Puteri, KUALA SELANGOR, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17134,17132,2022.0,19/12,19/12/2022,Selangor,KUALA SELANGOR,Jalan Rukun,"Jalan Rukun, KUALA SELANGOR, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17135,17133,2022.0,19/12,19/12/2022,Selangor,KUALA SELANGOR,Jalan Belakag Masjid,"Jalan Belakag Masjid, KUALA SELANGOR, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17136,17134,2022.0,19/12,19/12/2022,Selangor,KUALA SELANGOR,Kampung Harmoni,"Kampung Harmoni, KUALA SELANGOR, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17137,17135,2022.0,19/12,19/12/2022,Selangor,SEPANG,Taman Mas,"Taman Mas, SEPANG, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17138,17136,2022.0,19/12,19/12/2022,Selangor,SEPANG,Taman Koi prima,"Taman Koi prima, SEPANG, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17139,17137,2022.0,19/12,19/12/2022,Selangor,SEPANG,Taman Putra Prima,"Taman Putra Prima, SEPANG, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17140,17138,2022.0,22/12,22/12/2022,Selangor,PETALING,Jalan 2/1 & Jalan 2/2 Bandar Baru Sungai Buloh,"Jalan 2/1 & Jalan 2/2 Bandar Baru Sungai Buloh, PETALING, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17141,17139,2022.0,21/12,21/12/2022,Selangor,SABAK BERNAM,Jalan Sungai Panjang (B44),"Jalan Sungai Panjang (B44), SABAK BERNAM, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17142,17140,2022.0,22/12,22/12/2022,Selangor,GOMBAK,Taman Rahmat Jaya,"Taman Rahmat Jaya, GOMBAK, Selangor",FLAGGED_YEAR_2022,Tagged as 2022 in source table; suspected Dec 2021 Selangor flood requiring verification
+17165,17163,2021.0,7/1,7/1/2021,Terengganu,DUNGUN,Kampung Tepus,"Kampung Tepus, DUNGUN, Terengganu",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+17207,17205,2021.0,20/12,20/12/2021,Terengganu,KEMAMAN,Bukit Mentok,"Bukit Mentok, KEMAMAN, Terengganu",EXACT_DUPLICATE,Exact duplicate of an earlier record in the dataset
+5751,5749,2018.0,,2018-11-14,Kedah,Kulim,Kg. Pdg Tembak,"Kg. Pdg Tembak, Kulim, Kedah, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+5774,5772,2018.0,,2018-05-18,Kedah,Bandar Baharu,Kg. Paya Semambu,"Kg. Paya Semambu, Bandar Baharu, Kedah, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+5880,5878,2018.0,,2018-10-08,Kedah,Kubang Pasu,Kg. Kelubi Luar,"Kg. Kelubi Luar, Kubang Pasu, Kedah, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+5883,5881,2018.0,,2018-10-08,Kedah,Kubang Pasu,Kg. Padang Panjang,"Kg. Padang Panjang, Kubang Pasu, Kedah, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+5944,5942,2018.0,,2018-12-13,Perak,Pasir Mas,Kg. Gading,"Kg. Gading, Pasir Mas, Perak, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+5946,5944,2018.0,,2018-12-13,Perak,Pasir Mas,Kg. Siram,"Kg. Siram, Pasir Mas, Perak, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+13699,13697,2021.0,,2021-06-15,Negeri Sembilan,Jelebu,Kg. Kerangai,"Kg. Kerangai, Jelebu, Negeri Sembilan, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+13977,13975,2021.0,,2021-01-03,Pahang,Temerloh,Kg. Sungai Dingin,"Kg. Sungai Dingin, Temerloh, Pahang, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+13979,13977,2021.0,,2021-01-03,Pahang,Temerloh,Kg. Chatin,"Kg. Chatin, Temerloh, Pahang, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization
+14000,13998,2021.0,,2021-01-03,Pahang,Temerloh,Kg. Kuala Kaung,"Kg. Kuala Kaung, Temerloh, Pahang, Malaysia",NORMALIZED_DUPLICATE,Duplicate location_name on identical date after whitespace/casing normalization

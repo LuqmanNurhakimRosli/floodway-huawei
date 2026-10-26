@@ -1,0 +1,217 @@
+{
+  "benchmark_a_own_test": [
+    {
+      "model_name": "Dummy Baseline",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.5,
+      "average_precision_pr_auc": 0.5,
+      "recall_at_top_10_percent": 0.0,
+      "top_10_positives_captured": "0 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8357,
+      "average_precision_pr_auc": 0.8233,
+      "recall_at_top_10_percent": 0.2,
+      "top_10_positives_captured": "17 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Random Forest (depth=5)",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8058,
+      "average_precision_pr_auc": 0.7809,
+      "recall_at_top_10_percent": 0.1765,
+      "top_10_positives_captured": "15 / 85",
+      "top_10_cutoff_rank": 17
+    }
+  ],
+  "benchmark_b_own_test": [
+    {
+      "model_name": "Dummy Baseline",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.5,
+      "average_precision_pr_auc": 0.5,
+      "recall_at_top_10_percent": 0.0,
+      "top_10_positives_captured": "0 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.7186,
+      "average_precision_pr_auc": 0.7073,
+      "recall_at_top_10_percent": 0.1529,
+      "top_10_positives_captured": "13 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Random Forest (depth=5)",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.7727,
+      "average_precision_pr_auc": 0.7129,
+      "recall_at_top_10_percent": 0.1529,
+      "top_10_positives_captured": "13 / 85",
+      "top_10_cutoff_rank": 17
+    }
+  ],
+  "shared_fixed_test": [
+    {
+      "model_name": "Model A - Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8357,
+      "average_precision_pr_auc": 0.8233,
+      "recall_at_top_10_percent": 0.2,
+      "top_10_positives_captured": "17 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Model A - Random Forest",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8058,
+      "average_precision_pr_auc": 0.7809,
+      "recall_at_top_10_percent": 0.1765,
+      "top_10_positives_captured": "15 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Model B - Logistic Regression",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.8008,
+      "average_precision_pr_auc": 0.7896,
+      "recall_at_top_10_percent": 0.1647,
+      "top_10_positives_captured": "14 / 85",
+      "top_10_cutoff_rank": 17
+    },
+    {
+      "model_name": "Model B - Random Forest",
+      "n_test_total": 170,
+      "n_positives": 85,
+      "n_background": 85,
+      "roc_auc": 0.7632,
+      "average_precision_pr_auc": 0.7189,
+      "recall_at_top_10_percent": 0.1294,
+      "top_10_positives_captured": "11 / 85",
+      "top_10_cutoff_rank": 17
+    }
+  ],
+  "spatial_sub_evaluations_rf_a": [
+    {
+      "subset": "All Test Positives",
+      "n_pos": 85,
+      "n_bg": 85,
+      "roc_auc": 0.8058,
+      "average_precision": 0.7809,
+      "recall_top10": 0.1765,
+      "pos_captured_top10": "15 / 85"
+    },
+    {
+      "subset": "Exact Seen Coordinates (dist = 0km)",
+      "n_pos": 7,
+      "n_bg": 85,
+      "roc_auc": 0.8622,
+      "average_precision": 0.386,
+      "recall_top10": 0.2857,
+      "pos_captured_top10": "2 / 7"
+    },
+    {
+      "subset": "Novel Coordinates (dist > 0km)",
+      "n_pos": 78,
+      "n_bg": 85,
+      "roc_auc": 0.8008,
+      "average_precision": 0.7621,
+      "recall_top10": 0.1795,
+      "pos_captured_top10": "14 / 78"
+    },
+    {
+      "subset": "Proximal Positives (< 3km)",
+      "n_pos": 26,
+      "n_bg": 85,
+      "roc_auc": 0.8104,
+      "average_precision": 0.5476,
+      "recall_top10": 0.2308,
+      "pos_captured_top10": "6 / 26"
+    },
+    {
+      "subset": "Distal Positives (>= 3km)",
+      "n_pos": 59,
+      "n_bg": 85,
+      "roc_auc": 0.8038,
+      "average_precision": 0.7198,
+      "recall_top10": 0.2034,
+      "pos_captured_top10": "12 / 59"
+    },
+    {
+      "subset": "Meso-Proximal Positives (< 10km)",
+      "n_pos": 51,
+      "n_bg": 85,
+      "roc_auc": 0.839,
+      "average_precision": 0.7359,
+      "recall_top10": 0.1961,
+      "pos_captured_top10": "10 / 51"
+    },
+    {
+      "subset": "Meso-Distal Positives (>= 10km)",
+      "n_pos": 34,
+      "n_bg": 85,
+      "roc_auc": 0.7561,
+      "average_precision": 0.5361,
+      "recall_top10": 0.1765,
+      "pos_captured_top10": "6 / 34"
+    }
+  ],
+  "feature_weights": {
+    "model_a_uniform": {
+      "lr_standardized_coefficients": {
+        "rain_1d_prior_mm": 0.5595,
+        "rain_3d_prior_mm": -0.1287,
+        "rain_7d_prior_mm": 0.7336,
+        "elevation_m": -1.0647,
+        "slope_deg": -0.9301
+      },
+      "rf_feature_importances": {
+        "rain_1d_prior_mm": 0.1606,
+        "rain_3d_prior_mm": 0.1731,
+        "rain_7d_prior_mm": 0.252,
+        "elevation_m": 0.1783,
+        "slope_deg": 0.236
+      }
+    },
+    "model_b_matched": {
+      "lr_standardized_coefficients": {
+        "rain_1d_prior_mm": 0.017,
+        "rain_3d_prior_mm": -0.0253,
+        "rain_7d_prior_mm": 0.9568,
+        "elevation_m": -0.2159,
+        "slope_deg": -0.1205
+      },
+      "rf_feature_importances": {
+        "rain_1d_prior_mm": 0.1674,
+        "rain_3d_prior_mm": 0.2081,
+        "rain_7d_prior_mm": 0.3457,
+        "elevation_m": 0.2021,
+        "slope_deg": 0.0767
+      }
+    }
+  }
+}

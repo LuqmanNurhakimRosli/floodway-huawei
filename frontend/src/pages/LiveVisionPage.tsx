@@ -18,6 +18,7 @@ import { CaptureStrip } from '../components/live/feed/CaptureStrip';
 import { FeedHeader } from '../components/live/feed/FeedHeader';
 import { FeedViewer } from '../components/live/feed/FeedViewer';
 import { DEFAULT_OVERLAYS, OverlayToggles } from '../components/live/feed/OverlayToggles';
+import { FusionHero } from '../components/live/fusion/FusionHero';
 import type { OverlayState } from '../components/live/feed/OverlayToggles';
 import { ViewToggle } from '../components/live/feed/ViewToggle';
 import type { ViewMode } from '../components/live/feed/ViewToggle';
@@ -119,6 +120,7 @@ export default function LiveVisionPage() {
               </div>
             </div>
             {!loading && state.usingMock && <div className="mt-3"><OfflineNotice forcedMock={FORCE_MOCK} error={state.error} /></div>}
+            <FusionHero cameras={state.cameras} autoStart={params.get('demo') === 'storm'} />
 
             {loading ? (
               <LiveVisionSkeleton />

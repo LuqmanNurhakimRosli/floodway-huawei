@@ -1,0 +1,41 @@
+{
+  "stage": "5.8",
+  "description": "Five-Algorithm Machine Learning Benchmark for Flood Discrimination",
+  "algorithms": [
+    "Logistic Regression",
+    "Random Forest",
+    "LightGBM",
+    "CatBoost",
+    "XGBoost"
+  ],
+  "predictive_features": [
+    "rain_1d_prior_mm",
+    "rain_3d_prior_mm",
+    "rain_7d_prior_mm",
+    "elevation_m",
+    "slope_deg"
+  ],
+  "excluded_features": [
+    "latitude",
+    "longitude",
+    "rain_event_day_mm",
+    "date",
+    "year",
+    "state",
+    "place"
+  ],
+  "hyperparameters": {
+    "Logistic Regression": "StandardScaler(fit on train) + LogisticRegression(C=1.0, random_state=42, max_iter=1000)",
+    "Random Forest": "RandomForestClassifier(n_estimators=100, max_depth=5, min_samples_leaf=10, random_state=42)",
+    "LightGBM": "LGBMClassifier(n_estimators=100, max_depth=4, num_leaves=15, min_child_samples=10, lr=0.05, random_state=42)",
+    "CatBoost": "CatBoostClassifier(iterations=100, depth=4, lr=0.05, random_seed=42, verbose=False)",
+    "XGBoost": "XGBClassifier(n_estimators=100, max_depth=4, lr=0.05, subsample=0.8, colsample_bytree=0.8, random_state=42, eval_metric='logloss')"
+  },
+  "records": {
+    "n_train": 330,
+    "n_test_own": 170,
+    "n_test_shared": 170,
+    "temporal_split": "Train <= 2019 (165 pos, 165 bg), Test >= 2020 (85 pos, 85 bg)"
+  },
+  "target_definition": "Reported flood event (1) vs. landscape background (0). NOT verified flood-free negative."
+}

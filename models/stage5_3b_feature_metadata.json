@@ -1,0 +1,26 @@
+{
+  "stage": "5.3B",
+  "description": "Minimal Baseline Models for Peninsular Malaysia Reported Flood Discrimination",
+  "predictive_features": [
+    "rain_1d_prior_mm",
+    "rain_3d_prior_mm",
+    "rain_7d_prior_mm",
+    "elevation_m",
+    "slope_deg"
+  ],
+  "excluded_features": [
+    "latitude",
+    "longitude",
+    "rain_event_day_mm",
+    "date",
+    "year",
+    "state",
+    "place"
+  ],
+  "target_definition": "Retrospective reported flood incident (JPS reports) vs. uncertain background",
+  "random_seed": 42,
+  "n_train": 330,
+  "n_test_own": 170,
+  "n_test_shared": 170,
+  "temporal_firewall": "Train <= 2019, Test >= 2020. StandardScaler fit strictly on train."
+}

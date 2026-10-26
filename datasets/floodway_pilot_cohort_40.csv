@@ -1,0 +1,41 @@
+sample_id,source_type,split,target,label_class,label_certainty,date,year,state,place,latitude,longitude,excel_row_num
+PILOT_POS_01,jps_positive,train,1,positive,unverified_precision_candidate,2016-09-12,2016,Selangor,Pulau Carey,2.8907541,101.35862491105472,3142
+PILOT_POS_02,jps_positive,train,1,positive,unverified_precision_candidate,2017-11-28,2017,Negeri Sembilan,Kg. Sg. Jai,2.8572831,101.9246594,4022
+PILOT_POS_03,jps_positive,train,1,positive,unverified_precision_candidate,2016-09-18,2016,Pulau Pinang,Sg. Maklom,5.4381943,100.4078488,2677
+PILOT_POS_04,jps_positive,train,1,positive,unverified_precision_candidate,2016-10-29,2016,Pulau Pinang,Kg. Tasek Junjung,5.2956336,100.52996796341516,2740
+PILOT_POS_05,jps_positive,train,1,positive,unverified_precision_candidate,2019-04-22,2019,Selangor,Jalan Hamzah,3.1367694,101.4716644,9263
+PILOT_POS_06,jps_positive,train,1,positive,unverified_precision_candidate,2017-08-15,2017,Melaka,Kg. Pulau,2.3132667,102.2646304,3900
+PILOT_POS_07,jps_positive,train,1,positive,unverified_precision_candidate,2016-02-15,2016,Selangor,Taman Chi Liung,3.0227411,101.4339133,3087
+PILOT_POS_08,jps_positive,train,1,positive,unverified_precision_candidate,2017-01-24,2017,Johor,Taman Utama,2.5093014,102.8210348,1829
+PILOT_POS_09,jps_positive,train,1,positive,unverified_precision_candidate,2017-03-29,2017,Perak,Kg. Jelapang,4.8229837,100.6936228,4688
+PILOT_POS_10,jps_positive,train,1,positive,unverified_precision_candidate,2017-01-23,2017,Selangor,Politeknik Sultan Idris Shah,3.81249175,100.81600441217108,5648
+PILOT_POS_11,jps_positive,train,1,positive,unverified_precision_candidate,2018-08-23,2018,Kedah,Kg. Teluk Yu,6.4272342,99.8003304,5891
+PILOT_POS_12,jps_positive,train,1,positive,unverified_precision_candidate,2015-11-29,2015,Selangor,Ampang Campuran,3.1314923,101.770579578048,1520
+PILOT_POS_13,jps_positive,train,1,positive,unverified_precision_candidate,2019-12-14,2019,Johor,Kg. Changi,1.3722268,104.2342484,7455
+PILOT_POS_14,jps_positive,test,1,positive,unverified_precision_candidate,2021-01-03,2021,Pahang,Kg. Gelugor,3.8779712,103.3633481,13814
+PILOT_POS_15,jps_positive,test,1,positive,unverified_precision_candidate,2020-04-23,2020,Pulau Pinang,Tok Kangar,5.319823,100.4262341,10696
+PILOT_POS_16,jps_positive,test,1,positive,unverified_precision_candidate,2021-05-19,2021,Perak,Angsana Mall,4.6034964,101.0948862,14477
+PILOT_POS_17,jps_positive,test,1,positive,unverified_precision_candidate,2020-11-23,2020,Kedah,Kampung Lahar,6.2965571,100.4429875,9922
+PILOT_POS_18,jps_positive,test,1,positive,unverified_precision_candidate,2021-12-18,2021,Pahang,Industri Bentong,3.4872559,101.9367717,14183
+PILOT_POS_19,jps_positive,test,1,positive,unverified_precision_candidate,2020-11-17,2020,Kuala Lumpur,Segambut Bahagia,3.1857313,101.6581878,10288
+PILOT_POS_20,jps_positive,test,1,positive,unverified_precision_candidate,2020-11-21,2020,Kedah,Kampung Bendahara,6.3964593,100.325807,9911
+PILOT_NEG_01,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-05-06,2017,Pahang,Background Land Location,3.6435769,103.3368706,-1
+PILOT_NEG_02,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2015-10-13,2015,Kedah,Background Land Location,6.0624031,100.8213201,-1
+PILOT_NEG_03,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2015-02-10,2015,Pulau Pinang,Background Land Location,5.5612936,100.4658536,-1
+PILOT_NEG_04,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-05-18,2017,Selangor,Background Land Location,3.5123692,101.3473459,-1
+PILOT_NEG_05,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2016-08-15,2016,Perak,Background Land Location,5.2623681,100.8124176,-1
+PILOT_NEG_06,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-02-01,2017,Negeri Sembilan,Background Land Location,3.0205134,102.2202084,-1
+PILOT_NEG_07,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2018-01-13,2018,Selangor,Background Land Location,3.4885314,101.3017145,-1
+PILOT_NEG_08,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-12-09,2017,Selangor,Background Land Location,3.4132654,101.3372984,-1
+PILOT_NEG_09,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-09-26,2017,Pulau Pinang,Background Land Location,5.5389149,100.4771803,-1
+PILOT_NEG_10,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-01-08,2017,Kelantan,Background Land Location,4.7049509,102.5029356,-1
+PILOT_NEG_11,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2019-06-14,2019,Melaka,Background Land Location,2.4003729,102.328788,-1
+PILOT_NEG_12,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2019-03-04,2019,Pulau Pinang,Background Land Location,5.5386351,100.382266,-1
+PILOT_NEG_13,pseudo_negative,train,0,pseudo_negative,uncertain_background_sample,2017-07-27,2017,Kelantan,Background Land Location,5.7872377,102.3112073,-1
+PILOT_NEG_14,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2020-05-27,2020,Pahang,Background Land Location,4.6570759,102.6920033,-1
+PILOT_NEG_15,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2021-12-18,2021,Kedah,Background Land Location,5.4593905,100.8403172,-1
+PILOT_NEG_16,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2020-03-03,2020,Kedah,Background Land Location,5.9023642,100.7202494,-1
+PILOT_NEG_17,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2021-01-25,2021,Johor,Background Land Location,1.8631805,103.1296416,-1
+PILOT_NEG_18,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2020-10-25,2020,Perak,Background Land Location,4.6941455,101.2818926,-1
+PILOT_NEG_19,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2021-01-23,2021,Perak,Background Land Location,5.4146526,101.4951511,-1
+PILOT_NEG_20,pseudo_negative,test,0,pseudo_negative,uncertain_background_sample,2021-11-24,2021,Kuala Lumpur,Background Land Location,3.1984055,101.6246304,-1
