@@ -134,7 +134,7 @@ export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; 
         <div className="mt-3">
           <div className="flex items-center justify-between gap-2 text-xs/4 text-slate-600">
             <span>DEMO: scripted storm. The flood-prone score uses rain recorded before the 18 Dec 2021 flood nearby.</span>
-            <span className={num}>{Math.floor(storm.elapsed)}s / {STORM_DURATION_S}s</span>
+            <span className={`${num} shrink-0 whitespace-nowrap`}>{Math.floor(storm.elapsed)}s / {STORM_DURATION_S}s</span>
           </div>
           <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-slate-100">
             <div className="h-full origin-left rounded-full bg-[#1677FF] transition-transform duration-300 ease-linear motion-reduce:transition-none" style={{ transform: `scaleX(${storm.elapsed / STORM_DURATION_S})` }} />

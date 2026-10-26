@@ -115,3 +115,5 @@ catboost_info/
 # Local-only notes and PDFs stay on this machine, never pushed
 *.local.md
 *.pdf
+*.local.pptx
+docs/team/slide-assets/preview/
