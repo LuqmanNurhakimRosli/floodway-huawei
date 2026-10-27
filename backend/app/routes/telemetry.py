@@ -32,7 +32,7 @@ for dev_id, dev_cfg in DEVICES.items():
 class IngestPayload(BaseModel):
     device_id: str
     ts: int
-    distance_cm: float = Field(ge=10, le=800)
+    distance_cm: float = Field(ge=1.0, le=800)
     sig: str = ""
 
 @router.post("/ingest")

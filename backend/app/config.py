@@ -45,6 +45,18 @@ DEFAULT_DEVICES = {
         "warning_threshold_m": 0.15,
         "danger_threshold_m": 0.30,
         "initial_level_m": 0.0
+    },
+    # Nadi's physical ESP32 bench-scale node for the competition demo. 8 cm mount height (cup/tank).
+    "fw-bench-01": {
+        "id": "fw-bench-01",
+        "name": "Physical River Node (Bench Demo)",
+        "secret": "fw-secret-bench",
+        "mount_height_cm": 8.0,
+        "lat": 3.1610,
+        "lon": 101.7010,
+        "warning_threshold_m": 0.03,
+        "danger_threshold_m": 0.05,
+        "initial_level_m": 0.015
     }
 }
 
