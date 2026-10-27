@@ -117,3 +117,6 @@ catboost_info/
 *.pdf
 *.local.pptx
 docs/team/slide-assets/preview/
+
+# Pitch deck assets: third-party logos, news photos, team photos (local only)
+docs/team/slide-assets/deck/
