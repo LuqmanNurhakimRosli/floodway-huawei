@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useVisionStore } from '../../hooks/vision/useVisionStore';
-import { useNow } from '../../hooks/useNow';
-import { MapPin, Bell, Radio, ChevronDown, CheckCircle2, User as UserIcon } from 'lucide-react';
+import { MapPin, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { FloodWayLogo } from '../brand/FloodWayLogo';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { ORIGINS } from '../../data/klDemo';
+import { AlertsHeaderPopover } from '../dashboard/AlertsHeaderPopover';
+import { BenchAlerts } from '../dashboard/BenchAlerts';
 import { IoTHeaderPopover } from '../dashboard/IoTHeaderPopover';
 
 export function Header() {
@@ -15,10 +15,6 @@ export function Header() {
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const initials = user?.name ? user.name.slice(0, 2).toUpperCase() : 'LN';
-  const { alerts } = useVisionStore();
-  const now = useNow(60000);
-  const recentAlerts = alerts.filter((a) => now - Date.parse(a.timestamp) < 3600000).length;
-
   const locations = ORIGINS.map((o) => o.location);
 
   const shortLocation = selectedLocation.split(',')[0].trim();
@@ -76,16 +72,10 @@ export function Header() {
       {/* Right Actions: Compact IoT Header Button, Notifications & Profile Avatar */}
       <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
         <IoTHeaderPopover />
+        <BenchAlerts />
 
-        {/* Opens the camera alert list. The dot shows only when a camera raised an alert in the last hour. */}
-        <Link
-          to="/live"
-          aria-label={recentAlerts ? `Alerts: ${recentAlerts} in the last hour` : 'Alerts: none in the last hour'}
-          className="relative flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1677FF]"
-        >
-          <Bell className="w-4 h-4" aria-hidden="true" />
-          {recentAlerts > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#DC2626] rounded-full ring-2 ring-white" aria-hidden="true" />}
-        </Link>
+        {/* Opens the notification list (IoT node and camera alerts). */}
+        <AlertsHeaderPopover />
 
         <Link
           to="/profile"

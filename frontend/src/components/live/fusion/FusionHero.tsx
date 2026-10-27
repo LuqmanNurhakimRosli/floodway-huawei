@@ -1,12 +1,13 @@
 import { BrainCircuit, Cctv, ChevronDown, CloudRain, Cpu, Play, RotateCcw } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useBenchSensor } from '../../../hooks/useBenchSensor';
 import { useStormScenario } from '../../../hooks/useStormScenario';
 import { visionActions } from '../../../hooks/vision/useVisionStore';
 import { calmRatio, KAMPUNG_BARU_CAMERA } from '../../../services/vision/mockVision';
 import type { FactorKey } from '../../../lib/fusion';
 import { floodProneModel } from '../../../lib/fusion';
-import type { FactorStates } from '../../../lib/stormScenario';
+import type { FactorState, FactorStates } from '../../../lib/stormScenario';
 import { cameraFactor, fuseStates, idleIot, idleMet, modelFactor, STORM_DURATION_S, stormCameraRatio, stormStateAt } from '../../../lib/stormScenario';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import { notificationPermission, requestNotificationPermission } from '../../../lib/vision/notify';
@@ -45,10 +46,15 @@ type Paths = Partial<Record<FactorKey, string>>;
 export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; autoStart?: boolean }) {
   const storm = useStormScenario(autoStart);
   const base = useMemo(() => idleFactors(cameras), [cameras]);
-  const { factors, notices } = useMemo(
-    () => (storm.phase === 'idle' ? { factors: base, notices: [] } : stormStateAt(storm.elapsed, base)),
-    [storm.phase, storm.elapsed, base],
-  );
+  const bench = useBenchSensor();
+  const benchLive = bench.status === 'live' && bench.reading && bench.level ? { ...bench.reading, level: bench.level } : null;
+  const { factors, notices } = useMemo(() => {
+    const scene = storm.phase === 'idle' ? { factors: base, notices: [] } : stormStateAt(storm.elapsed, base);
+    // A connected bench sensor replaces the demo IoT number, during the storm too: the real cup always wins.
+    if (!benchLive) return scene;
+    const iot: FactorState = { level: benchLive.level, value: `${benchLive.pct}%`, detail: `LIVE IoT node: ${benchLive.waterCm.toFixed(1)} cm of water` };
+    return { ...scene, factors: { ...scene.factors, iot } };
+  }, [storm.phase, storm.elapsed, base, benchLive]);
   const fusion = fuseStates(factors);
 
   // The Kampung Baru camera in the feed below rises with the storm, then goes back to calm when it stops.
@@ -182,7 +188,7 @@ export function FusionHero({ cameras, autoStart = false }: { cameras: Camera[]; 
         ) : (
           <p>No factor is at warning. Watching {fusion.reporting} of {ORDER.length} sources.</p>
         )}
-        <p className="mt-1.5 text-xs/4 text-slate-500">Rule-based fusion, not a trained model. Flood-prone model: {floodProneModel.result}. Terrain from the nearest held-out flood record ({floodProneModel.site.place}, about 1 km away). Rain and sensor values are demo numbers until those feeds connect.</p>
+        <p className="mt-1.5 text-xs/4 text-slate-500">Rule-based fusion, not a trained model. Flood-prone model: {floodProneModel.result}. Terrain from the nearest held-out flood record ({floodProneModel.site.place}, about 1 km away). {benchLive ? 'Rain is a demo number; the IoT sensor is live.' : 'Rain and sensor values are demo numbers until those feeds connect.'}</p>
       </div>
 
       <details className="group mt-3">
