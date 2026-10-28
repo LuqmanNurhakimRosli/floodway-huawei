@@ -21,8 +21,8 @@ const SITE_CAMERA = KAMPUNG_BARU_CAMERA;
 const ORDER: FactorKey[] = ['model', 'met', 'iot', 'cctv'];
 const LEFT: FactorKey[] = ['model', 'met'];
 const FACTOR: Record<FactorKey, { icon: LucideIcon; name: string; role: string }> = {
-  model: { icon: BrainCircuit, name: 'Flood-prone model', role: 'Where: 7 years of JPS floods' },
-  met: { icon: CloudRain, name: 'MET Malaysia', role: 'When: rain warnings' },
+  model: { icon: BrainCircuit, name: 'Flood-prone model', role: 'Where: 7 years of past floods' },
+  met: { icon: CloudRain, name: 'Rain warning', role: 'When: heavy rain is coming' },
   iot: { icon: Cpu, name: 'IoT water sensor', role: 'Now: depth at one point' },
   cctv: { icon: Cctv, name: 'CCTV vision', role: 'Now: water over an area' },
 };

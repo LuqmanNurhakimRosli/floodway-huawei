@@ -53,8 +53,8 @@ const met = (mmh: number, detail: string): FactorState => ({ level: MET_LEVEL.or
 const iot = (pct: number, level: Level): FactorState => ({ level, value: `${pct}%`, detail: `Water sensor, ${place}, at ${pct}%` });
 
 export const STORM_STEPS: StormStep[] = [
-  { at: 0, patch: { met: met(74, 'MET orange warning: heavy rain, Kuala Lumpur, next 6 h') },
-    notice: { title: 'MET Malaysia: heavy rain warning', body: 'Orange warning for Kuala Lumpur, next 6 hours. FloodWay is watching.' } },
+  { at: 0, patch: { met: met(74, 'Orange warning: heavy rain, Kuala Lumpur, next 6 h') },
+    notice: { title: 'Heavy rain warning', body: 'Orange warning for Kuala Lumpur, next 6 hours. FloodWay is watching.' } },
   { at: 0.12, patch: { model: modelFactor(rainWet) } },
   { at: 0.25, patch: { model: modelFactor(rainHeavy) },
     notice: { title: 'Flood-prone place', body: `${place} is in the model's top band. No live reading agrees yet.` } },

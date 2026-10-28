@@ -1,0 +1,259 @@
+{
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "duration": 111.5,
+  "frames": 3345,
+  "scenes": [
+    {
+      "scene": 1,
+      "name": "sting",
+      "start": 0.0,
+      "end": 7.0,
+      "from": 0,
+      "frames": 210
+    },
+    {
+      "scene": 2,
+      "name": "car",
+      "start": 7.0,
+      "end": 18.0,
+      "from": 210,
+      "frames": 330
+    },
+    {
+      "scene": 3,
+      "name": "river",
+      "start": 18.0,
+      "end": 33.0,
+      "from": 540,
+      "frames": 450
+    },
+    {
+      "scene": 4,
+      "name": "live",
+      "start": 33.0,
+      "end": 54.0,
+      "from": 990,
+      "frames": 630
+    },
+    {
+      "scene": 5,
+      "name": "alert",
+      "start": 54.0,
+      "end": 61.0,
+      "from": 1620,
+      "frames": 210
+    },
+    {
+      "scene": 6,
+      "name": "map",
+      "start": 61.0,
+      "end": 77.0,
+      "from": 1830,
+      "frames": 480
+    },
+    {
+      "scene": 7,
+      "name": "arrival",
+      "start": 77.0,
+      "end": 85.0,
+      "from": 2310,
+      "frames": 240
+    },
+    {
+      "scene": 8,
+      "name": "reports",
+      "start": 85.0,
+      "end": 103.0,
+      "from": 2550,
+      "frames": 540
+    },
+    {
+      "scene": 9,
+      "name": "end",
+      "start": 103.0,
+      "end": 111.5,
+      "from": 3090,
+      "frames": 255
+    }
+  ],
+  "cues": [
+    {
+      "id": "s01",
+      "scene": 2,
+      "text": "Eleven PM. Federal Highway.",
+      "start": 9.0,
+      "end": 11.279,
+      "from": 270,
+      "frames": 68
+    },
+    {
+      "id": "s02",
+      "scene": 2,
+      "text": "Ahmad is stuck in a jam. The rain hasn't stopped for hours.",
+      "start": 12.0,
+      "end": 15.826,
+      "from": 360,
+      "frames": 115
+    },
+    {
+      "id": "s03",
+      "scene": 3,
+      "text": "Across the city, our river node prototype is watching the water.",
+      "start": 18.5,
+      "end": 22.656,
+      "from": 555,
+      "frames": 125
+    },
+    {
+      "id": "s04a",
+      "scene": 3,
+      "text": "Green.",
+      "start": 23.4,
+      "end": 24.106,
+      "from": 702,
+      "frames": 21
+    },
+    {
+      "id": "s04b",
+      "scene": 3,
+      "text": "Yellow.",
+      "start": 25.6,
+      "end": 26.261,
+      "from": 768,
+      "frames": 20
+    },
+    {
+      "id": "s04c",
+      "scene": 3,
+      "text": "Red. The water is climbing fast.",
+      "start": 28.2,
+      "end": 30.243,
+      "from": 846,
+      "frames": 61
+    },
+    {
+      "id": "s05",
+      "scene": 4,
+      "text": "FloodWay checks four things: rain, river sensor, camera and flood history.",
+      "start": 33.4,
+      "end": 38.375,
+      "from": 1002,
+      "frames": 149
+    },
+    {
+      "id": "s06",
+      "scene": 4,
+      "text": "When they agree, the street turns red.",
+      "start": 49.0,
+      "end": 51.059,
+      "from": 1470,
+      "frames": 62
+    },
+    {
+      "id": "s07",
+      "scene": 5,
+      "text": "Leave now.",
+      "start": 55.2,
+      "end": 55.967,
+      "from": 1656,
+      "frames": 23
+    },
+    {
+      "id": "s08",
+      "scene": 5,
+      "text": "About ninety minutes before the road floods.",
+      "start": 56.4,
+      "end": 58.933,
+      "from": 1692,
+      "frames": 76
+    },
+    {
+      "id": "s09",
+      "scene": 6,
+      "text": "The relief centre near his home is full.",
+      "start": 61.5,
+      "end": 63.703,
+      "from": 1845,
+      "frames": 66
+    },
+    {
+      "id": "s10",
+      "scene": 6,
+      "text": "FloodWay finds one that's open, and a route around the flooded road.",
+      "start": 64.0,
+      "end": 68.209,
+      "from": 1920,
+      "frames": 126
+    },
+    {
+      "id": "s11",
+      "scene": 6,
+      "text": "A normal GPS would drive him straight into the water.",
+      "start": 70.8,
+      "end": 74.148,
+      "from": 2124,
+      "frames": 100
+    },
+    {
+      "id": "s12",
+      "scene": 7,
+      "text": "He arrives. His family gets the message: he's safe.",
+      "start": 77.8,
+      "end": 81.129,
+      "from": 2334,
+      "frames": 100
+    },
+    {
+      "id": "s13",
+      "scene": 8,
+      "text": "Then someone spots a flood the map doesn't know yet.",
+      "start": 85.5,
+      "end": 88.48,
+      "from": 2565,
+      "frames": 89
+    },
+    {
+      "id": "s14",
+      "scene": 8,
+      "text": "One photo. Checked by AI, then a person.",
+      "start": 91.8,
+      "end": 94.795,
+      "from": 2754,
+      "frames": 90
+    },
+    {
+      "id": "s15",
+      "scene": 8,
+      "text": "Everyone within two kilometres is warned.",
+      "start": 99.2,
+      "end": 101.691,
+      "from": 2976,
+      "frames": 75
+    },
+    {
+      "id": "s16",
+      "scene": 9,
+      "text": "FloodWay. Ninety minutes that change the night.",
+      "start": 105.0,
+      "end": 107.624,
+      "from": 3150,
+      "frames": 79
+    }
+  ],
+  "markers": [
+    {
+      "name": "lightning",
+      "scene": 2,
+      "at": 10.4,
+      "frame": 312
+    },
+    {
+      "name": "phone_buzz",
+      "scene": 5,
+      "at": 54.6,
+      "frame": 1638
+    }
+  ]
+}

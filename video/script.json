@@ -1,0 +1,206 @@
+[
+  {
+    "id": "s01",
+    "scene": 2,
+    "lang": "en",
+    "text": "Eleven PM. Federal Highway.",
+    "visual": "Illustrated car interior at night, jam ahead, rain on the windscreen, wipers sweep, tail-light bokeh. Lightning flash on 'Highway'.",
+    "sfx": [
+      "rain_roof",
+      "wipers"
+    ],
+    "pause_after_ms": 400
+  },
+  {
+    "id": "s02",
+    "scene": 2,
+    "lang": "en",
+    "text": "Ahmad is stuck in a jam. The rain hasn't stopped for hours.",
+    "visual": "Slow push-in on the dashboard clock 11:00 PM; brake lights pulse ahead.",
+    "sfx": [
+      "rain_roof",
+      "wipers",
+      "thunder_far"
+    ],
+    "pause_after_ms": 500
+  },
+  {
+    "id": "s03",
+    "scene": 3,
+    "lang": "en",
+    "text": "Across the city, our river node prototype is watching the water.",
+    "visual": "Whip to the river: SAMPLE camera frame (label visible), then Nadi's node clip in a framed card, LED green.",
+    "sfx": [
+      "water_flow"
+    ],
+    "pause_after_ms": 200
+  },
+  {
+    "id": "s04a",
+    "scene": 3,
+    "lang": "en",
+    "text": "Green.",
+    "visual": "Nadi's clip, green LED, LCD 'SAFE 35%'.",
+    "sfx": [
+      "water_flow"
+    ],
+    "pause_after_ms": 0
+  },
+  {
+    "id": "s04b",
+    "scene": 3,
+    "lang": "en",
+    "text": "Yellow.",
+    "visual": "Clip at 2x (badge shown), yellow LED, LCD 'WARNING 58%'.",
+    "sfx": [
+      "water_flow"
+    ],
+    "pause_after_ms": 0
+  },
+  {
+    "id": "s04c",
+    "scene": 3,
+    "lang": "en",
+    "text": "Red. The water is climbing fast.",
+    "visual": "Red LED, LCD 'DANGER 81%', buzzer, water gauge peaks.",
+    "sfx": [
+      "buzzer_2s"
+    ],
+    "pause_after_ms": 600
+  },
+  {
+    "id": "s05",
+    "scene": 4,
+    "lang": "en",
+    "text": "FloodWay checks four things: rain, river sensor, camera and flood history.",
+    "visual": "Recorded /live in a phone frame: each factor tile gets a callout as it is named.",
+    "sfx": [
+      "tone_step"
+    ],
+    "pause_after_ms": 300
+  },
+  {
+    "id": "s06",
+    "scene": 4,
+    "lang": "en",
+    "text": "When they agree, the street turns red.",
+    "visual": "Storm scenario plays: tiles go NORMAL to WARNING to DANGER, risk ring fills red. Music carries the 15 s storm.",
+    "sfx": [
+      "tone_step",
+      "tone_step",
+      "tone_step"
+    ],
+    "pause_after_ms": 800
+  },
+  {
+    "id": "s07",
+    "scene": 5,
+    "lang": "en",
+    "text": "Leave now.",
+    "visual": "Back in the car: phone on the dash lights up with the recorded 'Leave now' alert (DEMO badge kept) in an illustrated phone and hand.",
+    "sfx": [
+      "phone_buzz",
+      "alert_tone"
+    ],
+    "pause_after_ms": 400
+  },
+  {
+    "id": "s08",
+    "scene": 5,
+    "lang": "en",
+    "text": "About ninety minutes before the road floods.",
+    "visual": "Caption '~90 min' highlights; thumb taps 'Open routes'.",
+    "sfx": [
+      "tap"
+    ],
+    "pause_after_ms": 300
+  },
+  {
+    "id": "s09",
+    "scene": 6,
+    "lang": "en",
+    "text": "The relief centre near his home is full.",
+    "visual": "Recorded /map from the Bangsar demo position: Dewan Serbaguna Kampung Baru with its amber FULL pill and 'Crosses 3 flooded'.",
+    "sfx": [
+      "tap"
+    ],
+    "pause_after_ms": 200
+  },
+  {
+    "id": "s10",
+    "scene": 6,
+    "lang": "en",
+    "text": "FloodWay finds one that's open, and a route around the flooded road.",
+    "visual": "Tap Dewan Komuniti Sentul Perdana ('Avoids flood'), choose Drive (Drive / Motorcycle / Walk), the 8 s drive runs.",
+    "sfx": [
+      "tap",
+      "whoosh"
+    ],
+    "pause_after_ms": 200
+  },
+  {
+    "id": "s11",
+    "scene": 6,
+    "lang": "en",
+    "text": "A normal GPS would drive him straight into the water.",
+    "visual": "Ghost line straight through the flooded road, crossed out; FloodWay route stays lit.",
+    "sfx": [],
+    "pause_after_ms": 500
+  },
+  {
+    "id": "s12",
+    "scene": 7,
+    "lang": "en",
+    "text": "He arrives. His family gets the message: he's safe.",
+    "visual": "Recorded arrival dialog, then the family's phone receiving the real Telegram check-in.",
+    "sfx": [
+      "chime"
+    ],
+    "pause_after_ms": 700
+  },
+  {
+    "id": "s13",
+    "scene": 8,
+    "lang": "en",
+    "text": "Then someone spots a flood the map doesn't know yet.",
+    "visual": "Mask wipe to a second person's view of a flooded street (illustrated).",
+    "sfx": [
+      "rain_light"
+    ],
+    "pause_after_ms": 200
+  },
+  {
+    "id": "s14",
+    "scene": 8,
+    "lang": "en",
+    "text": "One photo. Checked by AI, then a person.",
+    "visual": "Recorded /reports: photo, note, AI check, operator desk approval (demo label kept).",
+    "sfx": [
+      "shutter",
+      "ping"
+    ],
+    "pause_after_ms": 200
+  },
+  {
+    "id": "s15",
+    "scene": 8,
+    "lang": "en",
+    "text": "Everyone within two kilometres is warned.",
+    "visual": "Flood pin drops and the 2 km area expands on the map.",
+    "sfx": [
+      "whoosh_soft"
+    ],
+    "pause_after_ms": 700
+  },
+  {
+    "id": "s16",
+    "scene": 9,
+    "lang": "en",
+    "text": "FloodWay. Ninety minutes that change the night.",
+    "visual": "End card: UiTM, Huawei, FloodWay logos spring in; tagline. Spoken slower.",
+    "sfx": [
+      "music_resolve"
+    ],
+    "pause_after_ms": 1200
+  }
+]

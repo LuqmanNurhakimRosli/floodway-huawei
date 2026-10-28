@@ -1,0 +1,183 @@
+{
+  "segments": [
+    {
+      "scene": 3,
+      "file": "nadi_node.mp4",
+      "from": 0.8,
+      "to": 3.3,
+      "at": 4.8,
+      "rate": 1.0,
+      "audio": false,
+      "start": 22.8,
+      "end": 25.3
+    },
+    {
+      "scene": 3,
+      "file": "nadi_node.mp4",
+      "from": 3.3,
+      "to": 8.9,
+      "at": 7.3,
+      "rate": 2.0,
+      "audio": false,
+      "badge": "2x speed",
+      "start": 25.3,
+      "end": 28.1
+    },
+    {
+      "scene": 3,
+      "file": "nadi_node.mp4",
+      "from": 8.9,
+      "to": 13.8,
+      "at": 10.1,
+      "rate": 1.0,
+      "audio": true,
+      "start": 28.1,
+      "end": 33.0
+    },
+    {
+      "scene": 4,
+      "file": "live.mp4",
+      "from": 0.0,
+      "to": 20.925,
+      "at": 0.075,
+      "rate": 1.0,
+      "phone": true,
+      "start": 33.075,
+      "end": 54.0
+    },
+    {
+      "scene": 5,
+      "file": "live.mp4",
+      "from": 12.275,
+      "to": 19.275,
+      "at": 0.0,
+      "rate": 1.0,
+      "phone": true,
+      "start": 54.0,
+      "end": 61.0
+    },
+    {
+      "scene": 6,
+      "file": "map.mp4",
+      "from": 0.117,
+      "to": 16.117,
+      "at": 0.0,
+      "rate": 1.0,
+      "phone": true,
+      "start": 61.0,
+      "end": 77.0
+    },
+    {
+      "scene": 7,
+      "file": "map.mp4",
+      "from": 16.117,
+      "to": 23.583,
+      "at": 0.0,
+      "rate": 1.0,
+      "phone": true,
+      "hold_last": true,
+      "start": 77.0,
+      "end": 84.466
+    },
+    {
+      "scene": 8,
+      "file": "report.mp4",
+      "from": 1.577,
+      "to": 3.577,
+      "at": 4.2,
+      "rate": 1.0,
+      "phone": true,
+      "start": 89.2,
+      "end": 91.2
+    },
+    {
+      "scene": 8,
+      "file": "report.mp4",
+      "from": 5.928,
+      "to": 7.428,
+      "at": 6.2,
+      "rate": 1.0,
+      "phone": true,
+      "start": 91.2,
+      "end": 92.7
+    },
+    {
+      "scene": 8,
+      "file": "report.mp4",
+      "from": 9.956,
+      "to": 11.956,
+      "at": 7.7,
+      "rate": 1.0,
+      "phone": true,
+      "start": 92.7,
+      "end": 94.7
+    },
+    {
+      "scene": 8,
+      "file": "report.mp4",
+      "from": 11.995,
+      "to": 15.995,
+      "at": 9.7,
+      "rate": 1.0,
+      "phone": true,
+      "start": 94.7,
+      "end": 98.7
+    },
+    {
+      "scene": 8,
+      "file": "report.mp4",
+      "from": 17.598,
+      "to": 21.898,
+      "at": 13.7,
+      "rate": 1.0,
+      "phone": true,
+      "start": 98.7,
+      "end": 103.0
+    }
+  ],
+  "taps": [
+    {
+      "t": 38.0,
+      "x": 126.6953125,
+      "y": 174
+    },
+    {
+      "t": 65.307,
+      "x": 195,
+      "y": 589
+    },
+    {
+      "t": 67.613,
+      "x": 77.6640625,
+      "y": 615
+    },
+    {
+      "t": 69.084,
+      "x": 195,
+      "y": 755
+    },
+    {
+      "t": 89.846,
+      "x": 58.5,
+      "y": 337.5
+    },
+    {
+      "t": 90.716,
+      "x": 195,
+      "y": 1180
+    },
+    {
+      "t": 91.304,
+      "x": 195,
+      "y": 694
+    },
+    {
+      "t": 94.956,
+      "x": 305.6328125,
+      "y": 810
+    }
+  ],
+  "events": {
+    "arrived": 77.663
+  }
+}
