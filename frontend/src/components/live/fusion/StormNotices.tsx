@@ -1,6 +1,7 @@
 import { ChevronRight, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useHeaderPanel } from '../../../hooks/useHeaderPanel';
 import type { StormNotice } from '../../../lib/stormScenario';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import { notificationsSupported } from '../../../lib/vision/notify';
@@ -13,6 +14,7 @@ const SHOW_MS = 8000;
 export function StormNotices({ notices }: { notices: StormNotice[] }) {
   const [visible, setVisible] = useState<StormNotice[]>([]);
   const seen = useRef(new Set<string>());
+  const panel = useHeaderPanel();
 
   useEffect(() => {
     if (notices.length === 0) seen.current.clear();
@@ -37,7 +39,7 @@ export function StormNotices({ notices }: { notices: StormNotice[] }) {
     return () => clearTimeout(t);
   }, [visible]);
 
-  if (visible.length === 0) return null;
+  if (visible.length === 0 || panel) return null; // a header dropdown opens right where these sit
   return (
     // Phones: the newest one only, just above the bottom action bar, so it never hides the ring or the camera alert
     // toast at the top. Wider: a stack of three under the header, top right.

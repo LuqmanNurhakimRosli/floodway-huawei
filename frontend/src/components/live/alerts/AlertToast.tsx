@@ -1,5 +1,6 @@
 import { ChevronRight, X } from 'lucide-react';
 import { useEffect } from 'react';
+import { useHeaderPanel } from '../../../hooks/useHeaderPanel';
 import { LEVEL_META } from '../../../lib/vision/levels';
 import type { AlertEvent } from '../../../types/vision';
 import { interactive, num } from '../shared/ui';
@@ -15,13 +16,15 @@ const AUTO_DISMISS_MS = 12000;
 /** One per new WARNING/DANGER. Top-right on desktop; full width just under the app header on phones,
  *  so it never covers the sticky action bar at the bottom. */
 export function AlertToast({ alert, onOpen, onDismiss }: Props) {
+  const panel = useHeaderPanel();
   useEffect(() => {
     if (!alert) return;
     const t = setTimeout(() => onDismiss(alert), AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [alert, onDismiss]);
 
-  if (!alert) return null;
+  // A header dropdown opens right where this sits; the alert is still in the bell list.
+  if (!alert || panel) return null;
   const meta = LEVEL_META[alert.level];
   const Icon = meta.icon;
 
