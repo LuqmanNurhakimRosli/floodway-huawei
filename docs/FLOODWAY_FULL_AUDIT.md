@@ -2,8 +2,8 @@
 
 **Date:** 2026-10-19 · **Branch:** `ccr-693c90f8-qu560k` · **Scope:** web app (`frontend/`), backend (`backend/`), new Android app (`mobile/`)
 
-This audit records what was checked, what was found, and what state each finding is in now. Fixes are described in
-`FLOODWAY_REMEDIATION.md`; the commands and their output are in `FLOODWAY_TEST_REPORT.md`.
+This audit records what was checked, what was found, and what state each finding is in now. Fixes are recorded in
+`docs/ai/PROGRESS.md` (change log, 2026-10-19); the commands and their output are in `FLOODWAY_TEST_REPORT.md`.
 
 ## 1. How the audit was done
 

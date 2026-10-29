@@ -1,0 +1,34 @@
+# FloodWay on one Huawei Cloud ECS: the FastAPI backend and the built web app behind Caddy (automatic HTTPS).
+# Run from this folder after setting DOMAIN in .env (see README.md):  docker compose up -d --build
+services:
+  api:
+    build: ../../backend
+    restart: unless-stopped
+    env_file: ../../backend/.env          # secrets live on the server only, never in the web bundle
+    environment:
+      MODELS_DIR: /models
+      CORS_ORIGINS: https://${DOMAIN}
+    volumes:
+      - ../../models:/models:ro           # the flood-prone models the backend serves
+      - api-data:/app/data
+
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/ecs/web.Dockerfile
+      args:
+        VITE_API_BASE: https://api.${DOMAIN}
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy-data:/data
+    depends_on:
+      - api
+
+volumes:
+  api-data:
+  caddy-data:

@@ -1,0 +1,317 @@
+{
+ "scenes": {
+  "1": [
+   0.0,
+   9.7
+  ],
+  "2": [
+   9.7,
+   19.6
+  ],
+  "3": [
+   19.6,
+   25.6
+  ],
+  "4": [
+   25.6,
+   37.7
+  ],
+  "5": [
+   37.7,
+   64.2
+  ],
+  "6": [
+   64.2,
+   84.1
+  ],
+  "7": [
+   84.1,
+   95.6
+  ],
+  "8": [
+   95.6,
+   108.0
+  ],
+  "9": [
+   108.0,
+   113.5
+  ]
+ },
+ "nadi": [
+  {
+   "file": "nadi_node.mp4",
+   "from": 0.0,
+   "to": 3.3,
+   "start": 25.6,
+   "end": 29.15,
+   "rate": 0.93
+  },
+  {
+   "file": "nadi_node.mp4",
+   "from": 5.0,
+   "to": 5.75,
+   "start": 29.15,
+   "end": 29.9,
+   "rate": 1.0
+  },
+  {
+   "file": "nadi_node.mp4",
+   "from": 8.9,
+   "to": 11.2,
+   "start": 29.9,
+   "end": 32.2,
+   "rate": 1.0,
+   "audio": true
+  },
+  {
+   "file": "nadi_node.mp4",
+   "from": 11.2,
+   "to": 16.7,
+   "start": 32.2,
+   "end": 37.7,
+   "rate": 1.0
+  }
+ ],
+ "phone": {
+  "4": [
+   {
+    "file": "live.mp4",
+    "from": 4.725,
+    "to": 18.475,
+    "start": 32.2,
+    "end": 37.7,
+    "rate": 2.5,
+    "badge": "2.5× SPEED"
+   }
+  ],
+  "5": [
+   {
+    "file": "live.mp4",
+    "from": 12.575,
+    "to": 14.175,
+    "start": 62.6,
+    "end": 64.2,
+    "rate": 1.0
+   }
+  ],
+  "7": [
+   {
+    "file": "map.mp4",
+    "from": 4.303,
+    "to": 7.104,
+    "start": 84.1,
+    "end": 86.4,
+    "rate": 1.218
+   },
+   {
+    "file": "map.mp4",
+    "from": 8.118,
+    "to": 17.38,
+    "start": 86.4,
+    "end": 89.6,
+    "rate": 2.894,
+    "badge": "3× SPEED"
+   },
+   {
+    "file": "map.mp4",
+    "from": 17.38,
+    "to": 19.18,
+    "start": 89.6,
+    "end": 91.4,
+    "rate": 1.0
+   },
+   {
+    "file": "report.mp4",
+    "from": 9.956,
+    "to": 11.756,
+    "start": 91.4,
+    "end": 93.2,
+    "rate": 1.0,
+    "note": "In-app sample photo"
+   },
+   {
+    "file": "report.mp4",
+    "from": 19.924,
+    "to": 22.324,
+    "start": 93.2,
+    "end": 95.6,
+    "rate": 1.0
+   }
+  ]
+ },
+ "forecast": {
+  "level_m": 0.9,
+  "rain_mm_h": 100,
+  "danger_m": 1.5,
+  "horizons_min": [
+   0,
+   15,
+   30,
+   45,
+   60,
+   90,
+   120
+  ],
+  "p10": [
+   0.86,
+   0.964,
+   1.054,
+   1.13,
+   1.194,
+   1.285,
+   1.332
+  ],
+  "p50": [
+   0.9,
+   1.034,
+   1.154,
+   1.26,
+   1.354,
+   1.505,
+   1.612
+  ],
+  "p90": [
+   0.952,
+   1.125,
+   1.284,
+   1.429,
+   1.562,
+   1.791,
+   1.976
+  ],
+  "time_to_danger_min": 90,
+  "source": "Rule-based hydrologic estimate (not a trained model)"
+ },
+ "shahAlam": [
+  {
+   "year": 2015,
+   "date": "2015-06-05",
+   "place": "Kaw. Komersial SS 7, Shah Alam"
+  },
+  {
+   "year": 2015,
+   "date": "2015-01-26",
+   "place": "Persiaran Jubli Perak, Batu 3, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-01-12",
+   "place": "KTMB Batu 3, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-05-10",
+   "place": "Seksyen 14, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-05-10",
+   "place": "Seksyen 3, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-07-22",
+   "place": "Laluan Motorsikal Lebuhraya Persekutuan, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-07-22",
+   "place": "Jalan Lapangan Terbang Subang, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-08-30",
+   "place": "Jalan Lapangan Terbang Subang, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-09-01",
+   "place": "Laluan Motorsikal Lebuhraya Persekutuan, Shah Alam"
+  },
+  {
+   "year": 2016,
+   "date": "2016-09-07",
+   "place": "Laluan Motorsikal Lebuhraya Persekutuan, Shah Alam"
+  },
+  {
+   "year": 2017,
+   "date": "2017-05-02",
+   "place": "Laluan Motosikal Lebuhraya Persekutuan & Stesen KTMB Batu 3 Shah Alam"
+  },
+  {
+   "year": 2017,
+   "date": "2017-05-07",
+   "place": "Seksyen 7 Shah Alam & Terowong U12"
+  },
+  {
+   "year": 2017,
+   "date": "2017-10-30",
+   "place": "Laluan Motosikal Lebuhraya Persekutuan & Stesen KTMB Batu 3 Shah Alam"
+  },
+  {
+   "year": 2017,
+   "date": "2017-05-02",
+   "place": "Bandar Baru Kundang & Blok 26 Tasik Puteri Jalan Hijau 1/11 Shah Alam"
+  },
+  {
+   "year": 2018,
+   "date": "2018-01-26",
+   "place": "TTDI Jaya U2 Shah Alam"
+  },
+  {
+   "year": 2018,
+   "date": "2018-01-26",
+   "place": "Puchong, Taman Mesra Bt 3 Shah Alam"
+  },
+  {
+   "year": 2018,
+   "date": "2018-10-27",
+   "place": "Stadium Shah Alam."
+  },
+  {
+   "year": 2019,
+   "date": "2019-11-16",
+   "place": "Sekitar kawasan Tmn Sri Muda,Shah Alam"
+  },
+  {
+   "year": 2020,
+   "date": "2020-04-23",
+   "place": "Taman Mesra, Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-05-18",
+   "place": "Seksyen 13 Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-05-18",
+   "place": "Seksyen 22, Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-09-26",
+   "place": "Seksyen 22, Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-09-26",
+   "place": "Seksyen 4 Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-09-26",
+   "place": "Kg. Padang Jawa, Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-10-20",
+   "place": "Kg. Padang Jawa, Shah Alam"
+  },
+  {
+   "year": 2021,
+   "date": "2021-12-18",
+   "place": "Jalan Mat Raji, Kg Padang Jawa, Shah Alam"
+  }
+ ]
+}

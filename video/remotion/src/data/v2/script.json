@@ -1,0 +1,11 @@
+[
+  {"scene": 1, "text": "December 2021. Shah Alam went under water. In seven years of public flood reports, Shah Alam appears 26 times."},
+  {"scene": 2, "text": "The same places, again and again. Riverside homes in Taman Sri Muda and Kampung Padang Jawa. Riders on the Federal Highway motorcycle lane."},
+  {"scene": 3, "text": "FloodWay warns them before the water comes, and only when four signals agree."},
+  {"scene": 4, "text": "Our river node measures the water. Green, yellow, red. At the same moment, FloodWay checks the rain warning, the flood history, and the drain camera."},
+  {"scene": 5, "text": "So how do we warn 90 minutes early? The rain warning comes hours ahead. Our model flags streets that flooded under the same rain before. When the sensor crosses its warning line, FloodWay projects the water two hours ahead. The point where it crosses danger is your time left. In our storm scenario, that is about 90 minutes."},
+  {"scene": 6, "text": "How accurate is it? We trained on floods from 2015 to 2019, then tested on 2020 and 2021 floods it had never seen. Five inputs, five algorithms. The best one ranks a real flood site above a random place 84 times in 100."},
+  {"scene": 7, "text": "Then it acts. One tap routes you around flooded roads to an open relief centre. And when neighbours send a photo, AI checks it before it warns anyone."},
+  {"scene": 8, "text": "It runs on Huawei Cloud. ModelArts trains the model, OBS stores the data and camera frames, ECS hosts the app online, and SMN sends the alerts."},
+  {"scene": 9, "text": "FloodWay. Predict. Verify. Guide."}
+]

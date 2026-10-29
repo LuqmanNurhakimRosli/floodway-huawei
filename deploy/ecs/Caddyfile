@@ -1,0 +1,11 @@
+# Caddy gets free HTTPS certificates for both names. With no domain, use <EIP>.sslip.io (it resolves to the EIP).
+{$DOMAIN} {
+	root * /srv
+	encode gzip
+	try_files {path} /index.html
+	file_server
+}
+
+api.{$DOMAIN} {
+	reverse_proxy api:8080
+}
