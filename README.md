@@ -15,27 +15,28 @@ FloodWay warns residents of flood-prone places before the water reaches them. It
 
 | Input | What it answers | Status |
 |---|---|---|
-| Model 1, flood susceptibility (GINKGO, `models/ginkgo/`) | *Where* water is likely to collect | Trained; re-test pending (`models/ginkgo/MODEL_CARD.md`) |
-| Weather forecast and rainfall trigger | *When* heavy rain is coming | Prototype; the app uses a rule-based formula today |
-| IoT river node (ultrasonic, solar, LoRa) | *How high* the river is now | Designed; firmware sketch in `firmware/` |
-| Street cameras and citizen photos | *What* is happening on the road | Built and tested on sample frames; Gemini gives an opinion on photos |
+| **1. Flood-prone model** (`models/stage5_*`, `RESULTS_5_MODEL_COMPARISON.md`) | *Where* water collects (trained on 2015–2019 floods, tested on held-out 2020–2021 floods: **ROC-AUC 0.836**, 17/17 top-ranked sites were real flood sites) | Trained & served (`/api/v1/retrospective`); reproducible via `README-ML-BENCHMARK.md` |
+| **2. Rain warning** | *When* heavy rain is coming | Rule-based forecast formula (`backend/app/services/forecaster.py`) + storm scenario |
+| **3. IoT river depth node** (ESP32 + HC-SR04 ultrasonic, LCD, LEDs, buzzer) | *How high* the water is now at one point | Bench prototype (`firmware/floodway_bench_node.ino`) connected live via Web Serial / `scripts/bench_bridge.py` |
+| **4. CCTV Live Vision & citizen photos** | *What* is happening across the street / drain | Built & tested on sample ladder frames; AI photo check via `/api/v1/ai/flood-image-check` |
 
-A small set of readable rules combines them: any single input can raise a level; two inputs at Warning together raise Danger.
+A transparent four-factor fusion rule (`backend/app/services/fusion.py` and `frontend/src/lib/fusion.ts`) combines them: live readings (IoT or CCTV) set the floor, a second agreeing factor at Warning escalates one step, and context factors alone (rain + flood history) cap at Advisory so the system never cries wolf.
 
-## Stack (Google ecosystem)
+## Huawei Cloud Architecture & Stack
 
-| Layer | Technology | Status |
+- **Interactive Prototype Demo:** [https://floodway.pages.dev/](https://floodway.pages.dev/) (and [https://floodway-huawei.pages.dev/](https://floodway-huawei.pages.dev/))
+- **Huawei Cloud ECS Deployment Kit:** [`deploy/ecs/README.md`](deploy/ecs/README.md) (`docker-compose.yml`, `Caddyfile`, `setup.sh`)
+
+| Huawei Cloud Service / Layer | Role in FloodWay | Repository Path / Details |
 |---|---|---|
-| Web app | React 19, TypeScript, Vite, Tailwind CSS 4, Leaflet + OpenStreetMap | Running |
-| Android app | Expo, React Native | Code done; no APK yet |
-| Backend | Python, FastAPI, OpenCV | Running locally |
-| Sign-in and data | Firebase Authentication, Cloud Firestore | In use |
-| Photo check | Gemini API (OpenRouter as fallback) | Built; live call not yet run |
-| Hosting | Cloud Run (API), Firebase Hosting (web), Cloud Storage (photos, map tiles) | Planned |
-| Push alerts | Firebase Cloud Messaging, Telegram | Telegram works; FCM planned |
-| Model 1 features | Google Earth Engine (Sentinel-2, Copernicus DEM) | Planned |
+| **Huawei Cloud ModelArts** | Model training benchmark (5 algorithms: LR, RF, LightGBM, CatBoost, XGBoost across 5 ERA5 + Copernicus DEM features) and real-time flood-prone inference | `models/stage5_*`, `README-ML-BENCHMARK.md`, `RESULTS_5_MODEL_COMPARISON.md` |
+| **Huawei Cloud OBS (Object Storage)** | Stores historical flood datasets, serialized `.joblib` model artifacts, and camera snapshot frames | `datasets/`, `models/`, `backend/app/vision/sample_media/` |
+| **Huawei Cloud ECS (Elastic Cloud Server)** | Hosts the Dockerized FastAPI backend, Live Vision analyser, routing engine, and Caddy automatic-HTTPS web server on Ubuntu 22.04 | `deploy/ecs/` (`docker-compose.yml`, `setup.sh`, `web.Dockerfile`, `Caddyfile`) |
+| **Huawei Cloud SMN (Simple Message Notification)** | Multi-channel emergency broadcast (SMS, email, push) alongside Telegram when four-factor fusion reaches `DANGER` | `backend/app/services/`, `backend/app/routes/` |
+| **Huawei Cloud CodeArts** | Requirement management, code repository sync, automated test verification (`pytest` + `vitest`), bug tracking, and container deployment | `scripts/check.ps1`, `deploy/ecs/` |
+| **Web & Mobile Apps** | React 19, TypeScript, Vite, Tailwind CSS 4, Leaflet + OpenStreetMap; Android app in Expo / React Native | `frontend/`, `mobile/` |
 
-The plan and its order: `docs/plans/GLOBAL_STACK_PLAN.md`. Every algorithm, with its parameters and limits: `docs/architecture/FLOODWAY_OVERVIEW.md`.
+Full system specification: `docs/product/preliminary-round/architecture/SYSTEM_SPECIFICATION.md`. Every algorithm, with its parameters and limits: `docs/architecture/FLOODWAY_OVERVIEW.md`.
 
 ## Repository
 

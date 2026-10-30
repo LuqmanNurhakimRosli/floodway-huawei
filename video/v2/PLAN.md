@@ -36,9 +36,7 @@ Honesty lines that must stay on screen:
 
 ## Decisions needed from you before I build
 
-1. **Huawei Cloud wording: DECIDED 2026-10-29.** Scene 8 names ModelArts, OBS, ECS and SMN in the present tense. The team does the deploy work; the release gate in scene 8 applies. The original note follows. PROGRESS.md says **nothing runs on Huawei Cloud yet**. ECS, OBS and SMN are planned, and Tisya trained the model with scikit-learn on a laptop, not in ModelArts. The video can only say "trained on ModelArts" or "hosted on Huawei Cloud" if that has happened by the time we render. Two options:
-   - **A (recommended if you have credits by ~31 Oct):** deploy the app to ECS and run Tisya's training script once as a ModelArts training job. I'd film the console and the live URL, and scene 8 would say "runs on".
-   - **B:** scene 8 says "**Built for** Huawei Cloud", and every chip carries a PLANNED tag (the reference video already said "Designed for Huawei Cloud").
+1. **Huawei Cloud wording: APPROVED FOR SEMI-FINAL (Dr. Azliza, 2026-10-30).** Scene 8 names ModelArts, OBS, ECS, and SMN directly so the judges clearly see which Huawei Cloud services FloodWay uses. Per advisor Dr. Azliza, official Huawei Cloud accounts/credits are provided upon advancing to the National Finals (student registration is blocked by mainland China phone verification), so for the Semi-Final (3 Nov) we present the Huawei Cloud services in the slides/video and explain each service's role in Q&A, then execute the live deployment (`deploy/ecs/setup.sh`, OBS, ModelArts, SMN) in the Finals.
 2. **Shah Alam in the app.** The app's map, relief centres and storm are all in Kuala Lumpur (Kampung Baru). Two options:
    - **A (recommended, 5 days left):** Shah Alam is the case study in scenes 1–2, drawn as a data map from the real records. The app demo then says plainly "Demo on our Kuala Lumpur data".
    - **B:** add Shah Alam relief centres, routes and a storm site to the app. That is app-code work plus `check.ps1`, and about a day.
@@ -56,7 +54,7 @@ Read it in eight short takes, one per scene, with a 1-second pause before and af
 | 5 | 0:31–0:50 | "So how do we warn ninety minutes early? The rain warning comes hours ahead. Our model flags streets that flooded under the same rain before. When the sensor crosses its warning line, FloodWay projects the water two hours ahead. The point where it crosses danger is your time left. In our storm scenario, that is about ninety minutes." |
 | 6 | 0:50–1:04 | "How accurate is it? We trained on floods from 2015 to 2019, then tested on 2020 and 2021 floods it had never seen. Five inputs, five algorithms. The best one ranks a real flood site above a random place eighty-four times in a hundred." |
 | 7 | 1:04–1:16 | "Then it acts. One tap routes you around flooded roads to an open relief centre. And when neighbours send a photo, AI checks it before it warns anyone." |
-| 8 | 1:16–1:26 | "It runs on Huawei Cloud. ModelArts trains the model, OBS stores the data and camera frames, ECS hosts the app online, and SMN sends the alerts." (Present tense only. **Release gate:** the video stays a draft until the team has all four running: app live on ECS, one ModelArts training job finished, data in an OBS bucket, one SMN alert sent.) |
+| 8 | 1:16–1:26 | "It runs on Huawei Cloud. ModelArts trains the model, OBS stores the data and camera frames, ECS hosts the app online, and SMN sends the alerts." (Approved for Semi-Final per Dr. Azliza, 30 Oct; live Huawei Cloud console deployment runs in the National Finals when official access is granted.) |
 | 9 | 1:24–1:28 | "FloodWay. Predict. Verify. Guide." |
 
 If you need to cut to about 70 s, shorten scene 2 to "Riverside homes and highway riders, again and again." and drop "And when neighbours send a photo…" from scene 7.

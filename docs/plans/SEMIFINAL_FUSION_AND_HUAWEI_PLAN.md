@@ -115,11 +115,18 @@ Each factor tile is labelled with its source (REAL / SAMPLE / SCRIPTED). That ke
 
 ---
 
-## 3. Huawei Cloud deployment (keep the app as it is, host it on Huawei)
+## 3. Huawei Cloud strategy (Semi-Final vs. National Final)
 
-The rule: deploy on Huawei Cloud and use at least one Huawei Cloud service. The simplest compliant path keeps the code and moves the hosting.
+**Advisor decision (Dr. Azliza, 30 Oct 2026):**
+- Direct student registration on Huawei Cloud is blocked by China phone number / enterprise verification requirements, and official Huawei Cloud accounts/credits are provisioned to teams **when they advance to the Finals**.
+- **For the Semi-Final (Tue 3 Nov 2026):**
+  1. **Highlight the Huawei Cloud services in the presentation and video:** Present the complete Huawei Cloud architecture (**ModelArts**, **OBS**, **ECS**, **SMN**, and **CodeArts** for build/deployment) and state clearly what each service does in FloodWay's workflow.
+  2. **Demo & QR Code:** Use the live Cloudflare Pages prototype link (`https://floodway.pages.dev/` or `https://floodway-huawei.pages.dev/`) for the judge QR code and stage demo.
+  3. **Know how to defend every service in Q&A:** Judges rarely audit live cloud consoles during the semi-final, but every team member must be able to explain *how* and *why* each Huawei Cloud service is used.
+- **For the National Final (18 Nov 2026, once official Huawei Cloud access is granted):**
+  - Execute the ready-made deployment kit in `deploy/ecs/` (`docker-compose.yml`, `Caddyfile`, `setup.sh`) on the provisioned Huawei Cloud ECS instance, upload datasets/models to OBS, and run the ModelArts job.
 
-### Tier 1 (must, before 3 Nov): one ECS runs everything
+### Tier 1 (ready in `deploy/ecs/`, execute on official Finalist ECS): one ECS runs everything
 
 1. Create an **ECS** in AP-Singapore (pick AP-Kuala Lumpur if your console lists it). Use Ubuntu 22.04, 2 vCPU / 4 GiB, with an **EIP** (public IP). Security group: allow 22 (your IP only), 80 and 443.
 2. Install Docker. Run the existing `backend/Dockerfile`, plus **Caddy** serving `frontend/dist` and proxying `/api` and `/ws` to the backend. Caddy gets a free HTTPS certificate for `<EIP>.sslip.io`, so no domain purchase is needed and there is no mixed-content problem.
@@ -142,19 +149,18 @@ The rule: deploy on Huawei Cloud and use at least one Huawei Cloud service. The 
 
 Firebase Auth + Firestore, the Gemini 2.5 Flash photo check, Telegram, and OSM maps are unchanged. Say this plainly: "Hosted on Huawei Cloud ECS, models and data on OBS, alerts on SMN. Sign-in uses Firebase."
 
-### Open questions for the organiser or Dr Azliza
+### Answers to earlier open questions (resolved 30 Oct 2026 with Dr. Azliza)
 
-1. Do teams get a Huawei Cloud account or credits? No free tier was confirmed in our research.
-2. Is a third-party AI API (Gemini) allowed alongside Huawei services?
-3. Which round's rubric applies on 3 Nov? 15 + 5 minutes matches the Regional Competition row (Innovation 40, Application Value 35, Completeness 15, Presentation 10).
+1. **Do teams get a Huawei Cloud account or credits?** Yes, official access is provided when advancing to the Finals (Dr. Azliza, 30 Oct). For the Semi-Final, explain the Huawei Cloud services in the slides/pitch and know how to answer technical questions on each.
+2. **Prototype QR link for Semi-Final:** Confirmed with Dr. Azliza that sharing `https://floodway.pages.dev/` (or `https://floodway-huawei.pages.dev/`) on the slide QR code is approved.
+3. **Which round's rubric applies on 3 Nov?** 15 + 5 minutes matches the Regional Competition row (Innovation 40, Application Value 35, Completeness 15, Presentation 10).
 
-### Timeline
+### Timeline (updated 30 Oct)
 
 | Date | Done by end of day |
 |---|---|
-| Mon 26 Oct | Plan agreed; Huawei account and credits question sent |
-| Tue 27 Oct | Tisya's pack merged; fusion rule + tests; ECS up with the backend over HTTPS |
-| **Wed 28 Oct 3 PM** | **Slides emailed.** Architecture slide shows ECS + OBS + SMN, the four-factor slide, Tisya's result slide with its source line; anything not yet running is labelled "planned" |
-| Thu 29 - Fri 30 Oct | Fusion hero + motion, storm scenario, node on WiFi or the bridge |
-| Sat 31 Oct - Sun 1 Nov | OBS + SMN; README reproduction steps, deployment guide, LICENSE; screenshots |
-| Mon 2 Nov | Full rehearsal on the Huawei URL with the real node; offline fallback tested |
+| Mon 26 – Thu 29 Oct | Tisya's Stage 5 pack merged; fusion rule + UI + storm scenario built; Nadi's bench node live link merged; `deploy/ecs/` kit committed & pushed to GitHub; Demo Video v2 rendered |
+| **Fri 30 Oct** | **Advisor check-in completed (Dr. Azliza):** Semi-Final highlights Huawei Cloud services (`ModelArts`, `OBS`, `ECS`, `SMN`, `CodeArts`) and uses `floodway.pages.dev` QR link; live Huawei Cloud deployment runs in Finals once access is granted |
+| Sat 31 Oct – Mon 2 Nov | Full rehearsal of 10 min talk + 2 min live stage demo (`docs/team/DEMO_PLAN_2MIN.local.md`) + Huawei Cloud Q&A defense (`JUDGES_QNA.md`) |
+| **Tue 3 Nov (7:45 AM)** | **Semi-Final at Huawei Malaysia, TRX** |
+| **Wed 18 Nov** | **National Finals at PICC Putrajaya** (deploy `deploy/ecs/` on official Huawei Cloud account) |

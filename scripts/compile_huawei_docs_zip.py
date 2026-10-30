@@ -149,9 +149,17 @@ def main():
         "docs/team/DEMO_PLAN_2MIN.local.md",
         f"{cat3}/DEMO_PLAN_2MIN.md",
     )
+    copy_local_file(
+        "video/v2/PLAN.md",
+        f"{cat3}/DEMO_VIDEO_V2_PLAN.md",
+    )
 
     # 4. Technical Architecture & Huawei Cloud Specifications
     cat4 = "04_Architecture_and_Huawei_Cloud_Specs"
+    copy_local_file(
+        "README.md",
+        f"{cat4}/README_PROJECT_OVERVIEW.md",
+    )
     copy_local_file(
         "docs/product/preliminary-round/architecture/SYSTEM_SPECIFICATION.md",
         f"{cat4}/SYSTEM_SPECIFICATION.md",
